@@ -1,0 +1,174 @@
+<?php
+$title = "Formula Fields";
+$form_name = $form_details['form_name'];
+$this->headTitle($title);
+?>
+<div class="pagebar container-fluid col-md-12">
+    <!-- Sidebar Toggle -->
+    <button type="button" class="pagebar-toggle navbar-toggle pull-left">
+      <span class="pagebar-arrow"></span>
+    </button>
+    <ol class="breadcrumb">
+        <li><span>Settings</span></li>
+        <li><span>Form Settings</span></li>
+        <li class="active"><span><?php echo $this->escapeHtml($title); ?></span></li>
+    </ol>
+</div>
+<div class="card">
+    <div class="card-body">
+        <div class="card">
+            <div  class="card-header">
+                <h6 class="col-md-6"><?=$form_name;?></h6>
+            </div>
+            <div class="card-body">
+                <div class="table-responsive">
+                    <form id="commentForm" method="post" action="" name="myForm" class="form-horizontal">
+                        <table class="table table-striped">
+                            <thead>
+                                <tr>
+                                    <th>Field Name</th>
+                                    <th>Formula</th>
+                                    <th>Select Action</th>
+                                    <th>Action</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <?php
+                                if (!empty($formula_fields)) {
+                                    foreach ($formula_fields as $key => $value) {
+                                        $label = $value['label'];
+                                        $field_id = $value['field_id'];
+                                        $formula = isset($value['formula']) && strval($value['formula']) != "0" ?$value['formula']:"";
+                                        ?>
+                                        <tr>
+                                            <td>
+                                                <?=$label;?>
+                                                <input type="hidden" id="field_id_<?= $field_id; ?>" value="<?=$field_id;?>">
+                                            </td>
+                                            <td>
+                                                <textarea id="formula_<?=$field_id;?>" class="form-control"><?=$formula;?></textarea>
+                                            </td>
+                                            <td>
+                                                <button onclick="select_formula_popup('<?=$field_id;?>')" type="button" class="btn btn-primary mt-1" data-toggle="modal" data-target="#FormulaModel">Formula List</button>
+                                                <button onclick="select_field_popup('<?=$field_id;?>')" type="button" class="btn btn-primary mt-1" data-toggle="modal" data-target="#FieldModel">Field List</button>
+                                            </td>
+                                            <td>
+                                                <button onclick="addcomment('<?=$field_id;?>')" type="button" class="btn btn-primary mt-1">Save Formula</button>
+                                            </td>
+                                        </tr>
+                                    <?php }} else {
+                                    echo "<tr><td colspan='4'>No records found.</td></tr>";
+                                } ?>
+                            </tbody>
+                        </table>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="modal fade" id="addcommentasreason" data-backdrop="static" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Confirmation</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <input type="hidden" id="FieldIdForSave" name="FieldIdForSave"/>
+                <div class="form-group row">
+                    <label class="col-sm-4"></label>
+                    <div id="ffSaveErrorMessage" class="error col-sm-7"></div>
+                </div>
+                <div class="form-group row mt-2">
+                    <label class="col-sm-4 col-form-label">Reason for change<span class="error ml-1">*</span></label>
+                    <div class="col-sm-7">
+                        <textarea id="reason_for_change" class="form-control" placeholder="Reason for change." name="reason_for_change"></textarea>   
+                        <span id="reason_for_change_error" class="error"></span>
+                    </div>
+                </div>
+            </div>
+            <div id="saveFormulaProcessing" class="ml-3"></div>
+            <div class="modal-footer">
+                <button onclick="SaveFormula()" type="button" class="btn btn-primary">Save</button>
+                <button class="btn btn-default" type="button" data-dismiss="modal">Close</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="modal fade" id="FormulaModel" data-backdrop="static" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Insert Formula</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class='modal-body'>
+                <div id="modelContentAdd"></div>
+                <div id="Formula_Comment"></div>
+            </div>
+            <div class="modal-footer">
+                <button onclick="setFormula()" type="button" class="btn btn-primary">Save</button>
+                <button id="close_popup" type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="modal fade" id="FieldModel" data-backdrop="static" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Insert Field</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class='modal-body'>
+                <div id="modelContentAddField">
+                    <div class='form-group'>
+                        <select id="field_select_formula"  class="selectpicker form-control" onchange="checkFieldError(this.value)" data-live-search="true" data-placeholder="Choose a Field...">
+                            <option value="0">Select Field</option>
+                            <?php
+                            if (array_key_exists(0, $fields_array)) {
+                                foreach ($fields_array as $key => $value) {
+                                    $field_name = $value['Field'];
+                                    $label = $value['Field'];
+                                    ?>
+                                    <option value="<?="{{".$field_name."}}";?>"><?=$label;?></option>
+                                    <?php
+                                }
+                            }
+                            ?>
+                        </select>
+                    </div>
+                </div>
+                <div id="Field_Comment"></div>
+            </div>
+            <div class="modal-footer">
+                <button onclick="setField()" type="button" class="btn btn-primary">Save</button>
+                <button id="close_popup_field" type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+            </div>
+        </div>
+    </div>
+</div>
+<input type="hidden" id="input_hidden_formula_list" value="">
+<input type="hidden" id="input_hidden_field_formula_list" value="">
+
+<script>
+    var jsonFormulaData = '<?php echo addslashes(json_encode($formula_list));?>';
+    var jsonFieldsData = '<?php echo addslashes(json_encode($fields_array)); ?>';
+    
+    var trackerId = '<?=$trackerId;?>';
+    var formId = '<?=$formId;?>';
+</script>
+<?php $this->inlineScript()
+        ->appendFile($this->basePath() . '/js/module/common/tracker/formula_fields.js');
+
+

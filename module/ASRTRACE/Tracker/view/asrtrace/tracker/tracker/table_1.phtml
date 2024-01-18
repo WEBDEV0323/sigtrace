@@ -1,0 +1,41 @@
+
+<div class="panel panel-default">
+    <div class="panel-body">
+        <div class="btn-group" role="group" aria-label="...">
+            <a href="<?php echo $this->url('tracker', array('action' => 'view', 'tracker_id' => $tracker_id)) ?>">
+                <button type="button" class="btn btn-default"><span class="glyphicon glyphicon-home" aria-hidden="true"></span><br/>Home</button>
+            </a>
+        </div>
+        <div class="btn-group" role="group" aria-label="...">
+            <a href="<?php echo $this->url('tracker', array('action' => 'user', 'tracker_id' => $tracker_id)) ?>">
+                <button type="button" class="btn btn-default"><span class="glyphicon glyphicon-user" aria-hidden="true"></span><br/>User</button>
+            </a>
+        </div>
+        <?php
+        foreach ($tables as $key => $value) {
+            $table_name = $value['table_name'];
+            $table_id = $value['table_id'];
+            ?>
+
+            <div class="btn-group" role="group" aria-label="...">
+                <a href="<?php echo $this->url('tracker', array('action' => 'table', 'tracker_id' => $tracker_id, 'action_id' => $table_id)) ?>">
+                    <button type="button" class="btn btn-<?php
+        if ($action_id == $table_id) {
+            echo 'info';
+        } else {
+            echo 'default';
+        }
+            ?>"><span class="glyphicon glyphicon-list-alt" aria-hidden="true"></span><br/><?= $table_name; ?></button>
+                </a>
+            </div>
+            <?
+        }
+        ?>
+        <div class="btn-group" style="float:right" role="group" aria-label="...">
+            <a href="<?php echo $this->url('tracker', array('action' => 'newtable', 'tracker_id' => $tracker_id)) ?>">
+                <button type="button" class="btn btn-default"><span class="glyphicon glyphicon-plus-sign" aria-hidden="true"></span><br/>New Table</button>
+            </a>
+        </div>
+
+    </div>
+</div>

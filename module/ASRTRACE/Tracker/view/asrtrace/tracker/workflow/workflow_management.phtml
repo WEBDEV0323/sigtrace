@@ -1,0 +1,279 @@
+<?php
+use Session\Container\SessionContainer;
+$session = new SessionContainer();
+
+$session->clearSession('wfs');
+$session->clearSession('formula_fields'); 
+
+$tracker_details = $trackerResults['tracker_details'];
+$forms = $trackerResults['forms'];
+$form_name = $form_details['form_name'];
+$record = $form_details['record_name'];
+$tracker_name = $tracker_details['name'];
+$title = "$tracker_name - $form_name";
+$this->headTitle($title);
+
+?>
+<div class="pagebar container-fluid col-md-12">
+    <!-- Sidebar Toggle -->
+    <button type="button" class="pagebar-toggle navbar-toggle pull-left">
+      <span class="pagebar-arrow"></span>
+    </button>
+    <ol class="breadcrumb">
+      <li class="active"><span>Workflow Management</span></li>
+    </ol>
+</div>
+<div class="card">
+    <div class="card-body">
+        <div class="card">
+            <div class="card-header">
+                <h6 class="col-md-6 float-left">Workflow Management</h6>
+                <span class="col-md-6">
+                    <button type="button" class="btn btn-primary float-right" onclick="window.location.href='/workflow/add/<?=$trackerId;?>/<?=$formId;?>'">Add New Workflow</button>
+                </span>   
+             </div>
+            <div class="card-body">
+                <?php
+                $flashMessage = $this->flashMessenger()->getMessages();
+                if (count($flashMessage)) {
+                    if (isset($flashMessage[0]['success'])) {
+                        echo '<div class="contents boxpadding"><div class="alert alert-dismissable alert-success" id="fashMessage">'.$flashMessage[0]['success'].'<button type="button" class="close" data-dismiss="alert" aria-hidden="true">×</button></div></div>';
+                    } else if (isset($flashMessage[0]['error'])) {
+                        echo '<div class="contents boxpadding"><div class="alert alert-dismissable alert-danger" id="fashMessage">'.$flashMessage[0]['error'].'<button type="button" class="close" data-dismiss="alert" aria-hidden="true">×</button></div></div>';
+                    }
+                }
+                ?>
+                <?php
+                if (array_key_exists(0, $workflow_array)) {
+                ?>
+                    <span id="status_wf_sort"></span>
+                    <div class="table-responsive">
+                      <table class="table table-striped">
+                            <tr>
+                                <th>Action</th>
+                                <th>Workflow Name</th>
+                                <th>Sort Order</th>
+                                <th>Fields</th>
+                            </tr>
+                            <tbody id="tabledivbody_workflow">
+                                <?php
+                                foreach ($workflow_array as $wf_key => $wf_values) {
+                                    $workflow_id = $wf_values['workflow_id'];
+                                    $workflow_name = $wf_values['workflow_name'];
+                                    $status = $wf_values['status'];
+                                    $sort_order = $wf_values['sort_order'];
+                                    ?>
+                                    <tr  class="sectionsid">
+                                        <td>
+                                            <!--<a href="#" data-toggle="modal"  id="wf_edit_<?//=trim($workflow_id);?>" class="audModelAdd1" data-target="#editwfnameModel">-->
+                                                <button type="button" data-toggle="modal" onclick="edit_wf_name('<?=trim($workflow_id);?>','<?=trim($workflow_name);?>')" class="btn btn-default" data-target="#editwfnameModel">
+                                                    <span class="lnr icon-pencil" aria-hidden="true"></span>
+                                                </button>
+                                            <!--</a>-->
+                                            <button type="button" onclick="deleteWorkflow('<?=trim($workflow_id);?>')" class="btn btn-default" aria-label="Left Align">
+                                                <span class="lnr icon-trash2" aria-hidden="true"></span>
+                                            </button>
+                                        </td>
+                                        <td>
+                                            <?php echo $this->escapeHtml($workflow_name); ?>
+                                        </td>
+                                        <td>
+                                            <span class="sort_order_workflow">#<?= $sort_order; ?></span>
+                                            <input class="sort_rder_value_wf" value="<?= $sort_order; ?>" type="hidden"/>
+                                            <input class="wf_id_for_sort" value="<?= $workflow_id; ?>" type="hidden"/>
+                                            <input class="workflow_names_cls" value="<?= $workflow_name; ?>" type="hidden"/>
+                                        </td>
+                                        
+                                        <td>
+                                            <a href="#" data-toggle="modal" id="<?= $workflow_id; ?>" class="audModelAdd" data-target="#addAuditModel">
+                                                <button type="button" class="btn btn-default"><span class="lnr icon-plus" aria-hidden="true"></span></button>
+                                            </a>
+                                            <a href="#" data-toggle="modal" id="<?= $workflow_id; ?>" class="editModelField" data-target="#editFieldModel">
+                                                <button type="button" class="btn btn-default"><span class="lnr icon-pencil" aria-hidden="true"></span></button>
+                                            </a>
+                                        </td>
+                                    </tr>
+                                    <?php
+                                }
+                                ?>
+                            </tbody>
+                        </table>  
+                    </div>
+                <?php
+                } else {
+                    echo "No records found.";
+                }
+                ?>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Sorting Workflow popup -->
+<div class="modal fade" id="addcommentasreason" data-backdrop="static" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content" id="modelContentAdd">
+            <div class="modal-header">
+                <h5 class="modal-title" id="exampleModalLongTitle">Reorder Confirmation</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close" onclick="cancelSort()">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>   
+            <div class="modal-body">
+                <div class="form-group row">
+                    <label class="col-sm-4"></label>
+                    <div id="workflowSortingErrorMessage" class="error col-sm-6"></div>
+                </div>
+                <div class="form-group row">
+                    <label class="col-sm-4 col-form-label">Reason for change<span class="error ml-1">*</span></label>
+                    <div class="col-sm-7">
+                        <textarea id="addcommentforsort" class="form-control" placeholder="Reason for change." name="addcomment"></textarea>   
+                        <span id="commenterrorforsort" class="error"></span>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button onclick="sendOrderToServer_workflow()" type="button" class="btn btn-primary">Save</button>
+                <button onclick="cancelSort()" class="btn btn-default" type="button" data-dismiss="modal">Close</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Edit workflow popup -->
+<div class="modal fade" id="editwfnameModel" data-backdrop="static" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content" id="modelContentAdd">
+            <div class="modal-header">
+                <h5 class="modal-title" id="exampleModalLongTitle">Edit Workflow</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <form data-toggle="validator" id="commentForm_wf_edit" method="get" action="" name="myForm" class="form-horizontal">
+                    <div class="form-group row">
+                        <label class="col-sm-4"></label>
+                        <div id="workflowErrorMessages" class="error col-sm-6"></div>
+                    </div>
+                    <div class="form-group row">
+                        <label class="col-sm-4 col-form-label">Workflow Name<span class="error ml-1">*</span></label>
+                        <div class="col-sm-7">
+                            <input type="text" class="form-control"  placeholder="Workflow Name" id="workflow_name_edit" name="workflow_name_edit" required value="">
+                            <div id="errorForWorkflowName" class="error"></div>
+                        </div>
+                    </div>
+                    <div class="form-group row">
+                        <label class="col-sm-4 col-form-label">Reason for change<span class="error ml-1">*</span></label>
+                        <div class="col-sm-7">
+                           <textarea id="addcommentforworkflow" class="form-control" placeholder="Reason for change" name="addcomment"></textarea>
+                           <div id="errorForReason" class="error"></div>
+                        </div>
+                    </div>
+                    <input type="text" id="workflow_id_edit" value="" style="display:none"/>
+                    <span id="statusEdit_wf_name"></span> 
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button onclick="editSaveWorkflow()" type="button" class="btn btn-primary">Save</button>
+                <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Delete Workflow Popup -->
+<div class="modal fade" id="deletecommentasreason" data-backdrop="static" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content" id="modelContentdelete">
+            
+            <div class="modal-header">
+                <h5 class="modal-title" id="exampleModalLongTitle">Delete Confirmation</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+               
+            <div class="modal-body">
+                <div class="form-group row">
+                    <label class="col-sm-4"></label>
+                    <div id="workflowDeleteErrorMessages" class="error col-sm-6"></div>
+                </div>
+                <div class="form-group row">
+                    <label class="col-sm-4 col-form-label">Reason for change<span class="error ml-1">*</span></label>
+                    <div class="col-sm-7">
+                        <textarea id="addcommentfordelete" class="form-control" placeholder="Reason for change." name="addcomment"></textarea>   
+                        <span id="commenterrorfordelete" class="error"></span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="modal-footer">
+                <button id="reasonfordelete"  type="button" class="btn btn-primary">Delete</button>
+                <button class="btn btn-default" type="button" data-dismiss="modal">Close</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+<!-- Bulk add fields popup -->
+<div class="modal fade"  id="addAuditModel" data-backdrop="static" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="exampleModalLongTitle">Add Fields</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <form data-toggle="validator" id="commentForm" method="get" action="" name="myForm" class="form-horizontal">
+                    <div class="table-responsive">
+                        <table class="table table-striped">
+                            <tbody id="tabledivbody"></tbody>
+                        </table>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Bulk edit fields popup -->
+<div class="modal fade" id="editFieldModel" data-backdrop="static" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="exampleModalLongTitle">Edit Fields</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            
+            <div class="modal-body">
+                <form data-toggle="validator" id="commentFormedit" method="get" action="" name="myForm" class="form-horizontal">
+                    <table class="table table-striped">
+                        <tbody id="tabledivbodyedit"></tbody>
+                    </table>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+
+<input type="hidden" id="inputMaxFieldHidden" value="">
+<input type="hidden" id="input_hidden_codelist" value="">
+<input type="hidden" id="input_hidden_roles" value="">
+<script src=""></script>
+<script> 
+    var codelistJsonData = '<?=json_encode($code_lists); ?>';
+    var rolesJsonData = '<?=json_encode($roles); ?>';
+    var trackerId = '<?=$trackerId;?>';
+    var formId = '<?=$formId;?>';
+</script>
+<?php $this->inlineScript()
+        ->appendFile($this->basePath() . '/assets/jQuery-3.3.1/jquery-ui.min.js')
+        ->appendFile($this->basePath() . '/js/module/tracker/workflow.js');

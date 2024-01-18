@@ -1,0 +1,79 @@
+<?php
+use Zend\Session\Container;
+$tracker_details = $trackerResults['tracker_details'];
+$forms = $trackerResults['forms'];
+$tracker_name = $tracker_details['name'];
+$title = "$tracker_name - New Form";
+$this->headTitle($title);
+$container = new Container('msg');
+?>
+<div class="pagebar container-fluid col-md-12">
+    <!-- Sidebar Toggle -->
+    <button type="button" class="pagebar-toggle navbar-toggle pull-left">
+      <span class="pagebar-arrow"></span>
+    </button>
+    <ol class="breadcrumb">
+      <li class="active"><span><?php echo $this->escapeHtml($title); ?></span></li>
+    </ol>
+</div>
+
+<div class="card">
+    <div class="card-body">
+            <div class="card">
+                <div class="card-header"><h6>New Form</h6></div>
+                <div class="card-body">
+                    <form id="commentForm" method="post" action="" name="myForm">
+                        <div class="form-group row">
+                                <label class="col-sm-3"></label>
+                                <div id="FormErrorMessage" class="error col-sm-8"></div>
+                            </div>
+                        <div class="form-group row">
+                            <label class="col-sm-3 col-form-label">Form Name<span class="error ml-1">*</span></label>
+                            <div class="col-sm-8">
+                                <input type="text" class="form-control"  placeholder="Form Name" id="form_name" name="form_name" required>
+                                <span id="addReasonForFormNameError" class="error"></span>
+                            </div>
+                        </div>
+                        <div class="form-group row">
+                            <label class="col-sm-3 col-form-label">A single record is called a <span class="error ml-1">*</span></label>
+                            <div class="col-sm-8">
+                                <input type="text" class="form-control"  placeholder="A single record is called a" id="record" name="record" required>
+                                <span id="addReasonForRecordNameError" class="error"></span>
+                            </div>
+                        </div>
+                        <div class="form-group row">
+                            <label class="col-sm-3 col-form-label">Description</label>
+                            <div class="col-sm-8">
+                                <textarea class="form-control"  placeholder="Description(Optional)" id="description" name="description"></textarea>
+                            </div>
+                        </div>
+                        <span id="status"></span>
+                        <div class="form-group row">
+                            <label class="col-sm-3 col-form-label">Reason for change<span class="error ml-1">*</span></label>
+                            <div class="col-sm-8">
+                                <textarea id="addReasonForAdd" class="form-control" placeholder="Reason for change." name="add_reason" required></textarea>   
+                                <span id="addReasonForAddError" class="error"></span>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+                <div class="card-footer">
+                    <div class="form-group row">
+                        <div class="offset-sm-3">
+                            <button onclick="addNewForm()" type="button" class="btn btn-primary ml-3">Save</button>
+                            <!-- <button type="button" class="btn btn-default" onclick="window.location.href='<?=filter_input(INPUT_SERVER, 'HTTP_REFERER')?>'">Close</button> -->
+                            <!-- <button type="button" class="btn btn-default" onclick="cancelButton('<?=filter_input(INPUT_SERVER, 'HTTP_REFERER')?>')">Close</button> -->
+                            <button type="button" class="btn btn-default" id = 'cancelButton' data-link="<?=filter_input(INPUT_SERVER, 'HTTP_REFERER')?>" >Close</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+    </div>
+</div>
+
+<script>
+        var trackerId = '<?=$trackerId;?>';
+</script>
+<?php
+$this->inlineScript()
+        ->appendFile($this->basePath() . '/js/module/tracker/form.js');

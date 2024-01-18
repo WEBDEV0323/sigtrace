@@ -1,0 +1,100 @@
+<div class="crumbs">
+    <ul class="breadcrumb" id="breadcrumbs">
+        <li>
+            <i class="icon-home"></i>
+            <a title="" href="/product/<?=$trackerId;?>/<?=$formId;?>">Product</a>
+        </li>
+        <li class="current">
+            <a title="" href="javascript:void(0)">Synonyms</a>
+        </li>
+    </ul>
+</div>
+<div class="page-header"></div>
+<div class="row">
+    <div class="col-md-12">
+        <p class="alert fade in" id="alert" style="display:none;"></p>
+        <div class="widget box">
+            <div class="widget-header">
+                    <h4><i class="icon-reorder"></i>Synonyms</h4>
+                    <div class="toolbar no-padding">
+                            <div class="btn-group">
+                                <span class="btn btn-xs" onclick="window.location.href='/product/synonym/add/<?=$trackerId;?>/<?=$formId;?>/<?=$productId;?>'">
+                                    <i class="icon-plus"></i>
+                                    Add Synonym</a></span>
+                            </div>
+                    </div>
+            </div>
+            <div class="widget-content no-padding">
+                <table class="table table-highlight-head table-striped table-hover table-checkable table-bordered table-responsive datatable" style="display:table">
+                    <thead>
+                        <tr>
+                            <th>Action</th>
+                            <th>Synonym Name</th>
+                            <th>Created Date</th>    
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <?php foreach($synonyms as $synonym){?>
+                        <tr>
+                            <td>
+                                <ul class="table-controls">
+                                        <li><a href="javascript:void(0);" onclick="window.location.href='/product/synonym/edit/<?=$trackerId;?>/<?=$formId;?>/<?=$productId;?>/<?=$synonym['syn_id']?>'" class="bs-tooltip" title="Edit"><i class="icon-pencil"></i></a> </li>
+                                        <li><a href="javascript:void(0);" onclick="deleteSyn(<?=$synonym['syn_id']?>)" class="bs-tooltip" title="Delete"><i class="icon-trash"></i></a> </li>
+                                        <li><a href="javascript:void(0);" onclick="window.location.href='/product/synonym/history/<?=$trackerId;?>/<?=$formId;?>/<?=$productId;?>/<?=$synonym['syn_id']?>'" class="bs-tooltip" title="History"><i class="icon-eye-open"></i></a> </li>
+                                </ul>
+                            </td>
+                            <td><?=$synonym['syn_name']?></td>
+                            <td><?=$synonym['syn_created_date']?></td>
+                        </tr>
+                    <?php } ?>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+<script>
+<?php
+$msg = new \Zend\Session\Container('syn_msg');
+if($msg->msg == 'ADD'){ ?>
+   $('#alert').show().addClass('alert-success').html('<i class="icon-remove close" data-dismiss="alert"></i>Synonym added Successfully!!!'); 
+<?php 
+} else if($msg->msg == 'EDIT'){ ?>
+     $('#alert').show().addClass('alert-success').html('<i class="icon-remove close" data-dismiss="alert"></i>Synonym edited Successfully!!!'); 
+<?php 
+} else if($msg->msg == 'DELETE'){ ?>
+     $('#alert').show().addClass('alert-success').html('<i class="icon-remove close" data-dismiss="alert"></i>Synonym deleted Successfully!!!'); 
+<?php 
+}else{
+?>
+    $('#alert').hide().removeClass('alert-success').html('');
+<?php    
+} 
+$msg->getManager()->getStorage()->clear('syn_msg');
+?> 
+window.setInterval(function(){
+  $('#alert').removeClass('alert-success').hide().html('');
+}, 3000);
+$(document).ready(function() {
+    $('.datatable').dataTable( {
+        bDestroy: true,
+        aaSorting: [[2, 'desc']],
+    });
+});
+function deleteSyn(id){
+        var r = confirm("Do you want to remove this product?");
+        if (r == true) {
+            $.ajax({  
+                type: "POST", 
+                url: "/product/synonym/delete", 
+                data: "id="+id+'&trackerId='+<?=$trackerId;?>+'&formId='+<?=$formId;?>+'&productId='+<?=$productId;?>, 
+                success: function(respJson){
+                    var resp =JSON.parse(respJson);
+                    if(resp.responseCode == 1){
+                       location.reload(false); 
+                    }
+                }
+            });
+        }    
+}
+</script>

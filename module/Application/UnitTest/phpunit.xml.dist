@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<phpunit bootstrap="Bootstrap.php">
+    <testsuites>
+        <testsuite name="zf2tutorial">
+            <directory>./ApplicationTest</directory>
+        </testsuite>
+    </testsuites>
+    <php>
+        <server name="SERVER_NAME" value="http://localhost"/>
+    </php>
+</phpunit>

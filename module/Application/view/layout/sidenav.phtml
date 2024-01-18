@@ -1,0 +1,121 @@
+<?php 
+use Session\Container\SessionContainer;
+$session = new SessionContainer();
+$userContainer = $session->getSession('user');
+
+$var = $this->layout()->getVariables();
+$app = $this->AppHelper($var);
+$forms = isset($app[0]['forms'])?$app[0]['forms']:array();
+$reports = isset($app[1])?$app[1]:array();
+$calendar= isset($app[2])?$app[2]:array();
+$trackers= isset($app[3])?$app[3]:array();
+$sidemenu = isset($app['menu'][1])?$app['menu'][1]:array();
+$permittedResources = isset($app['menu'][2])?$app['menu'][2]:array();
+$userRoleType = $userContainer->offsetGet('roleNameType');
+$validationWorkFlows = $app[7];
+$url = filter_input(INPUT_SERVER, 'REQUEST_URI');
+?>
+<!-- Sidebar Start-->
+<aside class="left-panel" tabindex="5000" style="overflow: hidden; outline: none;" id="sidebar">
+  <!-- Sidebar Toggle -->
+  <button type="button" class="sidebar-toggle navbar-toggle pull-left">
+    <span class="sidebar-arrow"></span>
+  </button>
+  <!-- Profile-card -->
+  <div class="profile-card">
+    <div class="profile-title"></div>
+  </div>
+  <!-- Navbar Start -->
+  <nav class="navigation">
+    <div class="clearfix"></div>
+    <?php  if(!empty($sidemenu)){ ?>
+        <ul class="list-unstyled components">
+            <?php foreach($sidemenu as $menu){ 
+                    switch($menu['dependent_on']){
+                        case '':
+                            $abc = array();
+                            break;
+                        default:
+                            $abc = explode(',',$menu['dependent_on']);
+                            break;
+                    }
+                    if (empty($abc) || (count($abc) == 1 && isset(${$abc[0]})) || (count($abc)== 2 && isset(${$abc[0]}) && isset(${$abc[1]}))) {
+                        if ((in_array($menu['action_id'],$permittedResources) || $menu['controller_id'] == 0 || intval($userRoleType) == 1)) {
+                            if (isset($menu['blocks']) && !empty($menu['blocks'])) { ?>
+                                <li <?php if ($menu['have_blocks'] == 1) { ?> class="has-submenu" <?php } ?>>
+                                    <a <?php if($menu['action_url'] == ''){  ?> href="javascript:void(0);" <?php } else { ?>
+                                        href="<?php echo $menu['action_url'];?><?php if($menu['dependent_on'] != ''){ $dep = explode(',',$menu['dependent_on']); for($i=0;sizeof($dep)>$i; $i++){ ?>/<?=${$dep[$i]};?><?php }}?>" 
+                                        <?php } ?>>
+                                        <?php if (isset($menu['icon_class']) && $menu['icon_class'] != "") { ?>
+                                        <i class="lnr <?=$menu['icon_class'];?>"></i>
+                                        <?php } ?>
+                                        <span class="nav-label"><?=$menu['action_label'];?></span>
+                                        <span class="menu-arrow"></span>
+                                    </a>
+                                    <ul class="collapse list-unstyled">
+                                        <?php foreach($menu['blocks'] as $block) { ?>
+                                            <?php if ((in_array($block['action_id'],$permittedResources)|| intval($userRoleType) == 1)) { ?>
+                                                <li <?php if ($block['have_blocks'] == 1) { ?>class="has-submenu" <?php } ?>>
+                                                    <a <?php if($block['action_url'] == '') {  ?> 
+                                                            href="javascript:void(0);" 
+                                                        <?php } else{ ?>
+                                                            href="<?=$block['action_url'];?><?php if($block['dependent_on'] != ''){ $dep = explode(',',$block['dependent_on']); for($i=0;sizeof($dep)>$i; $i++){ ?>/<?=${$dep[$i]};?><?php }}?>" 
+                                                        <?php } ?>>
+                                                        <?php if ($block['have_blocks'] == 1) { ?><span class="nav-label"><?php } ?>
+                                                        <?=$block['action_label']?>
+                                                        <?php if ($block['have_blocks'] == 1) { ?></span><?php } ?>
+                                                        <?php if ($block['have_blocks'] == 1) { ?><span class="menu-arrow"></span><?php } ?>
+                                                    </a>
+                                                </li>
+                                            <?php } ?>
+                                        <?php } ?>
+                                    </ul>
+                                </li>
+                    <?php   } else { ?>
+                                <?php if ($menu['controller_id'] > 0) { ?>
+                                    <li>
+                                        <a  <?php if($menu['action_url'] == ''){  ?> href="javascript:void(0);" <?php } else if($menu['hash_tag'] != '') { ?>
+                                             href="javascript:void(0);" onclick="window.location.href='<?php echo $menu['action_url'];?><?php if($menu['dependent_on'] != ''){ $dep = explode(',',$menu['dependent_on']); for($i=0;sizeof($dep)>$i; $i++){ ?>/<?=${$dep[$i]};?><?php }}?><?php echo '#'.$menu['hash_tag'];?>'; openTab()"
+                                        <?php }else{ ?>
+                                        href="<?php echo $menu['action_url'];?><?php if($menu['dependent_on'] != ''){ $dep = explode(',',$menu['dependent_on']); for($i=0;sizeof($dep)>$i; $i++){ ?>/<?=${$dep[$i]};?><?php }}?>"<?php } ?>>
+                                            <?php if (isset($menu['icon_class']) && $menu['icon_class'] != "") { ?>
+                                            <i class="lnr <?=$menu['icon_class'];?>"></i>
+                                            <?php } ?>
+                                            <span class="nav-label"><?= $menu['action_label'];?></span>
+                                        </a>
+                                    </li>
+                                    
+                                <?php } else if ($menu['action_name'] == 'forms') { ?>
+                                    <?php foreach ($forms as $key => $value) { if (count($value['workflows']) > 0) {?>
+                                        <li class="has-submenu">
+                                            <a href="javascript:void(0);">
+                                                <i class="lnr <?=$menu['icon_class'];?>"></i>
+                                                <span class="nav-label"><?=$value['form_name'];?></span>
+                                                <span class="menu-arrow"></span>
+                                            </a>
+                                            <ul class="collapse list-unstyled">
+                                               <?php  foreach($value['workflows'] as $workFlow){ ?>
+                                                    <li>
+                                                        <a  style="cursor: pointer;" onclick="window.location.href='/dashboard/<?=$tracker_id;?>#<?=lcfirst(preg_replace('/\s+/', '',ucwords(strtolower($workFlow['workflow_name']))));?>'; openTab();">
+                                                            <?=$workFlow['workflow_name'];?> 
+                                                        </a>
+                                                    </li>    
+                                                <?php } ?> 
+                                            </ul>
+                                        </li>
+                                    <?php }} ?>
+                                <?php } ?>
+                     <?php  } 
+                        } 
+                    } ?>
+            <?php } ?>
+            <!-- <li>
+                <a href="/calendar/view/<?=$tracker_id;?>/<?=$form_id;?>">
+                    <i class="lnr icon-calendar-full"></i>
+                    <span class="nav-label">Calendar</span>
+                </a>
+            </li> -->
+        </ul>
+    <?php } ?>
+</nav> 
+</aside>

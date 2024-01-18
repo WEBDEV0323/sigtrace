@@ -1,0 +1,16 @@
+
+0 */6 * * * /usr/bin/php /var/www/html/current/asrtrace/public/index.php move_to_s3 'backup_while_delete_workflow'
+0 */6 * * * /usr/bin/php /var/www/html/current/asrtrace/public/index.php move_to_s3 'backup_while_delete_field'
+
+*/1 * * * * /usr/bin/php /var/www/html/current/asrtrace/public/index.php cronjob
+
+30 6 * * * /usr/bin/php /var/www/html/current/asrtrace/public/index.php checkReminder
+30 6 * * * /usr/bin/php /var/www/html/current/asrtrace/public/index.php checkSubscription
+
+0 */6 * * * /usr/bin/php /var/www/html/current/asrtrace/public/index.php move_to_s3 'sigtrace-audit_log'
+0 */6 * * * /usr/bin/php /var/www/html/current/asrtrace/public/index.php move_to_s3 'error_log'
+0 */6 * * * /usr/bin/php /var/www/html/current/asrtrace/public/index.php move_to_s3 'error_db'
+0 */6 * * * /usr/bin/php /var/www/html/current/asrtrace/public/index.php move_to_s3 'apache2_error'
+0 */6 * * * /usr/bin/php /var/www/html/current/asrtrace/public/index.php move_to_s3 'apache2_access'
+0 */6 * * * /usr/bin/php /var/www/html/current/asrtrace/public/index.php move_to_s3 'apache2_other_vhosts_access'
+

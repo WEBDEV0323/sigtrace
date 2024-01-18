@@ -1,0 +1,125 @@
+<!-- Header -->
+<header class="navbar-expand-sm container-fluid">
+    
+    <!-- Main Menu -->
+    <button type="button" class="menu-toggle" data-toggle="collapse" data-target="#main-menu">
+      <span class="sr-only">Toggle navigation</span>
+      <span class="icon-bar"></span>
+      <span class="icon-bar"></span>
+      <span class="icon-bar"></span>
+    </button>
+
+    <!-- brand -->
+    <a href="/">
+    <div class="logo-expanded">
+      <i class="lnr icon-biobug"></i>
+      <span class="nav-label logo-bio">BIOCLINICA</span>
+      <span class="nav-label logo-product">SIGTRACE</span>
+    </div>
+    </a>
+    <!-- Header Navigation -->
+    <ul class="navbar-nav top-menu top-right-menu float-right">
+        <?php if (isset($tracker_id)) { ?>       
+            <?php  if (isset($container->tracker_user_groups)) { ?>
+                <li class="nav-item dropdown">
+                    <?php 
+                    $tracker_user_groups = $container->tracker_user_groups;
+                    $session_group = @$tracker_user_groups[$tracker_id]['session_group'];
+
+                    if ($role_id != 1) { 
+                    ?>
+                    <a data-toggle="dropdown" class="nav-link dropdown-toggle" href="#" aria-expanded="false">
+                        Role : <?php echo $this->translate($session_group) ?>
+                    </a>
+                     <?php } ?>
+                        <ul class="dropdown-menu extended nicescroll" tabindex="5002" 
+                            style="right:0; left:auto; overflow: hidden; outline: none; cursor: -webkit-grab;">
+                            <?php
+                            $tracker_rel_group = isset($tracker_user_groups[$tracker_id]['groups'])&& is_array($tracker_user_groups[$tracker_id]['groups'])?$tracker_user_groups[$tracker_id]['groups']:array();
+
+                            foreach ($tracker_rel_group as $key => $value) {
+                                    $group_name = $value['group_name'];
+                                    $group_id = $value['group_id'];
+                                    ?>
+                            <li>
+                                <a class="dropdown-item" href="javascript:void(0)" onclick="changeSessionRole('<?= $tracker_id; ?>','<?= $group_id; ?>','<?= $group_name; ?>')">
+                                    <?php echo $this->translate($group_name) ?>
+                                </a>
+                            </li>
+                           <?php } ?>
+                        </ul>
+                    </li>
+            <?php } ?>       
+        <?php } ?>
+                            
+        <?php if ($role_id == 1) { ?>
+            <li class="nav-item">
+                <a class="nav-link" href="#">Role : <?php echo $this->translate($user_details['group_name']) ?></a>
+            </li>
+        <?php } ?>
+        <li class="nav-item dropdown">
+            <a data-toggle="dropdown" role="button" id="dropdownMenuLink" class="nav-link dropdown-toggle" href="#" aria-haspopup="true" aria-expanded="false">
+              <i class="lnr icon-settings"></i>
+            </a>
+            <ul class="dropdown-menu extended nicescroll" tabindex="5002" style="overflow: hidden; outline: none; cursor: -webkit-grab;" aria-labelledby="dropdownMenuLink">
+              <li><a class="dropdown-item" href="#">Tracker Settings</a></li>
+              <li><a class="dropdown-item" href="#">Form Settings</a></li>
+            </ul>
+        </li>
+         <!--User Dropdown-->
+        <li class="nav-item dropdown">
+            <a data-toggle="dropdown" role="button" class="nav-link dropdown-toggle" href="#" aria-haspopup="true" aria-expanded="false" id="dropdownMenuLink">
+              <i class="lnr icon-user"></i>
+            </a>
+            <ul class="dropdown-menu extended nicescroll" tabindex="5002" style="overflow: hidden; outline: none; cursor: -webkit-grab;" aria-labelledby="dropdownMenuLink">
+              <li class="dropdown-header"><p><?php echo $this->translate($user_details['email']) ?></p></li>
+              <?php if ($user_type == 'Normal') { ?>
+              <li><a class="dropdown-item" href="/profile/changepassword">Change Password</a></li>
+              <?php } ?>
+              <li><a class="dropdown-item" href="<?php echo $this->url('logout') ?>">Log Out</a></li>
+            </ul>
+        </li>
+    </ul>
+    
+    <div class="collapse navbar-collapse" id="main-menu">
+       <!-- <ul class="nav navbar-nav">
+            <li class="nav-item"><a class="nav-link" href="">Sites</a></li>
+            <li class="nav-item"><a class="nav-link" href="">Studies</a></li>
+            <li class="nav-item"><a class="nav-link" href="">Supply</a></li>
+        </ul> -->
+    </div>
+    <!-- End Main Navigation -->
+    <!-- End Header Navigation -->
+    <div id="ascrail2000" class="nicescroll-rails" style="width: 7px; z-index: 3; cursor: default; position: absolute; top: 0px; left: 23px; height: 327px; display: none;">
+        <div style="position: relative; top: 0px; float: right; width: 5px; height: 0px; background-color: rgb(157, 158, 165); border: 1px solid rgb(255, 255, 255); background-clip: padding-box; border-radius: 0px;">
+        </div>
+    </div>
+    <div id="ascrail2000-hr" class="nicescroll-rails" style="height: 7px; z-index: 3; top: 320px; left: -250px; position: absolute; cursor: default; display: none;">
+        <div style="position: relative; top: 0px; height: 5px; width: 0px; background-color: rgb(157, 158, 165); border: 1px solid rgb(255, 255, 255); background-clip: padding-box; border-radius: 0px;"></div>
+    </div>
+    <div id="ascrail2001" class="nicescroll-rails" style="width: 7px; z-index: 3; cursor: default; position: absolute; top: 0px; left: 23px; height: 267px; display: none;">
+        <div style="position: relative; top: 0px; float: right; width: 5px; height: 0px; background-color: rgb(157, 158, 165); border: 1px solid rgb(255, 255, 255); background-clip: padding-box; border-radius: 0px;"></div>
+        </div>
+    <div id="ascrail2001-hr" class="nicescroll-rails" style="height: 7px; z-index: 3; top: 260px; left: -250px; position: absolute; cursor: default; display: none;"><div style="position: relative; top: 0px; height: 5px; width: 0px; background-color: rgb(157, 158, 165); border: 1px solid rgb(255, 255, 255); background-clip: padding-box; border-radius: 0px;"></div></div>
+    <div id="ascrail2002" class="nicescroll-rails" style="width: 7px; z-index: 3; cursor: -webkit-grab; position: absolute; top: 0px; left: 23px; height: 327px; display: none;"><div style="position: relative; top: 0px; float: right; width: 5px; height: 0px; background-color: rgb(157, 158, 165); border: 1px solid rgb(255, 255, 255); background-clip: padding-box; border-radius: 0px;"></div></div>
+    <div id="ascrail2002-hr" class="nicescroll-rails" style="height: 7px; z-index: 3; top: 320px; left: -250px; position: absolute; display: none;"><div style="position: relative; top: 0px; height: 5px; width: 0px; background-color: rgb(157, 158, 165); border: 1px solid rgb(255, 255, 255); background-clip: padding-box; border-radius: 0px;"></div></div>
+    <div id="ascrail2003" class="nicescroll-rails" style="width: 7px; z-index: 3; cursor: -webkit-grab; position: absolute; top: 0px; left: 23px; height: 267px; display: none;">
+        <div style="position: relative; top: 0px; float: right; width: 5px; height: 0px; background-color: rgb(157, 158, 165); border: 1px solid rgb(255, 255, 255); background-clip: padding-box; border-radius: 0px;"></div></div>
+    <div id="ascrail2003-hr" class="nicescroll-rails" style="height: 7px; z-index: 3; top: 260px; left: -250px; position: absolute; display: none;">
+        <div style="position: relative; top: 0px; height: 5px; width: 0px; background-color: rgb(157, 158, 165); border: 1px solid rgb(255, 255, 255); background-clip: padding-box; border-radius: 0px;"></div></div>
+    <div id="ascrail2004" class="nicescroll-rails" style="width: 7px; z-index: 3; cursor: default; position: absolute; top: 0px; left: 23px; height: 327px; display: none;">
+        <div style="position: relative; top: 0px; float: right; width: 5px; height: 0px; background-color: rgb(157, 158, 165); border: 1px solid rgb(255, 255, 255); background-clip: padding-box; border-radius: 0px;"></div></div>
+    <div id="ascrail2004-hr" class="nicescroll-rails" style="height: 7px; z-index: 3; top: 320px; left: -250px; position: absolute; cursor: default; display: none;">
+        <div style="position: relative; top: 0px; height: 5px; width: 0px; background-color: rgb(157, 158, 165); border: 1px solid rgb(255, 255, 255); background-clip: padding-box; border-radius: 0px;"></div></div>
+    <div id="ascrail2005" class="nicescroll-rails" style="width: 7px; z-index: 3; cursor: default; position: absolute; top: 0px; left: 23px; height: 267px; display: none;">
+        <div style="position: relative; top: 0px; float: right; width: 5px; height: 0px; background-color: rgb(157, 158, 165); border: 1px solid rgb(255, 255, 255); background-clip: padding-box; border-radius: 0px;"></div></div>
+    <div id="ascrail2005-hr" class="nicescroll-rails" style="height: 7px; z-index: 3; top: 260px; left: -250px; position: absolute; cursor: default; display: none;">
+        <div style="position: relative; top: 0px; height: 5px; width: 0px; background-color: rgb(157, 158, 165); border: 1px solid rgb(255, 255, 255); background-clip: padding-box; border-radius: 0px;"></div></div>
+    <div id="ascrail2006" class="nicescroll-rails" style="width: 7px; z-index: 3; cursor: default; position: absolute; top: 0px; left: 23px; height: 327px; display: none;">
+        <div style="position: relative; top: 0px; float: right; width: 5px; height: 0px; background-color: rgb(157, 158, 165); border: 1px solid rgb(255, 255, 255); background-clip: padding-box; border-radius: 0px;"></div></div>
+    <div id="ascrail2006-hr" class="nicescroll-rails" style="height: 7px; z-index: 3; top: 320px; left: -250px; position: absolute; cursor: default; display: none;"><div style="position: relative; top: 0px; height: 5px; width: 0px; background-color: rgb(157, 158, 165); border: 1px solid rgb(255, 255, 255); background-clip: padding-box; border-radius: 0px;"></div></div>
+    <div id="ascrail2007" class="nicescroll-rails" style="width: 7px; z-index: 3; cursor: default; position: absolute; top: 0px; left: 23px; height: 267px; display: none;"><div style="position: relative; top: 0px; float: right; width: 5px; height: 0px; background-color: rgb(157, 158, 165); border: 1px solid rgb(255, 255, 255); background-clip: padding-box; border-radius: 0px;"></div></div>
+    <div id="ascrail2007-hr" class="nicescroll-rails" style="height: 7px; z-index: 3; top: 260px; left: -250px; position: absolute; cursor: default; display: none;">
+        <div style="position: relative; top: 0px; height: 5px; width: 0px; background-color: rgb(157, 158, 165); border: 1px solid rgb(255, 255, 255); background-clip: padding-box; border-radius: 0px;"></div>
+    </div>
+</header>

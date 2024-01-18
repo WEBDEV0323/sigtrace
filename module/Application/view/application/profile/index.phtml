@@ -1,0 +1,146 @@
+<div class="container">
+    <div class="logo-expanded form-signin" style="font-size:30px;width: 400px;margin: 0 auto;">
+        <i class="lnr icon-biobug"></i>
+        <span class="nav-label logo-bio">BIOCLINICA</span>
+        <span class="nav-label logo-product">ASRTRACE</span>
+    </div>
+    <div class="clearfix"></div>
+    <form class="form-signin form-horizontal" method="POST" style="background:white;border: 1px solid #ccc;" role="form" action="<?php echo $key?>" id="changepasswrd">
+        <input type="hidden" id="key" value="<?php echo $key?>">
+        <div class="form-group">
+            <label for="upw" class="col-sm-3 control-label">Password</label>
+            <div class="col-sm-9">
+              <input type="password" name="upw" class="form-control" id="upw" placeholder="Password">
+            </div>
+        </div>
+        <div class="form-group">
+            <label for="cupw" class="col-sm-3 control-label">Confirm Password</label>
+            <div class="col-sm-9">
+                <input type="password" class="form-control" id="cupw" name="cupw" placeholder="Confirm Password">
+            </div>
+        </div>
+        <div class="form-group">
+            <label class="col-sm-3"></label>
+            <div class="col-sm-9">
+                <?php if($exist=='notexist') { ?>
+                <div id="status"><font color="#cc0000">Invalid link.</font></div>
+                <?php }else{ ?>
+                    <div id="status">&nbsp;</div>
+                <?php } ?>
+                <button class="btn btn-success" type="submit">Submit</button>
+                <button class="btn btn-default" type="reset">Clear</button>
+            </div>
+        </div>
+    </form>
+</div>
+
+
+<script type="text/javascript">
+    var keys='<?php echo $key?>';
+    $(document).ready(function()
+    {
+        $('.user').hide();
+        $('.sidebar').hide();
+        $('.topnav').hide();
+        $("#upw").val('');
+        //            $('.navbar').hide();
+        $("#changepasswrd").submit(function()
+        {
+            var password = $("#upw").val();
+            var confirmpassword = $("#cupw").val();
+          //  var ccReg = /^(?=.*\d)(?=.*[a-z])(?=.*[A-Z]).{8,}$/;
+            var ccReg=/^.*(?=.{8,})(?=.*[a-z])(?=.*[A-Z])(?=.*[\d])(?=.*[\W_]).*$/
+            $("#status").html('');
+            if(password.length ===0)
+            {
+                $("#status").html('<font color="#cc0000">Password Can not be blank</font>');
+                return false;
+            }
+            else if(confirmpassword.length===0)
+            {
+                $("#status").html('<font color="#cc0000"> Confirm Password can not be blank.</font>');
+                return false;
+            }
+            else if(confirmpassword!=password){
+            $("#status").html('<font color="#cc0000"> Password do not match.</font>');
+            return false;
+             }
+            else if(password.length < 8){
+                $("#status").html('<font color="#cc0000"> Password atleast 8 charater long</font>');
+                return false;
+            }
+
+            else if(!ccReg.test(password)) {
+                $("#status").html('<font color="#cc0000"> Password must be 8 characters including 1 uppercase letter, 1 special character, alphanumeric characters.</font>');
+                return false;
+            }
+            else
+            {
+               // $("#changepasswrd").submit();
+                var data = {
+                    password : password,
+                    confirmpassword : confirmpassword,
+                    key:keys
+                }
+                var url = "<?php echo $this->url('profile'); ?>";
+                $.post(url, data,function(respJson){
+                    if(respJson == 'changed'){
+                        window.location.assign('/');
+                    }
+                    else if(respJson == 'notchanged'){
+                        $("#status").html('<font color="#cc0000"> Password already changed</font>');
+                    }
+                });
+                return false;
+            }
+            return false;
+        });
+    });
+</script>
+
+
+<style>
+    a, a:hover {
+        color: #0080c4;
+    }
+    .form-group .control-label {
+        margin-top: 15px !important;
+    }
+    .col-xs-1, .col-sm-1, .col-md-1, .col-lg-1, .col-xs-2, .col-sm-2, .col-md-2, .col-lg-2, .col-xs-3, .col-sm-3, .col-md-3, .col-lg-3, .col-xs-4, .col-sm-4, .col-md-4, .col-lg-4, .col-xs-5, .col-sm-5, .col-md-5, .col-lg-5, .col-xs-6, .col-sm-6, .col-md-6, .col-lg-6, .col-xs-7, .col-sm-7, .col-md-7, .col-lg-7, .col-xs-8, .col-sm-8, .col-md-8, .col-lg-8, .col-xs-9, .col-sm-9, .col-md-9, .col-lg-9, .col-xs-10, .col-sm-10, .col-md-10, .col-lg-10, .col-xs-11, .col-sm-11, .col-md-11, .col-lg-11, .col-xs-12, .col-sm-12, .col-md-12, .col-lg-12 { margin-top: 15px; }
+    .form-signin {
+        margin: 0 auto;
+        max-width: 600px;
+        padding: 15px;
+    }
+    .btn-success {
+        background-color: #7AC143 !important;
+        border: 1px solid #7AC143 !important;
+    }
+    .logo-expanded {
+        font-size: 16px;
+        font-weight: bold;
+        /* text-transform: uppercase; */
+        display: block;
+        /*float: left;*/
+        margin: 14px 50px 0 -2px;
+    }
+    .logo-expanded i {
+        font-size: 26px;
+        vertical-align: middle;
+        margin-right: 5px;
+        color: #73B72F;
+    }
+    .logo-expanded .nav-label {
+        vertical-align: middle;
+    }
+
+    .logo-bio {
+        color: #4E5860;
+        border-right: 1px solid #ddd;
+        padding-right: 7px;
+    }
+    .logo-product {
+        color: #73B72F;
+        padding-left: 2px;
+    }
+</style>

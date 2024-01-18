@@ -1,0 +1,84 @@
+<?php
+$title = 'Edit Customer';
+$this->headTitle($title);
+$form->setAttribute('action', $this->url('customer', array('action' => 'add', 'customer_id' => $customerId)));
+$form->prepare();
+?>
+<div class="pagebar container-fluid col-md-12">
+    <!-- Sidebar Toggle -->
+    <button type="button" class="pagebar-toggle navbar-toggle pull-left">
+      <span class="pagebar-arrow"></span>
+    </button>
+    <ol class="breadcrumb">
+        <li><a href="/customer"><span>Customer</span></a></li>
+        <li class="active"><span><?php echo $this->escapeHtml($title); ?></span></li>
+    </ol>
+</div>
+<div class="card">
+    <div class="card-body">
+        <div class="card">
+            <div  class="card-header">
+                <h6 class="col-md-6 float-left"> <?php echo $this->escapeHtml($title); ?></h6>
+            </div>
+            <div class="card-body">
+                <?php echo $this->form()->openTag($form); ?>
+                <?php echo $this->formElement($form->get('c_hidden')); ?>
+                <?php echo $this->formElement($form->get('c_flag')); ?>
+                <div class="form-group row">
+                    <label class="col-sm-4"></label>
+                    <div id="customerErrorMessages" class="error col-sm-6"></div>
+                </div>
+                <div class="form-group row">
+                    <label class="col-sm-4 col-form-label"><?php echo $this->formlabel($form->get('c_name')); ?><span class="error ml-1">*</span></label>
+                    <div class="col-sm-7">
+                        <?php echo $this->formElement($form->get('c_name')); ?>
+                        <div id="errorForName" class="error"></div>
+                    </div>
+                </div>
+                <div class="form-group row">
+                    <label class="col-sm-4 col-form-label"><?php echo $this->formlabel($form->get('c_email')); ?><span class="error ml-1">*</span></label>
+                    <div class="col-sm-7">
+                        <?php echo $this->formElement($form->get('c_email')); ?>
+                        <div id="errorForEmail" class="error"></div>
+                    </div>
+                </div>
+                <div class="form-group row">
+                    <label class="col-sm-4 col-form-label"><?php echo $this->formlabel($form->get('c_proj_manager_name')); ?><span class="error ml-1">*</span></label>
+                    <div class="col-sm-7">
+                        <?php echo $this->formElement($form->get('c_proj_manager_name')); ?>
+                        <div id="errorForPM" class="error"></div>
+                    </div>
+                </div>
+                <div class="form-group row">
+                    <label class="col-sm-4 col-form-label"><?php echo $this->formlabel($form->get('c_description')); ?><span class="error ml-1">*</span></label>
+                    <div class="col-sm-7">
+                        <?php echo $this->formElement($form->get('c_description')); ?>
+                        <div id="errorForDesc" class="error"></div>
+                    </div>
+                </div>
+                <div class="form-group row">
+                    <label class="col-sm-4 col-form-label"><?php echo $this->formlabel($form->get('c_country')); ?><span class="error ml-1">*</span></label>
+                    <div class="col-sm-7">
+                        <?php echo $this->formElement($form->get('c_country')); ?>
+                        <div id="errorForCountry" class="error"></div>
+                    </div>
+                </div>
+                <div class="form-group row">
+                        <label class="col-sm-4 col-form-label">Reason for change<span class="error ml-1">*</span></label>
+                        <div class="col-sm-7">
+                           <textarea id="addreason" class="form-control" placeholder="Reason for change" name="addreason"></textarea>
+                           <div id="errorForReason" class="error"></div>
+                        </div>
+                </div>
+                <span id="status"></span>
+                <div class="modal-footer" style="padding-bottom:0px">
+                    <button onclick="validateCustomer(<?php echo $customerId; ?>)" type="button" class="btn btn-primary">Save</button>
+                    <button onclick="window.location.href='/customer'" type="button" class="btn btn-default">Cancel</button>
+                </div>
+                <?php echo $this->form()->closeTag($form); ?>
+            </div>
+        </div>
+    </div>
+</div>
+<?php
+echo $this->inlineScript()->appendFile($this->basePath() . '/js/module/common/customer/customer.js');

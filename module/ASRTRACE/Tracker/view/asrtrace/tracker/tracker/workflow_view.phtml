@@ -1,0 +1,866 @@
+<?php
+$tracker_details = $trackerRsults['tracker_details'];
+$forms = $trackerRsults['forms'];
+//$table_details = $trackerRsults['table_details'];
+$form_name = $form_details['form_name'];
+$record = $form_details['record_name'];
+$tracker_name = $tracker_details['name'];
+$title = "$tracker_name Tracker - $form_name";
+$this->headTitle($title);
+unset($_SESSION['wfs']);
+    $user_details = $_SESSION['user_details'];
+
+$role_id = $user_details['group_id'];
+$tracker_user_groups = @$_SESSION['tracker_user_groups'];
+$session_group = @$tracker_user_groups[$tracker_id]['session_group'];
+?>
+
+<div class="container-liquid">
+    <div class="row">
+        <div class="col-xs-12">
+            <div class="sec-box">
+                <!--                <a class="closethis">Close</a>-->
+                <header>
+                    <h2 class="heading"><?php echo $this->escapeHtml($title); ?></h2>
+                </header>
+                <div class="contents boxpadding">
+                    <div class="panel panel-default">
+                        <div class="panel-body">
+                            <div class="btn-group" role="group" aria-label="...">
+                                <a href="<?php echo $this->url('tracker', array('action' => 'view', 'tracker_id' => $tracker_id)) ?>">
+                                    <button type="button" class="btn btn-default"><span class="glyphicon glyphicon-home" aria-hidden="true"></span><br/>Home</button>
+                                </a>
+                            </div>
+                            <?
+                            if ($role_id == 1 || $session_group == "Administrator") {
+                                ?>
+
+                                <div class="btn-group" role="group" aria-label="...">
+                                    <a href="<?php echo $this->url('tracker', array('action' => 'settings', 'tracker_id' => $tracker_id)) ?>">
+                                        <button type="button" class="btn btn-default"><span class="glyphicon glyphicon-asterisk" aria-hidden="true"></span><br/>Settings</button>
+                                    </a>
+                                </div>
+                                <?
+                            }
+                            ?>
+
+                            <?php
+                            foreach ($forms as $key => $value) {
+                                $form_name = $value['form_name'];
+                                $form_id = $value['form_id'];
+                                ?>
+
+                                <div class="btn-group" role="group" aria-label="...">
+                                    <a href="<?php echo $this->url('tracker', array('action' => 'form', 'tracker_id' => $tracker_id, 'action_id' => $form_id)) ?>">
+                                        <button type="button" class="btn btn-<?php
+                            if ($action_id == $form_id) {
+                                echo 'info';
+                            } else {
+                                echo 'default';
+                            }
+                                ?>"><span class="glyphicon glyphicon-list-alt" aria-hidden="true"></span><br/><?= $form_name; ?></button>
+                                    </a>
+                                </div>
+                                <?
+                            }
+                            ?>
+                            <div class="btn-group" style="float:right" role="group" aria-label="...">
+                                <a href="<?php echo $this->url('tracker', array('action' => 'newform', 'tracker_id' => $tracker_id)) ?>">
+                                    <button type="button" class="btn btn-default"><span class="glyphicon glyphicon-plus-sign" aria-hidden="true"></span><br/>New Form</button>
+                                </a>
+                            </div>
+
+                        </div>
+                    </div>
+                    <div class="panel panel-default">
+                        <div class="panel-body">
+                            <div  class="clearfix">
+                                <?php $form_name = $form_details['form_name'];
+                                ; ?>
+                                <b>Workflow - <?= $form_name; ?></b>
+                                <div  class="pull-right">
+                                    <div class="btn-group" role="group" aria-label="...">
+                                        <a href="<?php echo $this->url('tracker', array('action' => 'addworkflow', 'tracker_id' => $tracker_id, 'action_id' => $form_id)) ?>" data-toggle="modal" >
+                                            <button type="button" class="btn btn-default "><span class="glyphicon glyphicon-arrow-right" aria-hidden="true"></span> Add New WorkFlow</button>
+                                        </a>
+                                    </div>
+                                    <div class="btn-group" role="group" aria-label="...">
+                                        <a href="<?php echo $this->url('tracker', array('action' => 'fields', 'tracker_id' => $tracker_id, 'action_id' => $action_id)) ?>">
+                                            <button type="button" class="btn btn-default "><span class="glyphicon glyphicon-asterisk" aria-hidden="true"></span> Fields</button>
+                                        </a>
+                                    </div>
+                                </div>    
+                            </div>    
+                            <hr/>
+                            <?php
+                            if (array_key_exists(0, $workflow_array)) {
+                                ?>
+                                <table class="table table-striped">
+                                    <tr>
+                                        <th>Sl No</th>
+                                        <th>WorkFlow Name</th>
+                                        <th>Status</th>
+                                        <th>Sort Order</th>
+                                        <th>Action</th>
+                                        <th>Fields</th>
+                                        <th></th>
+                                    </tr>
+                                    <tbody id="tabledivbody_workflow">
+
+
+                                        <?php
+                                        $ival = 0;
+                                        foreach ($workflow_array as $wf_key => $wf_values) {
+                                            $workflow_id = $wf_values['workflow_id'];
+                                            $workflow_name = $wf_values['workflow_name'];
+                                            $status = $wf_values['status'];
+                                            $sort_order = $wf_values['sort_order'];
+                                            ?>
+                                            <tr  class="sectionsid">
+                                                <td><?php $ival++;
+                                    echo $this->escapeHtml($ival); ?>
+
+                                                </td>
+                                                <td><?php echo $this->escapeHtml($workflow_name); ?></td>
+                                                <td><?php echo $this->escapeHtml($status); ?></td>
+                                                <td><span class="sort_order_workflow">#<?= $sort_order; ?></span>
+                                                    <input class="sort_rder_value_wf" value="<?= $sort_order; ?>" type="hidden"/>
+                                                    <input class="wf_id_for_sort" value="<?= $workflow_id; ?>" type="hidden"/>
+                                                    <input class="workflow_names_cls" value="<?= $workflow_name; ?>" type="hidden"/>
+                                                </td>
+                                                <td>
+                                                    <button type="button" onclick="window.location.href='#/client/viewworkflow/<?php echo$workflow_id; ?>'" class="btn btn-default" aria-label="Left Align">
+                                                        <span class="glyphicon glyphicon-eye-open" aria-hidden="true"></span>
+                                                    </button>
+                                                    <button type="button" onclick="deleteWorkflow('<?php echo$workflow_id; ?>')" class="btn btn-default" aria-label="Left Align">
+                                                        <span class="glyphicon glyphicon-trash" aria-hidden="true"></span>
+                                                    </button>
+                                                </td>
+                                                <td>
+                                                    <a href="#" data-toggle="modal" id="<?= $workflow_id; ?>" class="audModelAdd" data-target="#addAuditModel">
+                                                        <button type="button" class="btn btn-default"><span class="glyphicon glyphicon-plus" aria-hidden="true"></span></button>
+                                                    </a>
+                                                    <a href="#" data-toggle="modal" id="<?= $workflow_id; ?>" class="editModelField" data-target="#editFieldModel">
+                                                        <button type="button" class="btn btn-default"><span class="glyphicon glyphicon-pencil" aria-hidden="true"></span></button>
+                                                    </a>
+                                                </td>
+                                                <td><span class="glyphicon glyphicon-arrow-down movecss"></span>
+                                                    <span class="glyphicon glyphicon-arrow-up movecss"></span>
+                                                </td>
+                                            </tr>
+                                            <?php
+                                        }
+                                        ?>
+                                    </tbody>
+                                </table>
+                                <span id="status_wf_sort"></span>
+                                <?
+                            } else {
+                                echo "WorkFlow does not exist.";
+                            }
+                            ?>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <!-- Row End -->
+</div>
+</div>
+<!-- Content Section End -->
+</div>
+<!-- Right Section End -->
+</div>
+</div>
+<div class="container-liquid">
+
+    <!-- Row End -->
+</div>
+
+<div class="modal fade" id="addAuditModel" data-backdrop="static" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+    <div class="modal-dialog"  style="margin-bottom:0px; width: 75%;" >
+        <div class="modal-content" id="modelContentAdd">
+
+            <div class="panel panel-primary" style="margin:0px">
+                <div class="panel-heading">New Fields<button aria-hidden="true" data-dismiss="modal" class="close" type="button">×</button></div>
+                <div style="padding: 0px 10px;">
+                    <form data-toggle="validator" id="commentForm" method="get" action="" name="myForm" class="form-horizontal">
+
+                        <table class="table table-striped">
+                            <tbody id="tabledivbody">
+
+                            </tbody>
+                        </table>
+                    </form>
+
+
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="modal fade" id="editFieldModel" data-backdrop="static" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+    <div class="modal-dialog"  style="margin-bottom:0px; width: 75%;" >
+        <div class="modal-content" id="modelContentAdd">
+
+            <div class="panel panel-primary" style="margin:0px">
+                <div class="panel-heading">Edit Fields<button aria-hidden="true" data-dismiss="modal" class="close" type="button">×</button></div>
+                <div style="padding: 0px 10px;">
+                    <form data-toggle="validator" id="commentFormedit" method="get" action="" name="myForm" class="form-horizontal">
+
+                        <table class="table table-striped">
+                            <tbody id="tabledivbodyedit">
+
+                            </tbody>
+                        </table>
+                    </form>
+
+
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<input type="hidden" id="inputMaxFieldHidden" value="">
+<input type="hidden" id="input_hidden_codelist" value="">
+<script src="//ajax.googleapis.com/ajax/libs/jqueryui/1.10.4/jquery-ui.min.js"></script>
+<script>
+    $(document).ready(function() {
+        
+        var jsonData = <?php echo json_encode($code_lists); ?> 
+        var jsonString = JSON.stringify(jsonData);
+        $('#input_hidden_codelist').val(jsonString);
+        
+        $("#tabledivbody").sortable({
+            items: "tr",
+            cursor: 'move',
+            opacity: 0.6,
+            update: function() {
+                sendOrderToServer();
+            }
+        });
+        $("#tabledivbody_workflow").sortable({
+            items: "tr",
+            cursor: 'move',
+            opacity: 0.6,
+            update: function() {
+                sendOrderToServer_workflow();
+            }
+        });
+        
+        $(".editModelField").click(function() 
+        { 
+            $('#commentForm').html("");
+            var workflow_id =this.id;
+            var str = random_string(6);
+            var selid = 'questionID'+str
+            var html = '';
+            var data = {
+                workflow_id : workflow_id
+            }
+            var url = "<?php echo $this->url('tracker', array('action' => 'getfieldsbyworkflowid')); ?>";
+            $.post(url, data,function(respJson){
+                var resp =JSON.parse(respJson);
+                var responseCode = resp.responseCode;
+                var results = resp.results;
+                if(responseCode == 1){
+                    html += '<table class="table table-striped">';
+                    html += '<tr>';
+                    html += '<th># Order</th>';
+                    html += '<th>Field name</th>';
+                    html += '<th>Type</th>';
+                    html += '<th>KPI</th>';
+                    html += '<th></th>';
+                    html += '</tr>';
+                    html += '<tbody id="tabledivbodyedit">';
+                    var countRes  = results.length;
+                    for(var i = 0; i<countRes; i++){
+                        var arr_res = results[i];
+                        var field_id = arr_res.field_id;
+                        var field_type = arr_res.field_type;
+                        var label = arr_res.label;
+                        var kpi = arr_res.kpi;
+                        var sort_order = arr_res.sort_order;
+                        selid += "_"+field_id;
+                        str += "_"+field_id;
+                        html += '<tr class="sectionsid">';
+                        html += '<td><span class="sort_order_td_edit">#'+sort_order+'</span>';
+                        html += '<input class="sort_rder_edit" value="'+sort_order+'" type="hidden"/><input class="id_values_edit" value="'+field_id+'" type="hidden"/>';
+                        html += '<td>';
+                        html += '<div class="form-group">';
+                        html += '<input type="text" class="form-control quesiionIDs_edit"  placeholder="Add Field" id="'+selid+'" name="questionID_'+selid+'" required value="'+label+'">'
+                        html += '<input type="text" class="form-control expected_edit" style="display:none" id="questionType_'+selid+'_expected">'
+                        html += '</div>';
+                        html += '<div id="id_'+selid+'">';
+                        html += '</div>';
+                        html += '</td>';
+                        html += '<td>';
+                        html += '<div class="form-group">';
+                        html += '<select onchange="checkMultiple(\'id_'+selid+'\', this.id, 0, \'questionType_'+selid+'\')" type="text" class="form-control quesiionSelect_edit" placeholder="Question type" id="questionType_'+str+'" name="questionStep_'+str+'" required disabled>';
+                        html += '<option value="Integer"';
+                        if(field_type == "Integer"){html+='selected'}
+                        html+='>Integer</option>';
+                        html += '<option value="Text"';
+                        if(field_type == "Text"){html+='selected'}
+                        html += '>Text</option>';
+                        html += '<option value="TextArea"';
+                        if(field_type == "TextArea"){html+='selected'}
+                        html += '>Text Area</option>';
+                        html += '<option value="Date"';
+                        if(field_type == "Date"){html+='selected'}
+                        html += '>Date</option>';
+                        html += '<option value="Date Time"';
+                        if(field_type == "Date Time"){html+='selected'}
+                        html += '>Date Time</option>';
+                        html += '<option value="Check Box"';
+                        if(field_type == "Check Box"){html+='selected'}
+                        html += '>Check Box</option>';
+                        html += '<option value="Combo Box"';
+                        if(field_type == "Combo Box"){html+='selected'}
+                        html += '>Combo Box</option>';
+                        html += '</select>';
+                        html += '</div>';
+                        html += '</td>';
+                        html += '<td>';
+                        html += '<div class="form-group">';
+                        html += '<select type="text" class="form-control quesiionKpi_edit" placeholder="Question Kpi" id="kpiType_'+str+'" name="kpiType_'+str+'" required>';
+                        html += '<option value="0"';
+                        if(kpi == "0"){html+='selected'}
+                        html += '>None</option>';
+                        html += '<option value="1"';
+                        if(kpi == "1"){html+='selected'}
+                        html += '>Critical</option>';
+                        html += '<option value="2"';
+                        if(kpi == "2"){html+='selected'}
+                        html += '>Major</option>';
+                        html += '<option value="3"';
+                        if(kpi == "3"){html+='selected'}
+                        html += '>Important</option>';
+                        html += '</select>';
+                        html += '</div>';
+                        html += '</td>';
+                        html += '<td>';
+                        html += '<span class="glyphicon glyphicon-arrow-down movecss"></span>';
+                        html += '<span class="glyphicon glyphicon-arrow-up movecss"></span>';
+                        html += '</td>';
+                        html += '</tr>';
+                    }
+                    
+                    html += '</tbody>';
+                    html += '</table>';
+                    html += '<span id="status"></span><br/>';
+                    html += '<div style="clear:both"></div>';
+                    html += '<div class="modal-footer">'
+                    html += '<button onclick="editQusetions(\''+workflow_id+'\')" type="button" class="btn btn-primary">Save</button>'
+                    html += '<button type="button" class="btn btn-default" data-dismiss="modal">Close</button>'
+                    html += '</div>'
+                    $('#commentFormedit').html(html);
+                    
+                    $("#tabledivbodyedit").sortable({
+                        items: "tr",
+                        cursor: 'move',
+                        opacity: 0.6,
+                        update: function() {
+                            sendOrderToServeredit();
+                        }
+                    });
+                    
+                }
+            });
+        });
+
+        
+        $(".audModelAdd").click(function() 
+        { 
+            $('#commentForm').html("");
+            var workflow_id =this.id;
+            var str = random_string(6);
+            var selid = 'questionID'+str
+            var html = '';
+            var data = {
+                workflow_id : workflow_id
+            }
+            var url = "<?php echo $this->url('tracker', array('action' => 'getmaxfield')); ?>";
+            $.post(url, data,function(respJson){
+                var resp =JSON.parse(respJson);
+                var responseCode = resp.responseCode;
+                var maxfieldSortNumber = parseInt(resp.maxfieldSortNumber);
+                $('#inputMaxFieldHidden').val(maxfieldSortNumber);
+                if(responseCode == 1){
+                    html += '<table class="table table-striped">';
+                    html += '<tr>';
+                    html += '<th># Order</th>';
+                    html += '<th>Field name</th>';
+                    html += '<th>Type</th>';
+                    html += '<th>KPI</th>';
+                    html += '<th></th>';
+                    html += '<th></th>';
+                    html += '</tr>';
+                    html += '<tbody id="tabledivbody">';
+                    html += '<tr class="sectionsid">';
+                    html += '<td><span class="sort_order_td">#'+(maxfieldSortNumber+1)+'</span>';
+                    html += '<input class="sort_rder" value="'+(maxfieldSortNumber+1)+'" type="hidden"/></td>';
+                    html += '<td>';
+                    html += '<div class="form-group">';
+                    html += '<input type="text" class="form-control quesiionIDs"  placeholder="Add Field" id="'+selid+'" name="questionID_'+selid+'" required>'
+                    html += '<input type="text" class="form-control expected1" style="display:none" id="questionType_'+selid+'_expected">'
+                    html += '</div>';
+                    
+                    html += '<div id="id_'+selid+'" style="display:none">';
+                    html += "<div class='form-group'>";
+                    html += '<label class="" style="padding-left: 10px;">Options</label>'
+                    html += '<select type="text" placeholder="Add Option" class="form-control expected" required id="id_'+selid+'_expected">';
+                    html += '<option value="0">None</option>';
+                    var respCheckListJson = $('#input_hidden_codelist').val();
+                    var resp_checklist =JSON.parse(respCheckListJson);
+                    var check_count = resp_checklist.length;
+                    for(var ck = 0; ck<check_count; ck++){
+                        var ck_list_id = resp_checklist[ck].code_list_id;
+                        var ck_list_name = resp_checklist[ck].code_list_name;
+                        html += '<option value="'+ck_list_id+'">'+ck_list_name+'</option>';
+                    }
+                    html += '</select>';
+                    html += "</div>";
+                    html += '</div>';
+                    
+                    html += '</td>';
+                    html += '<td>';
+                    html += '<div class="form-group">';
+                    html += '<select onchange="checkMultiple(\'id_'+selid+'\', this.id, 0, \'questionType_'+selid+'\')" type="text" class="form-control quesiionSelect" placeholder="Question type" id="questionType_'+str+'" name="questionStep_'+str+'" required>';
+                    html += '<option value="Integer">Integer</option>';
+                    html += '<option value="Text">Text</option>';
+                    html += '<option value="TextArea">Text Area</option>';
+                    html += '<option value="Date">Date</option>';
+                    html += '<option value="Date Time">Date Time</option>';
+                    html += '<option value="Check Box">Check Box</option>';
+                    html += '<option value="Combo Box">Combo Box</option>';
+                    html += '</select>';
+                    html += '</div>';
+                    html += '</td>';
+                    html += '<td>';
+                    html += '<div class="form-group">';
+                    html += '<select type="text" class="form-control quesiionKpi" placeholder="Question Kpi" id="kpiType_'+str+'" name="kpiType_'+str+'" required>';
+                    html += '<option value="0">None</option>';
+                    html += '<option value="1">Critical</option>';
+                    html += '<option value="2">Major</option>';
+                    html += '<option value="3">Important</option>';
+                    html += '</select>';
+                    html += '</div>';
+                    html += '</td>';
+                    html += '<td>';
+                    html += '<span class="glyphicon glyphicon-arrow-down movecss"></span>';
+                    html += '<span class="glyphicon glyphicon-arrow-up movecss"></span>';
+                    html += '</td>';
+                    html += '<td>';
+                    html += '<!--<i class="icon-arrow-up"></i><i class="icon-arrow-down"></i>--><i class="icon-remove" style="color: red; cursor: pointer;" onClick="delSuspectProduct(this)">X</i>';
+                    html += '</td>';
+                    html += '</tr>';
+                    html += '</tbody>';
+                    html += '</table>';
+                    html += '<span id="status"></span><br/>';
+                    html += '<button style="float:right" type="button"id="add_img" class="btn btn-primary" onClick="insSpec(); return false;" align="center">New Field</button>';
+                    html += '<div style="clear:both"></div>';
+                    html += '<div class="modal-footer">'
+                    html += '<button onclick="addQusetions(\''+workflow_id+'\')" type="button" class="btn btn-primary">Save</button>'
+                    html += '<button type="button" class="btn btn-default" data-dismiss="modal">Close</button>'
+                    html += '</div>'
+                    $('#commentForm').html(html);
+                    
+                    $("#tabledivbody").sortable({
+                        items: "tr",
+                        cursor: 'move',
+                        opacity: 0.6,
+                        update: function() {
+                            sendOrderToServer();
+                        }
+                    });
+                }
+            });
+        });
+    });	
+    
+    
+    
+    function sendOrderToServer() {
+        var elem = document.getElementsByClassName("sort_order_td");
+        var max_sort_num = parseInt($('#inputMaxFieldHidden').val());
+        for (var i = 0; i < elem.length; ++i) {
+            elem[i].innerHTML = "#"+(max_sort_num+1+i);
+        }
+        var elem = document.getElementsByClassName("sort_rder");
+        for (var i = 0; i < elem.length; ++i) {
+            elem[i].value = max_sort_num+1+i;
+        }
+    }
+    
+    function sendOrderToServer_workflow() {
+        
+        $("#status_wf_sort").html('processing... please wait');
+        var elem = document.getElementsByClassName("sort_order_workflow");
+        for (var i = 0; i < elem.length; ++i) {
+            elem[i].innerHTML = "#"+(1+i);
+        }
+        var elem = document.getElementsByClassName("sort_rder_value_wf");
+        for (var i = 0; i < elem.length; ++i) {
+            elem[i].value = 1+i;
+        }
+        
+        
+        var elem = document.getElementsByClassName("sort_rder_value_wf");
+        var sort_rder_value_wf = [];
+        for (var i = 0; i < elem.length; ++i) {
+            if (typeof elem[i].value !== "undefined") {
+                sort_rder_value_wf.push(elem[i].value);
+            }
+        }
+        var elem = document.getElementsByClassName("wf_id_for_sort");
+        var wf_id_for_sort = [];
+        for (var i = 0; i < elem.length; ++i) {
+            if (typeof elem[i].value !== "undefined") {
+                wf_id_for_sort.push(elem[i].value);
+            }
+        }
+        var elem = document.getElementsByClassName("workflow_names_cls");
+        var wf_names = [];
+        for (var i = 0; i < elem.length; ++i) {
+            if (typeof elem[i].value !== "undefined") {
+                wf_names.push(elem[i].value);
+            }
+        }
+        //        return false;
+        var data = {
+            wf_id_for_sort : wf_id_for_sort,
+            wf_sort_order : sort_rder_value_wf,
+            wf_names : wf_names,
+            subType : 'save'
+        }
+        //        console.log(data);
+        //        return false;
+        var url = "<?php echo $this->url('tracker', array('action' => 'updateworkflow')); ?>";
+        $.post(url, data,function(respJson){
+            var resp =JSON.parse(respJson);
+            var responseCode = resp.responseCode;
+            var errMessage = resp.errMessage;
+            if(responseCode == 1){
+                $("#status").html('<font color="#088A08">'+errMessage+'</font>');
+                window.setTimeout('window.location.replace("<?php echo $this->url('tracker', array('action' => 'workflow', 'tracker_id' => $tracker_id, 'action_id' => $action_id)) ?>")', 1000);
+            }
+            else{
+                $("#status").html('<font color="#cc0000">'+errMessage+'</font>');
+            }
+        });
+        
+    }
+    
+    
+    function sendOrderToServeredit() {
+        var elem = document.getElementsByClassName("sort_order_td_edit");
+        
+        for (var i = 0; i < elem.length; ++i) {
+            elem[i].innerHTML = "#"+(1+i);
+        }
+        var elem = document.getElementsByClassName("sort_rder_edit");
+        for (var i = 0; i < elem.length; ++i) {
+            elem[i].value = 1+i;
+        }
+        
+        
+    }
+    
+    function insSpec()
+    {
+        var str = random_string(6);
+        var selid = 'questionID'+str
+        var html = "";
+        var maxfieldSortNumber = $('#inputMaxFieldHidden').val();
+        maxfieldSortNumber = parseInt(maxfieldSortNumber);
+        html += '<tr class="sectionsid">';
+        html += '<td><span class="sort_order_td">#'+(maxfieldSortNumber+1)+'</span>';
+        html += '<input class="sort_rder" value="'+(maxfieldSortNumber+1)+'" type="hidden"/>';
+        html += '</td>';
+        html += '<td>';
+        html += '<div class="form-group">';
+        html += '<input type="text" class="form-control quesiionIDs"  placeholder="Add Field" id="'+selid+'" name="questionID_'+selid+'" required>'
+        html += '<input type="text" class="form-control expected1" style="display:none" id="questionType_'+selid+'_expected">'
+        html += '</div>';
+        html += '<div id="id_'+selid+'" style="display:none">';
+        html += "<div class='form-group'>";
+        html += '<label class="" style="padding-left: 10px;">Options</label>'
+        html += '<select type="text" placeholder="Add Option" class="form-control expected" required id="id_'+selid+'_expected">';
+        html += '<option value="0">None</option>';
+        var respCheckListJson = $('#input_hidden_codelist').val();
+        var resp_checklist =JSON.parse(respCheckListJson);
+        var check_count = resp_checklist.length;
+        for(var ck = 0; ck<check_count; ck++){
+            var ck_list_id = resp_checklist[ck].code_list_id;
+            var ck_list_name = resp_checklist[ck].code_list_name;
+            html += '<option value="'+ck_list_id+'">'+ck_list_name+'</option>';
+        }
+        html += '</select>';
+        html += "</div>";
+        html += '</div>';
+        html += '</td>';
+        html += '<td>';
+        html += '<div class="form-group">';
+        html += '<select onchange="checkMultiple(\'id_'+selid+'\', this.id, 0, \'questionType_'+selid+'\')" type="text" class="form-control quesiionSelect" placeholder="Question type" id="questionType_'+str+'" name="questionStep_'+str+'" required>';
+        html += '<option value="Integer">Integer</option>';
+        html += '<option value="Text">Text</option>';
+        html += '<option value="TextArea">Text Area</option>';
+        html += '<option value="Date">Date</option>';
+        html += '<option value="Date Time">Date Time</option>';
+        html += '<option value="Check Box">Check Box</option>';
+        html += '<option value="Combo Box">Combo Box</option>';
+        html += '</select>';
+        html += '</div>';
+        html += '</td>';
+        html += '<td>';
+        html += '<div class="form-group">';
+        html += '<select type="text" class="form-control quesiionKpi" placeholder="Question Kpi" id="kpiType_'+str+'" name="kpiType_'+str+'" required>';
+        html += '<option value="0">None</option>';
+        html += '<option value="1">Critical</option>';
+        html += '<option value="2">Major</option>';
+        html += '<option value="3">Important</option>';
+        html += '</select>';
+        html += '</div>';
+        html += '</td>';
+        html += '<td>';
+        html += '<span class="glyphicon glyphicon-arrow-down movecss"></span>';
+        html += '<span class="glyphicon glyphicon-arrow-up movecss"></span>';
+        html += '</td>';
+        html += '<td>';
+        html += '<!--<i class="icon-arrow-up"></i><i class="icon-arrow-down"></i>--><i class="icon-remove" style="color: red; cursor: pointer;" onClick="delSuspectProduct(this)">X</i>';
+        html += '</td>';
+        html += '</tr>';
+        $("#tabledivbody").append(html);
+        sendOrderToServer();
+    }
+    
+    function checkMultiple(id, selID, start, questionType){
+        var selVal= $('#'+selID).val();
+        var html="";
+        var str = random_string(6);
+        var respCheckListJson = $('#input_hidden_codelist').val();
+        var resp_checklist =JSON.parse(respCheckListJson);
+        $("#"+id+"_expected").val(0);
+        
+        if(selVal == 'Check Box' || selVal == 'Combo Box'){
+            $("#"+id).show();
+        }      
+        else{
+            $("#"+id+"_expected").val("0");
+            $("#"+id).hide();
+            
+        }
+    }
+    
+    function random_string(size){
+        var str = "";
+        for (var i = 0; i < size; i++){
+            str += random_character();
+        }
+        return str;
+    }
+    
+    function random_character() {
+        var chars = "lmnopqurstuvwxyzABCDEFGHIJKLMNOPQURSTUVWXYZ";
+        return chars.substr( Math.floor(Math.random() * 62), 1);
+    }
+    function delSuspectProduct(node)
+    {
+        r = node.parentNode.parentNode;
+        r.parentNode.removeChild(r);
+        sendOrderToServer();
+    }
+
+    function addQusetions(workflow_id)
+    {
+        var elem = document.getElementsByClassName("quesiionIDs");
+        var names = [];
+        for (var i = 0; i < elem.length; ++i) {
+            if (typeof elem[i].value !== "undefined") {
+                names.push(elem[i].value);
+            }
+        }
+
+        var elem = document.getElementsByClassName("quesiionSelect");
+        var types = [];
+        for (var i = 0; i < elem.length; ++i) {
+            if (typeof elem[i].value !== "undefined") {
+                types.push(elem[i].value);
+            }
+        }
+        
+        var elem = document.getElementsByClassName("expected");
+        var expected = [];
+        for (var i = 0; i < elem.length; ++i) {
+            if (typeof elem[i].value !== "undefined") {
+                expected.push(elem[i].value);
+            }
+        }
+        
+        var elem = document.getElementsByClassName("quesiionKpi");
+        var kpivalues = [];
+        for (var i = 0; i < elem.length; ++i) {
+            if (typeof elem[i].value !== "undefined") {
+                kpivalues.push(elem[i].value);
+            }
+        }
+        var elem = document.getElementsByClassName("sort_rder");
+        var field_sort_order = [];
+        for (var i = 0; i < elem.length; ++i) {
+            if (typeof elem[i].value !== "undefined") {
+                field_sort_order.push(elem[i].value);
+            }
+        }
+
+        var $valid = $("#commentForm").valid();
+        if(!$valid) {
+            return false;
+        }else{
+            
+            $("#status").html('processing...');
+            var tracker_id = '<?= $tracker_id; ?>';
+            var action_id = '<?= $action_id; ?>';
+            var wf_id = workflow_id;
+
+            var data = {
+                names : names,
+                types : types,
+                expected : expected,
+                action_id: action_id,
+                kpivalues:kpivalues,
+                tracker_id : tracker_id,
+                workflow_id : wf_id,
+                field_sort_order : field_sort_order,
+                subType : 'save'
+            }
+            var url = "<?php echo $this->url('tracker', array('action' => 'savenewfields')); ?>";
+            $.post(url, data,function(respJson){
+                var resp =JSON.parse(respJson);
+                var responseCode = resp.responseCode;
+                var errMessage = resp.errMessage;
+                if(responseCode == 1){
+                    $("#status").html('<font color="#088A08">'+errMessage+'</font>');
+                    window.setTimeout('window.location.replace("<?php echo $this->url('tracker', array('action' => 'fields', 'tracker_id' => $tracker_id, 'action_id' => $action_id)) ?>")', 1000);
+                }
+                else{
+                    $("#status").html('<font color="#cc0000">'+errMessage+'</font>');
+                }
+            });
+        }
+    }
+    
+
+    function editQusetions(workflow_id)
+    {
+        var elem = document.getElementsByClassName("quesiionIDs_edit");
+        var names = [];
+        for (var i = 0; i < elem.length; ++i) {
+            if (typeof elem[i].value !== "undefined") {
+                names.push(elem[i].value);
+            }
+        }
+
+        var elem = document.getElementsByClassName("quesiionSelect_edit");
+        var types = [];
+        for (var i = 0; i < elem.length; ++i) {
+            if (typeof elem[i].value !== "undefined") {
+                types.push(elem[i].value);
+            }
+        }
+        
+        var elem = document.getElementsByClassName("expected_edit");
+        var expected = [];
+        for (var i = 0; i < elem.length; ++i) {
+            if (typeof elem[i].value !== "undefined") {
+                expected.push(elem[i].value);
+            }
+        }
+        
+        var elem = document.getElementsByClassName("quesiionKpi_edit");
+        var kpivalues = [];
+        for (var i = 0; i < elem.length; ++i) {
+            if (typeof elem[i].value !== "undefined") {
+                kpivalues.push(elem[i].value);
+            }
+        }
+        var elem = document.getElementsByClassName("sort_rder_edit");
+        var field_sort_order = [];
+        for (var i = 0; i < elem.length; ++i) {
+            if (typeof elem[i].value !== "undefined") {
+                field_sort_order.push(elem[i].value);
+            }
+        }
+        var elem = document.getElementsByClassName("id_values_edit");
+        var field_id_arr = [];
+        for (var i = 0; i < elem.length; ++i) {
+            if (typeof elem[i].value !== "undefined") {
+                field_id_arr.push(elem[i].value);
+            }
+        }
+        
+        var $valid = $("#commentFormedit").valid();
+        if(!$valid) {
+            return false;
+        }else{
+            $("#status").html('processing...');
+            var tracker_id = '<?= $tracker_id; ?>';
+            var action_id = '<?= $action_id; ?>';
+            var wf_id = workflow_id;
+
+            var data = {
+                names : names,
+                types : types,
+                expected : expected,
+                action_id: action_id,
+                kpivalues:kpivalues,
+                tracker_id : tracker_id,
+                workflow_id : wf_id,
+                field_sort_order : field_sort_order,
+                field_id_arr : field_id_arr,
+                subType : 'save'
+            }
+            var url = "<?php echo $this->url('tracker', array('action' => 'editfields')); ?>";
+            $.post(url, data,function(respJson){
+                var resp =JSON.parse(respJson);
+                var responseCode = resp.responseCode;
+                var errMessage = resp.errMessage;
+                if(responseCode == 1){
+                    $("#status").html('<font color="#088A08">'+errMessage+'</font>');
+                    window.setTimeout('window.location.replace("<?php echo $this->url('tracker', array('action' => 'fields', 'tracker_id' => $tracker_id, 'action_id' => $action_id)) ?>")', 1000);
+                }
+                else{
+                    $("#status").html('<font color="#cc0000">'+errMessage+'</font>');
+                }
+            });
+        }
+    }
+    
+    function deleteWorkflow(workflowID)
+    {
+        if( confirm("Are you sure you want to delete this Workflow?"))
+        {
+            //   
+            //                     var id=$(this).closest('tr').attr("id");
+            var tracker_id = '<?= $tracker_id; ?>';
+            var action_id = '<?= $action_id; ?>';
+            $.ajax({
+                url: "/tracker/deleteWorkflow",
+                type:'post',
+                dataType:'json',
+                data:{workflowID:workflowID, tracker_id:tracker_id, form_id:action_id},
+                success:function(data) {
+                    if(data=='Deleted')
+                    {
+                        location.reload(); 
+                    }
+                }
+            })
+            return false;
+        }
+    }
+    
+    
+</script>

@@ -1,0 +1,93 @@
+<?php
+$title = "Qualitative Settings";
+?>
+
+<div class="pagebar container-fluid col-md-12">
+    <!-- Sidebar Toggle -->
+    <button type="button" class="pagebar-toggle navbar-toggle pull-left">
+      <span class="pagebar-arrow"></span>
+    </button>
+    <ol class="breadcrumb">
+        <li><span>Settings</span></li>
+      <li class="active"><span><?php echo $this->escapeHtml($title); ?></span></li>
+    </ol>
+</div>
+<div class="card">
+    <div class="card-body"> 
+        <div class="card">
+            <div class="card-header"><?php echo $this->escapeHtml($title); ?></div>
+            <form style="margin: 0px" method="POST" id="qualitativeForm" class="form-horizontal row-border" enctype="multipart/form-data">
+                <div class="card-body">
+                       <?=$list;?> 
+                </div>
+                <div class="card-footer text-right">
+                    <a class="btn btn-default pull-right" href="<?=isset($_SERVER['HTTP_REFERER'])? $_SERVER['HTTP_REFERER']:'#';?>">Cancel</a>
+                    <button class="btn btn-primary pull-right" type="submit">Save</button>
+                </div>
+            </form>
+        </div>
+        
+<!--        <div class="row">
+            <div class="col-md-12">
+                <p class="alert" id="alert" style="display:none;"></p>
+                <div class="widget box">
+                    <div class="widget-header">
+                        <h4><i class="icon-reorder"></i> Qualitative Settings</h4>
+                    </div>
+                    <div class="widget-content">
+                        <form style="margin: 0px" method="POST" id="qualitativeForm" class="form-horizontal row-border" enctype="multipart/form-data">
+                        <table class="table table-highlight-head table-striped table-bordered table-checkable table-responsive" style="display:table">
+                            <?//=$list;?>
+                        </table>
+                        <div class="form-actions" style="margin: 0px">
+                            <a class="btn btn-default pull-right" href="<?//=isset($_SERVER['HTTP_REFERER'])? $_SERVER['HTTP_REFERER']:'#';?>">Cancel</a>
+                            <button class="btn btn-primary pull-right" type="submit">Save</button>
+                        </div>
+                    </form>
+                    </div>
+                </div>
+            </div>
+        </div>-->
+    </div>
+</div>
+
+<script>
+$(document).ready(function(){
+    $('#qualitativeForm').validate();
+});   
+function select_field_popup(field_id) {
+    var html = "";
+    html = '<span id="field_comment_span"></span>';
+    html +='<input id="formula_field_select_id_val_hidden" value="'+field_id+'" type="hidden"/>';
+    $("#Field_Comment").html(html);
+    $("#")
+}
+function setField(){
+    var formula_field_id_val = $("#formula_field_select_id_val_hidden").val();
+    var formula_val =  $("#field_select_formula_"+formula_field_id_val).val();
+    insertAtCursor(formula_val, "textarea_"+formula_field_id_val);
+    $("#close_popup_field_"+formula_field_id_val).click();
+}
+function insertAtCursor(text, id_formula) {   
+    var field = document.getElementById(id_formula);
+        if (document.selection) {
+            var range = document.selection.createRange();
+
+            if (!range || range.parentElement() != field) {
+                field.focus();
+                range = field.createTextRange();
+                range.collapse(false);
+            }
+            range.text = text;
+            range.collapse(false);
+            range.select();
+        } else {
+            field.focus();
+            var val = field.value;
+            var selStart = field.selectionStart;
+            var caretPos = selStart + text.length;
+            field.value = val.slice(0, selStart) + text + val.slice(field.selectionEnd);
+            field.setSelectionRange(caretPos, caretPos);
+        }
+    }
+</script>

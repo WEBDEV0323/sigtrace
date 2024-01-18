@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<phpunit bootstrap="Bootstrap.php" colors="true" stderr="true">
+    <testsuites>
+        <testsuite name="SigTrace">
+            <directory>./ReportTest</directory>
+            <file>./ReportTest/Controller/ReportControllerTest.php</file>
+        </testsuite>
+    </testsuites>
+    <filter>
+        <whitelist>    
+            <directory suffix=".php">../src/Common/Report/Model</directory>
+            <directory suffix=".php">../src/Common/Report/Controller</directory>
+        </whitelist>
+        
+    </filter>
+    
+    <logging>
+        <log type="coverage-html" target="../../../../../test/unittest/code_coverage/report" lowUpperBound="40" highLowerBound="80" />
+    </logging>
+</phpunit>

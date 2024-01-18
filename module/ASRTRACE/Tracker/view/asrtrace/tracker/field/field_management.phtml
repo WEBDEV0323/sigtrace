@@ -1,0 +1,434 @@
+<?php 
+$title = 'Fields Management';
+$this->headTitle($title);
+?>
+<div class="pagebar container-fluid col-md-12">
+    <!-- Sidebar Toggle -->
+    <button type="button" class="pagebar-toggle navbar-toggle pull-left">
+      <span class="pagebar-arrow"></span>
+    </button>
+    <ol class="breadcrumb">
+      <li class="active"><span><?php echo $this->escapeHtml($title); ?></span></li>
+    </ol>
+</div>
+<div class="card">
+    <div class="card-body">
+    <div class="card">
+        <div  class="card-header">
+            <h6 class="col-md-6 float-left">List of Fields</h6>
+            <span class="col-md-6">
+               <button type="button" class="btn btn-primary float-right" data-toggle="modal"  class="editModelField" data-target="#FieldAddModel" onclick="addFieldErrorMesagesClean();">Add New Field</button>
+            </span>
+        </div>
+        <div class="card-body">
+            <?php
+            $flashMessage = $this->flashMessenger()->getMessages();
+            if (count($flashMessage) && isset($flashMessage[0]['success'])) {
+                echo '<div class="contents boxpadding"><div class="alert alert-dismissable alert-success" id="fashMessage">'.$flashMessage[0]['success'].'<button type="button" class="close" data-dismiss="alert" aria-hidden="true">×</button></div></div>';
+            }
+            ?>
+            <div class="table-responsive">
+            <?php
+            if (array_key_exists(0, $fieldsArray)) {
+                ?>
+                <table class="table table-striped" id="fieldDataTable">
+                    <thead>
+                        <tr>
+                            <th>Action</th>
+                            <th>Field Name</th>
+                            <th>Label</th>
+                            <th>Type</th>
+                            <th>Sort Order</th>
+                            <th>Workflow</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                    <?php
+                    $ival = 0;
+                    foreach ($fieldsArray as $field => $f_values) {
+                        $field_id = $f_values['field_id'];
+                        $field_name = $f_values['field_name'];
+                        $label = $f_values['label'];
+                        $field_type = $f_values['field_type'];
+                        $group = $f_values['workflow_name'];
+                        $sort_order = $f_values['sort_order'];
+                        $kpi = $f_values['kpi'];
+                        $code_list_id = $f_values['code_list_id'];
+                        $formula = addslashes($f_values['formula']);
+                        $validation_required_edit = $f_values['validation_required'];
+                        $rule_id = $f_values['rule_id'];
+                        $rule_value = $f_values['value'];
+                        $rule_msg = $f_values['message'];
+                        ?>
+                    
+                        <tr>
+                            <td>
+                                <button type="button" class="btn btn-default" onclick='editFieldName(<?=json_encode(array("fieldName"=>$field_name,"fieldType"=>$field_type,"label"=>$label,"fieldId"=>$field_id,"KPI"=>$kpi,"codeListId"=>$code_list_id,"formula"=>$formula,"validationRequired"=>$validation_required_edit,"ruleId"=>$rule_id,"ruleValue"=>$rule_value,"ruleMsg"=>$rule_msg))?>)' data-toggle="modal"  class="editModelField" data-target="#FieldEditModel">
+                                    <span class="lnr icon-pencil" aria-hidden="true"></span>
+                                </button>
+                                <button type="button" onclick="clearDeleteFields('<?php echo $field_id; ?>')" class="btn btn-default" aria-label="Left Align">
+                                    <span class="lnr icon-trash2" aria-hidden="true"></span>
+                                </button>
+                            </td>
+                            <td><?php echo $this->escapeHtml($field_name); ?></td>
+                            <td><?php echo $this->escapeHtml($label); ?></td>
+                            <td><?php echo $this->escapeHtml($field_type); ?></td>
+                            <td><?php echo "#" . $this->escapeHtml($sort_order); ?></td>
+                            <td><?php echo $this->escapeHtml($group); ?></td>
+                        </tr>
+
+                        <?php
+                    }
+                    ?>
+                    </tbody>
+                </table>
+                <?php
+                } else {
+                    echo "No records found.";
+                }
+                ?>
+            </div>
+        </div>
+        </div>
+    </div>
+</div>
+
+
+<div class="modal fade" id="FieldEditModel" data-backdrop="static" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+    <div class="modal-dialog" style="max-width:700px!important;">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Edit Field</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>   
+            <div class="modal-body">
+                <form data-toggle="validator" id="commentForm_editFieldName" method="post" action="" name="myForm" class="form-horizontal">
+                    <input type="hidden" value="" id="originalFieldType"/>
+                    <input type="hidden" value="" id="originalRuleId"/>
+                    <input type="hidden" value="" id="originalRuleValue"/>
+                    <input type="hidden" value="" id="originalRuleMsg"/>
+                    <div class="form-group row">
+                        <label class="col-sm-5"></label>
+                        <div id="fieldEditErrorMessage" class="error col-sm-6"></div>
+                    </div>
+                    <div class="form-group row">
+                        <label class="col-sm-5 col-form-label">Field Label Name<span class="error ml-1">*</span></label>
+                        <div class="col-sm-6">
+                            <input type="text" class="form-control"  placeholder="Field Label Name" id="edit_field_name" name="edit_field_name" value="">
+                            <span id="edit_field_name_error" class="error"></span>
+                            
+                            <input type="text" class="form-control"  placeholder="Field Label Name" id="edit_field_name_hidden" name="edit_field_name_hidden" required value="" style="display:none">
+                            <input type="text" class="form-control"  placeholder="field_id" id="edit_field_id" name="edit_field_id" required value="" style="display:none">
+                            <input type="text" class="form-control"  placeholder="field_id" id="expected_f_option" name="expected_f_option" required value="" style="display:none">
+                        </div>
+                    </div>
+                    <div class="form-group row">
+                        <label class="col-sm-5 col-form-label">Field Type</label>
+                        <div class="col-sm-6" id="ftype_div">
+                            <select onchange="checkMultiple('id_selid', this.id, 0, 'fieldType_edit');valDataType();" type="text" class="form-control quesiionSelect_edit" placeholder="Field type" id="edit_field_type" name="fieldType_edit">
+                                <option value="Integer">Integer</option>
+                                <option value="Text">Text</option>
+                                <option value="TextArea">Text Area</option>
+                                <option value="Date">Date</option>
+                                <option value="Date Time">Date Time</option>
+                                <option value="Check Box">Check Box</option>
+                                <option value="Combo Box">Combo Box</option>
+                                <option value="Formula">Formula</option>
+                                <option value="User Role">User Role</option>
+                                <option value="Heading">Heading</option>
+                                <option value="Formula Combo Box">Formula Combo Box</option>
+                                <option value="DependentText">DependentText</option>
+                                <option value="Formula Date">Formula Date</option>
+                                <option value="File">File</option>
+                                <option value="ReadOnly">ReadOnly</option>
+                            </select>
+                             <span class="error" id="edit_field_type_error"></span>
+                        </div>
+                    </div>
+                    <div class="form-group row" id="id_selid" style="display:none">
+                        <label class="col-sm-5 col-form-label">Options<span class="error ml-1">*</span></label>
+                        <div class="col-sm-6">
+                            <select id="edit_code_list_option" class="form-control">
+                                <option value="0">Select value</option>
+                                <?php
+                                foreach ($codeLists as $key_cl => $value_cl) {
+                                    $code_list_id = $value_cl['code_list_id'];
+                                    $code_list_name = $value_cl['code_list_name'];
+                                    ?>
+                                    <option value="<?= $code_list_id; ?>"><?= $code_list_name; ?></option>
+                                    <?php
+                                }
+                                ?>
+                            </select>
+                            <span class="error" id="edit_code_list_option_error"></span>
+                        </div>
+                    </div>
+
+                    <div class="form-group row" id="id_selid_role" style="display:none">
+                        <label class="col-sm-5 col-form-label">Options<span class="error ml-1">*</span></label>
+                        <div class="col-sm-6">
+                            <select id="edit_role_option" class="form-control role">
+                                <option value="0">Select value</option>
+                                <?php
+                                foreach ($roles as $key_cl => $value_cl) {
+                                    $code_list_id = $value_cl['group_id'];
+                                    $code_list_name = $value_cl['group_name'];
+                                    ?>
+                                    <option value="<?= $code_list_id; ?>" ><?= $code_list_name; ?></option>
+                                    <?php
+                                }
+                                ?>
+                            </select>
+                            <span class="error" id="edit_role_option_error"></span>
+                        </div>
+                    </div>
+                    <div class="form-group row">
+                        <label class="col-sm-5 col-form-label">KPI</label>
+                        <div class="col-sm-6">
+                            <select type="text" class="form-control quesiionKpi_edit" placeholder="Kpi" id="edit_kpi_type" name="edit_kpi_type">
+                                <option value="0">None</option>
+                                <option value="1">Critical</option>
+                                <option value="2">Major</option>
+                                <option value="3">Important</option>
+                            </select>
+                            <span class="error" id="edit_kpi_type_error"></span>
+                        </div>
+                    </div>
+
+                    <div class="form-group row">
+                        <label class="col-sm-5 col-form-label">Validation Required</label>
+                        <div class="col-sm-6" id="valreq">
+                            <select onchange="checkVal('id_validreq',this.id,0,'edit_val_req')" type="text" class="form-control quesiionMandatory-edit" placeholder="Validation" id="edit_val_req" name="edit_val_req">
+                                <option value="0">No</option>
+                                <option value="1">Yes</option>
+                            </select>
+                            <span class="error" id="edit_val_req_error"></span>
+                        </div>
+                    </div>
+                    <div class="form-group row" id="id_validreq" style="display:none;">
+                        <label class="col-sm-3 col-form-label">Validation Rules<span class="error ml-1">*</span></label>
+                        <div class="col-sm-8">
+                            <div class="card">
+                                <div class="card-body" id="valdiv"></div>
+                            </div>
+                            <span class="error" id="edit_val_rules"></span>
+                            <button style="float:right" type="button" id="add_rule" class="btn btn-primary mt-3" onClick="addRule(); return false;" align="center">Add New Rule</button>
+                        </div>
+                    </div> 
+                    <div class="form-group row mt-2">
+                        <label class="col-sm-5 col-form-label">Reason for change<span class="error ml-1">*</span></label>
+                        <div class="col-sm-6">
+                            <textarea id="reason_for_change" class="form-control" placeholder="Reason for change." name="reason_for_change"></textarea>   
+                            <span id="edit_reason_for_change_error" class="error"></span>
+                        </div>
+                    </div>
+                </form>
+            </div>
+            <span id="status_edit" class="ml-3"></span>
+            <div class="modal-footer">
+                <button onclick="editFieldList()" type="button" class="btn btn-primary">Save</button>
+                <button onclick="clearEditModelStatus()" class="btn btn-default" type="button" data-dismiss="modal">Close</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="modal fade" id="FieldAddModel" data-backdrop="static" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+    <div class="modal-dialog" style="max-width:700px!important;">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Add Field</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div> 
+            <div class="modal-body">
+                <form data-toggle="validator" id="addNewFieldForm" method="post" action="" name="addNewFieldForm" class="form-horizontal">
+                    <div class="form-group row">
+                        <label class="col-sm-5"></label>
+                        <div id="fieldAddErrorMessage" class="error col-sm-6"></div>
+                    </div>
+                    <div class="form-group row">
+                        <label class="col-sm-5 col-form-label">Field Label Name<span class="error ml-1">*</span></label>
+                        <div class="col-sm-6">
+                            <input type="text" class="form-control"  placeholder="Field Label Name" id="add_field_name" name="add_field_name" required value="">
+                            <span id="add_field_name_error" class="error"></span>
+                            
+                            <input type="hidden" id="add_field_id" name="add_field_id" value="0">
+                        </div>
+                    </div>
+                    <div class="form-group row">
+                        <label class="col-sm-5 col-form-label">Workflow<span class="error ml-1">*</span></label>
+                        <div class="col-sm-6">
+                            <select id="add_workflow" class="form-control">
+                                <option value="0">Select Workflow</option>
+                                <?php
+                                foreach ($workflowArray as $key_cl => $value_cl) {
+                                    ?>
+                                    <option value="<?= $value_cl['workflow_id']; ?>"><?= $value_cl['workflow_name']; ?></option>
+                                    <?php
+                                }
+                                ?>
+                            </select>
+                            <span class="error" id="workflow_error"></span>
+                        </div>
+                    </div>
+                    <div class="form-group row">
+                        <label class="col-sm-5 col-form-label">Field Type</label>
+                        <div class="col-sm-6">
+                            <select onchange="checkMultiple('add_id_selid', this.id, 0, 'add_field_type');valDataTypeForAdd();" type="text" class="form-control" placeholder="Field type" id="add_field_type" name="add_field_type" required>
+                                <option value="Integer">Integer</option>
+                                <option value="Text">Text</option>
+                                <option value="TextArea">Text Area</option>
+                                <option value="Date">Date</option>
+                                <option value="Date Time">Date Time</option>
+                                <option value="Check Box">Check Box</option>
+                                <option value="Combo Box">Combo Box</option>
+                                <option value="Formula">Formula</option>
+                                <option value="User Role">User Role</option>
+                                <option value="Heading">Heading</option>
+                                <option value="Formula Combo Box">Formula Combo Box</option>
+                                <option value="DependentText">DependentText</option>
+                                <option value="Formula Date">Formula Date</option>
+                                <option value="File">File</option>
+                                <option value="ReadOnly">ReadOnly</option>
+                            </select>
+                            <span class="error" id="add_field_type_error"></span>
+                        </div>
+                    </div>
+                    <div class="form-group row" id="add_id_selid" style="display:none">
+                        <label class="col-sm-5 col-form-label">Options<span class="error ml-1">*</span></label>
+                        <div class="col-sm-6">
+                            <select id="add_code_list_option" class="form-control">
+                                <option value="0">Select value</option>
+                                <?php
+                                foreach ($codeLists as $key_cl => $value_cl) {
+                                    $code_list_id = $value_cl['code_list_id'];
+                                    $code_list_name = $value_cl['code_list_name'];
+                                    ?>
+                                    <option value="<?= $code_list_id; ?>"><?= $code_list_name; ?></option>
+                                    <?php
+                                }
+                                ?>
+                            </select>
+                            <span class="error" id="add_code_list_option_error"></span>
+                        </div>
+                    </div>
+
+                    <div class="form-group row" id="add_id_selid_role" style="display:none">
+                        <label class="col-sm-5 col-form-label">Options<span class="error ml-1">*</span></label>
+                        <div class="col-sm-6">
+                            <select id="add_role_option" class="form-control role">
+                                <option value="0">Select value</option>
+                                <?php
+                                foreach ($roles as $key_cl => $value_cl) {
+                                    $code_list_id = $value_cl['group_id'];
+                                    $code_list_name = $value_cl['group_name'];
+                                    ?>
+                                    <option value="<?= $code_list_id; ?>" ><?= $code_list_name; ?></option>
+                                    <?php
+                                }
+                                ?>
+                            </select>
+                            <span class="error" id="add_role_option_error"></span>
+                        </div>
+                    </div>
+                    <div class="form-group row">
+                        <label class="col-sm-5 col-form-label">KPI</label>
+                        <div class="col-sm-6">
+                            <select type="text" class="form-control" placeholder="Kpi" id="add_kpi_type" name="add_kpi_type" required>
+                                <option value="0">None</option>
+                                <option value="1">Critical</option>
+                                <option value="2">Major</option>
+                                <option value="3">Important</option>
+                            </select>
+                            <span class="error" id="add_kpi_type_error"></span>
+                        </div>
+                    </div>
+
+                    <div class="form-group row">
+                        <label class="col-sm-5 col-form-label">Validation Required</label>
+                        <div class="col-sm-6">
+                            <select onchange="checkRules()" type="text" class="form-control" placeholder="Validation" id="add_val_req" name="add_val_req">
+                                <option value="0">No</option>
+                                <option value="1">Yes</option>
+                            </select>
+                            <span class="error" id="add_val_req_error"></span>
+                        </div>
+                    </div>
+                    <div class="form-group row" id="add_id_valid_req" style="display:none;">
+                        <label class="col-sm-3 col-form-label">Validation Rules<span class="error ml-1">*</span></label>
+                        <div class="col-sm-8">
+                            <div class="card">
+                                <div class="card-body" id="add_valdiv"></div>
+                            </div>
+                            <span class="error" id="add_val_rules"></span>
+                            <button style="float:right" type="button"id="add_rule" class="btn btn-primary mt-3" onClick="addRuleForAdd(); return false;" align="center">Add New Rule</button>
+                        </div>
+                    </div>
+                    <div class="form-group row mt-2">
+                        <label class="col-sm-5 col-form-label">Reason for change<span class="error ml-1">*</span></label>
+                        <div class="col-sm-6">
+                            <textarea id="add_reason_for_change" class="form-control" placeholder="Reason for change." name="add_reason_for_change"></textarea>   
+                            <span id="add_reason_for_change_error" class="error"></span>
+                        </div>
+                    </div>
+                </form>
+            </div>
+            <span id="status_add" class="ml-3"></span>
+            <div class="modal-footer">
+                <button onclick="addFieldName()" type="button" class="btn btn-primary">Add</button>
+                <button class="btn btn-default" type="button" data-dismiss="modal">Close</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="modal fade" id="deletecommentasreason" data-backdrop="static" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+    <div class="modal-dialog"  style="margin-bottom:0px;" >
+        <div class="modal-content" id="modelContentdelete">
+            <div class="modal-header">
+                <h5 class="modal-title" id="exampleModalLongTitle">Delete Confirmation</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div> 
+            <div class="modal-body">
+                <input type="hidden" id="fieldIDToDelete" value="">
+                <div class="form-group row">
+                    <label class="col-sm-5"></label>
+                    <div id="fieldDeleteErrorMessage" class="error col-sm-6"></div>
+                </div>
+                <div class="form-group row row">
+                    <label class="col-sm-4 col-form-label">Reason for change<span class="error ml-1">*</span></label>
+                    <div class="col-sm-7">
+                        <textarea id="addcommentfordelete" class="form-control" placeholder="Reason for change." name="addcomment"></textarea>   
+                        <span id="commenterrorfordelete" class="error"></span>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button id="reasonfordelete" type="button" class="btn btn-primary" onclick="deleteField()">Delete</button>
+                <button class="btn btn-default" type="button" data-dismiss="modal">Close</button>
+            </div>
+        </div>
+    </div>
+</div>
+<input type="hidden" id="inputWfHidden">
+<input type="hidden" id="input_hidden_codelist" value="">
+<input type="hidden" id="input_hidden_roles" value="">
+<input type="hidden" id="inputMaxRuleHidden" value="">
+<script>
+    var jsonWorkflowData = '<?php echo json_encode($workflowArray); ?>';
+    
+    var jsonCodeListData = '<?php echo json_encode($codeLists); ?>';
+    
+    var jsonRolesData = '<?php echo json_encode($roles); ?>';
+    
+    var trackerId = '<?=$trackerId;?>';
+    var formId = '<?=$formId;?>';
+</script>
+<?php $this->inlineScript()
+        ->appendFile($this->basePath() . '/js/module/tracker/field.js');

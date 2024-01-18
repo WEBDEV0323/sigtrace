@@ -1,0 +1,176 @@
+<div class="pagebar container-fluid col-md-12">
+    <!-- Sidebar Toggle -->
+    <button type="button" class="pagebar-toggle navbar-toggle pull-left">
+      <span class="pagebar-arrow"></span>
+    </button>
+    <ol class="breadcrumb">
+        <li><a href="/dashboard/<?=$trackerId;?>/<?=$formId;?>?filter=<?=$filter?>"><span>Dashboard</span></a></li>
+        <li class="active"><span>Quantitative Analysis</span></li>
+
+    </ol>
+</div>
+<div class="card">
+    <div class="card-body">
+        
+   
+        
+            <div class="card">
+                <div class="card card-body" >
+                    <form class="form-row" action="/dashboard/list" method="GET" id="listFilterForm">
+                        <?php if(!empty($filterFields)) { ?>
+                            <?php foreach ($filterFields as $filter) { ?>
+                                <?php switch ($filter->type) {
+                                case 'date': ?>
+                                <div class="form-group mb-3 ">
+                                    <label for="<?=$filter->field;?>"><?=$filter->label;?></label>
+                                    <input type="text" class="form-control daterange" id="<?=$filter->field;?>" name="date:<?=$filter->field;?>" value ="<?= $filter->value?>" title ="<?= $dateRange?>"  readOnly>
+                                </div>
+                                <?php break;   
+                                 case 'select': 
+                                    break;
+                                }} ?>
+
+                            <div class="form-group mx-sm-3 mb-2">
+                                <label for="filterButton" > &nbsp; </label>
+                                <button type="button" class="btn btn-primary mb-2 form-control" id="filterButtonListPage">Filter</button>
+                            </div>
+                        <?php } ?>    
+                    </form>
+                </div>
+            </div>
+
+            <div class="card">
+
+            <div class="card-header">
+                <div class="row" id="active_substance_id"></div>
+            </div>
+            <div class="card-body">
+                <div class="row">
+                    <div class="col-sm-0">Page Size:</div>
+                    <div class="ml-2" style="width:80px!important;">
+                        <select onchange="onPageSizeChanged()" id="page-size" class="form-control">
+                            <option value="5" selected>5</option>
+                            <option value="10">10</option>
+                            <option value="25">25</option>
+                            <option value="50">50</option>
+                            <option value="100">100</option>
+                            <option value="500">500</option>
+                            <option value="1000">1000</option>
+                        </select>
+                    </div>
+                    <div class="col-sm-2 ml-auto mb-2">
+                        <div class="btn-toolbar">
+                            <div class="btn-group toolbar-icons ml-auto" role="group">
+                              <div class="btn-group" role="group">
+                                  <button type="button" class="btn btn-icon" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                                      <i class="lnr icon-arrow-down-square"></i>
+                                  </button>
+                                  <ul class="dropdown-menu dropdown-menu-right">
+                                    <li><a class="dropdown-item" onclick="downloadCSV();">Export to CSV</a></li>
+                                    <li><a class="dropdown-item" onclick="downloadEXCEL();">Export to Excel</a></li>
+                                    <li><a class="dropdown-item" onclick="downloadPDF();">Export to PDF</a></li>
+                                  </ul>
+                              </div>
+                              <!--<button type="button" class="btn btn-icon" id="dt_reload" onclick="refresh();"><i class="lnr icon-refresh"></i></button>-->
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div id="myGrid" class="ag-theme-material"></div>
+            </div>
+        </div>
+    </div>
+</div>
+<div class="modal fade" id="edit_medical_evaluation" data-backdrop="static" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="exampleModalLongTitle">Edit Medical Evaluation</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <form data-toggle="validator" id="medical_evaluation" method="get" action="" name="myForm" class="form-horizontal">
+
+                </form>
+            </div>
+            <div id="status_add_cl" class="ml-3"></div>
+            <div class="modal-footer">
+                <button onclick="changeMedicalEvaluation()" type="button" class="btn btn-primary">Save</button>
+                <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+            </div>
+        </div>
+    </div>                            
+</div>
+<div class="modal fade" id="edit_priority" data-backdrop="static" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="exampleModalLongTitle">Edit Priority</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <form data-toggle="validator" id="priority" method="get" action="" name="myForm" class="form-horizontal">
+
+                </form>
+            </div>
+            <div id="status_priority" class="ml-3"></div>
+            <div class="modal-footer">
+                <button onclick="changePriority()" type="button" class="btn btn-primary">Save</button>
+                <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+            </div>
+        </div>
+    </div>                            
+</div>
+<form action="" id="downloadReport" method="POST">
+    <input type="hidden" name="trackerId" value="<?php echo $trackerId;?>" />
+    <input type="hidden" name="formId" value="<?php echo $formId; ?>" />
+    <input type="hidden" name="productId" value="<?php echo $productId; ?>" />
+    <input type="hidden" name="dateRange" value="<?php echo $dateRange; ?>" />
+    <input type="hidden" name="filter" value="<?php echo $queryFilter; ?>" />
+    <!-- <input type="hidden" id="startDate" name="startDate" value="" />
+    <input type="hidden" id="endDate" name="endDate" value="" />
+    <input type="hidden" id="endDate" name="endDate" value="" /> -->
+</form>
+<style> 
+    .table{
+        overflow-x: auto;
+        max-width: 100%;
+        display: block;
+        white-space: nowrap;
+    }
+    .custom-tooltip {
+        position: absolute;
+        min-width: 150px;
+        min-height: 70px;
+        border: 1px solid cornflowerblue;
+        overflow-x: auto;
+        pointer-events: none;
+        transition: opacity 1s;
+    }
+    .custom-tooltip.ag-tooltip-hiding {
+        opacity: 0;
+    }
+    .custom-tooltip p {
+        margin: 5px;
+        white-space: nowrap;
+    }
+    .custom-tooltip p:first-of-type {
+        font-weight: bold;
+    }    
+</style>
+<script type="text/javascript">
+    var trackerId="<?php echo $trackerId ?>";
+    var formId="<?php echo $formId ?>";
+    var productId="<?php echo $productId ?>";
+    var dashboardId="<?php echo $dashboardId ?>"; 
+    var filter="<?php echo $queryFilter ?>";
+  
+</script>
+
+<?php 
+    $this->inlineScript()
+            ->appendFile($this->basePath() . '/js/module/sigtrace/quantitative/quantitative1.js', 'text/javascript');

@@ -1,0 +1,96 @@
+<?php
+$reportName = isset($reportDetails['report_name'])?$reportDetails['report_name']:"";
+$title = "Report For - ".$reportName;
+$this->headTitle($title);
+//echo $urlQuery;
+?>
+<div class="pagebar container-fluid col-md-12">
+    <!-- Sidebar Toggle -->
+    <button type="button" class="pagebar-toggle navbar-toggle pull-left">
+        <span class="pagebar-arrow"></span>
+    </button>
+    <ol class="breadcrumb">
+        <li><span>Reports</span></li>
+        <li class="active"><a href="/report/<? if ($reportId == 0) { echo 'custom/'; } else { echo 'filter/'; }?><?=$trackerId;?>/<?=$formId;?>/<?=$reportId;?>"><span> <? if ($reportName != "") { echo "Filters for ".$reportName; } else { echo "Custom Report"; }?></span></a></li>
+        <?php if ($reportName != '') {?>
+        <li class="active"><span><?=$reportName;?></span></li>
+        <?php } ?>
+    </ol>
+</div>
+<div class="card">
+    <div class="card-body">
+        <div class="card">
+            <div class="card-header">
+                <div class="row mb-3"><?php echo $reportName; if (strlen($headBreadcrumb) > 4) { echo " for ".substr($headBreadcrumb, 4);}?></div>
+            </div>
+            <div class="card-body">
+                <div class="card-body">
+                    <p class="alert-warning" id="alert"></p>
+                    <div class="row">
+                        <div class="col-sm-0">Page Size:</div>
+                        <div class="ml-2" style="width:80px!important;">
+                            <select onchange="onPageSizeChanged()" id="page-size" class="form-control">
+                                <option value="5" selected>5</option>
+                                <option value="10">10</option>
+                                <option value="25">25</option>
+                                <option value="50">50</option>
+                                <option value="100">100</option>
+                                <option value="500">500</option>
+                                <option value="1000">1000</option>
+                            </select>
+                        </div>
+                        <div class="col-sm-2 ml-auto mb-2">
+                            <div class="btn-toolbar">
+                                <div class="btn-group toolbar-icons ml-auto" role="group">
+                                  <?php if ($download) { ?>
+                                  <div class="btn-group" role="group">
+                                      <button type="button" class="btn btn-icon" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                                          <i class="lnr icon-arrow-down-square"></i>
+                                      </button>
+                                      <ul class="dropdown-menu dropdown-menu-right">
+                                        <?php if ($csv) { ?> 
+                                        <li><a class="dropdown-item" onclick="downloadCSV();">Export to CSV</a></li>
+                                        <?php } ?>
+                                        <?php if ($xls) { ?>
+                                        <li><a class="dropdown-item" onclick="downloadEXCEL();">Export to Excel</a></li>
+                                        <?php } ?>
+                                        <?php if ($pdf) { ?>
+                                        <!--<li><a class="dropdown-item" onclick="downloadPDF();">Export to PDF</a></li>-->
+                                        <?php } ?>
+                                      </ul>
+                                  </div>
+                                  <?php } ?>
+                                  <!--<button type="button" class="btn btn-icon" id="dt_reload" onclick="refresh();"><i class="lnr icon-refresh"></i></button>-->
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div id="myGrid" class="ag-theme-material"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<script> 
+    var trackerId="<?php echo $trackerId;?>";
+    var formId="<?php echo $formId;?>";
+    var reportId="<?php echo $reportId;?>";
+    var condition = "<?php echo $condition;?>";
+    var headBreadcrumb = "<?php echo $headBreadcrumb;?>"
+    var canEdit = "<?php echo $canEdit;?>";
+    var canRead = "<?php echo $canRead;?>";   
+    var urlQuery = "<?php echo $urlQuery;?>"; 
+    var baseEncode = "<?php echo $baseEncode;?>";
+    
+</script>
+
+<form action="" id="downloadReport" method="POST">
+    <input type="hidden" name="condition" value="<?=$condition;?>" />
+    <input type="hidden" name="headBreadcrumb" value="<?=$headBreadcrumb;?>" />
+    <input type="hidden" name="filteredData" value="<?=base64_encode(serialize($filteredData));?>"/>
+    <input type="hidden" name="urlQuery" value="<?=$urlQuery;?>" />
+</form>
+
+ <?php 
+    $this->inlineScript()
+         ->appendFile($this->basePath() . '/js/module/common/report/report.js', 'text/javascript');

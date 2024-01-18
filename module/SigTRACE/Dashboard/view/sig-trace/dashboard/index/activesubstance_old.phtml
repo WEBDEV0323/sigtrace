@@ -1,0 +1,122 @@
+<?php 
+    $title = 'Molecule List';
+?>
+<div class="pagebar container-fluid col-md-12">
+    <ol class="breadcrumb">
+        <li class="active"><span><?php echo $this->escapeHtml($title); ?></span></li>
+    </ol>
+</div>
+
+<div class="card">
+  <div class="card-body">
+    <div class="card card-default mb-2">
+    <div class="card-body">
+            <a href="\signalcalendar/<?php echo "".$trackerId."/".$formId; ?>" ><button type="button" class="btn btn-primary float-right" >Signal Calendar</button></a>
+        </div>
+        <div class="card-body"> 
+
+            <div class="row">
+              <ul class="nav nav-tabs" id="myTab" role="tablist">
+              <?php foreach ($tabList as $key => $tab) { 
+                  if ($tab['dashboard_name'] == "moleculesourceList") {
+
+                  ?>
+                    <li class="nav-item">
+                    <a id="<?=$tab['dashboard_name'];?>-tab" data-toggle="tab" href="#<?=$tab['dashboard_name'];?>" role="tab" aria-controls="<?=$tab['dashboard_name'];?>" aria-selected="true" dashId="<?=$tab['dashboard_id'];?>">
+                        
+                    </a>
+                    </li>
+                  <?php 
+                  }
+
+               }?>
+               
+              </ul>
+            </div>
+          
+            <div class="tab-content " id="myTabContent">
+                <div class="tab-pane fade " id="moleculesourceList" role="tabpanel" aria-labelledby="quantitativeAnalysis-tab">
+                <?=$this->render('filters.phtml');?>
+                    <div class="card-columns card-body"  data-always-visible="1" data-rail-visible="0" id ="quantitativeAnalysisGrids">                                  
+                        <?php foreach ($productsList as $key => $product) { ?>
+                            <div class="card btn-primary gridTab" formId="<?=$formId;?>" tabid="<?=$product['tabId']?>" active_substance="<?=$product['active_substance']?>" asid="<?=$product['as_id']?>" atab="<?=$product['tabName']?>">
+                                <a href="javascript:void(0);" onclick="window.location.href = '#'">
+                                    <div class="card-body">
+                                    <h6 class="card-title text-white"> <?=$product['active_substance']?></h6>
+                                        <!-- <span class="float-left text-white"> Total : <?=$product['total_cnt']?></span>
+                                        <span class="float-right text-white">Pending : <?=$product['pending_cnt']?></span> -->
+                                    </div>
+                                </a>
+                            </div>
+                        <?}?>
+                    </div>  
+
+                </div>
+                <?php foreach ($tabList as $key => $tab) { ?>
+                    <?php if(!isset($tab['tab'])) {?>
+                    <div class="tab-pane fade" id="<?=$tab['dashboard_name'];?>" role="tabpanel" aria-labelledby="<?=$tab['dashboard_name'];?>-tab">
+                        <div class="card card-body" >
+                            <form class="form-row" id ="<?=$tab['dashboard_name'];?>Filter">
+
+                            </form>
+                        </div>
+                        <div class="card-columns card-body"  data-always-visible="1" data-rail-visible="0" id ="<?=$tab['dashboard_name'];?>Grid"> 
+                        </div>
+                    </div>
+                    <?php } else {?>
+                    <div class="tab-pane fade" id="<?=$tab['dashboard_name'];?>" role="tabpanel" aria-labelledby="<?=$tab['dashboard_name'];?>-tab">
+                        
+                        <div class="row">
+                            <ul class="nav nav-tabs" id="myTab" role="tablist">
+                                <?php foreach ($tab['tab'] as $key => $tabIn) { ?>
+                                    
+                                    <li class="nav-item">
+                                        <a class="nav-link " id="<?=$tabIn['dashboard_name'];?>-tab" data-toggle="tab" href="#<?=$tabIn['dashboard_name'];?>" role="tab" aria-controls="<?=$tabIn['dashboard_name'];?>" aria-selected="true" data-tab ='<?php echo json_encode($tabIn);?>' dashId="<?=$tabIn['dashboard_id'];?>">
+                                            <div class="p-1 mb-1"><b><?php echo $tabIn['label'];?></b></div>
+                                        </a>
+                                    </li>
+                                    
+                                <?php }?>
+                            </ul>
+                        </div>
+                        <div class="tab-content " id="myTabContent">
+                            <?php foreach ($tab['tab'] as $key => $tabIn) { ?>
+                                <div class="tab-pane fade" id="<?=$tabIn['dashboard_name'];?>" role="tabpanel" aria-labelledby="<?=$tabIn['dashboard_name'];?>-tab">
+                                <div class="card card-body">
+                                    <form class="form-row" id ="<?=$tabIn['dashboard_name'];?>Filter">
+
+                                    </form>
+                                </div>
+                                    <div class="card-columns card-body"  data-always-visible="1" data-rail-visible="0" id ="<?=$tabIn['dashboard_name'];?>Grid"> 
+                                    </div>
+                                </div>
+                            <?php }?>
+                        </div>
+                        
+                    </div>
+                    <?php }?>
+                <?php }?>
+    
+
+            </div>
+          </div>
+    </div>
+  </div>
+</div>
+
+<script>
+    var trackerId = '<?=$trackerId;?>';
+    var formId = '<?=$formId;?>';
+    var url = document.location.toString();
+    $(function () {
+        $('#myTab li:first-child a').tab('show');
+    });
+    
+</script>
+<style>
+    .ui-datepicker-today .ui-state-highlight { background: ...; }
+
+</style>
+<?php
+$this->inlineScript()
+    ->appendFile($this->basePath() . '/js/module/sigtrace/dashboard/sourcelist.js');

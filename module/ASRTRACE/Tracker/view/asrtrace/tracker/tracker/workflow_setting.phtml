@@ -1,0 +1,792 @@
+<?php
+$tracker_details = $trackerRsults['tracker_details'];
+$forms = $trackerRsults['forms'];
+$tracker_name = $tracker_details['name'];
+$title = "$tracker_name - Workflow Settings";
+$this->headTitle($title);
+?>
+
+<div class="container-liquid">
+    <div class="row">
+        <div class="col-xs-12">
+            <div class="sec-box">
+                <!--                <a class="closethis">Close</a>-->
+                <header>
+                    <h2 class="heading"><?php echo $this->escapeHtml($title); ?></h2>
+                </header>
+                <div class="contents boxpadding">
+                    <div class="panel panel-default">
+                        <div class="panel-body">
+                            <div class="btn-group" role="group" aria-label="...">
+                                <a href="<?php echo $this->url('tracker', array('action' => 'view', 'tracker_id' => $tracker_id)) ?>">
+                                    <button type="button" class="btn btn-default"><span class="glyphicon glyphicon-home" aria-hidden="true"></span><br/>Home</button>
+                                </a>
+                            </div>
+                            <div class="btn-group" role="group" aria-label="...">
+                                <a href="<?php echo $this->url('tracker', array('action' => 'settings', 'tracker_id' => $tracker_id)) ?>">
+                                    <button type="button" class="btn btn-info"><span class="glyphicon glyphicon-asterisk" aria-hidden="true"></span><br/>Settings</button>
+                                </a>
+                            </div>
+                            <?php
+                            foreach ($forms as $key => $value) {
+                                $form_name = $value['form_name'];
+                                $form_id = $value['form_id'];
+                                ?>
+
+                                <div class="btn-group" role="group" aria-label="...">
+                                    <a href="<?php echo $this->url('tracker', array('action' => 'form', 'tracker_id' => $tracker_id, 'action_id' => $form_id)) ?>">
+                                        <button type="button" class="btn btn-default"><span class="glyphicon glyphicon-list-alt" aria-hidden="true"></span><br/><?= $form_name; ?></button>
+                                    </a>
+                                </div>
+                                <?
+                                }
+                                ?>
+                                <div class="btn-group" style="float:right" role="group" aria-label="...">
+                                    <a href="<?php echo $this->url('tracker', array('action' => 'newform', 'tracker_id' => $tracker_id)) ?>">
+                                        <button type="button" class="btn btn-default"><span class="glyphicon glyphicon-plus-sign" aria-hidden="true"></span><br/>New Form</button>
+                                    </a>
+                                </div>
+
+                            </div>
+                        </div>
+                        <div class="panel panel-default" >
+                            <div class="panel-body">
+                                <div  class="clearfix">
+                                    <b>Rules</b>
+                                </div>    
+                                <hr/>
+                                <div class="contents boxpadding">
+                                    <span style="float: right">
+                                        <!--                                        <a id="addrule"  data-toggle="modal">+Add New</a>-->
+                                        <input id="addrule" class="stdButton"  value="ADD NEW RULE" style="visibility: visible;margin-left: 627px;" type="button">
+                                    </span>
+                                </div>
+                                <?php
+                                $flashMessage = $this->flashMessenger()->getMessages();
+                                //print_r($flashMessage);die;
+                                if (count($flashMessage) && isset($flashMessage[0]['success'])) {
+                                    echo '<div class="contents boxpadding"><div class="alert alert-dismissable alert-success">								
+                                                    ' . $flashMessage[0]['success'] . '
+                                    <button type="button" class="close" data-dismiss="alert" aria-hidden="true">×</button>							
+                           </div></div>';
+                                }
+                                ?>
+                                <div class="contents boxpadding">
+                                    <table  class="table table-striped">
+                                        <thead>
+                                            <tr>
+                                                <th>Sl No</th>
+                                                <th>Rule</th>
+                                                <th>Form</th>
+                                                <th>Delete</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            <?php
+                                            $ival = 0;
+                                            if (!empty($workflowRules)) {
+                                                foreach ($workflowRules as $rules => $value) {
+                                                    // print_r($workflowRules);die;
+                                                    ?>
+                                                    <tr id="rule_<?php echo $value->rule_id ?>">
+                                                        <td><?php
+                                        $ival++;
+                                        echo $this->escapeHtml($ival);
+                                                    ?></td>
+                                                        <td><?php echo $value->rule ?></td>
+                                                        <td><?php echo $value->form_name ?></td>
+                                                        <td><a onclick="deleteRule(<?php echo $value->rule_id ?>,<?php echo $value->form_id ?>)" href="javascript:void(0)" aria-label="Left Align">
+                                                                <span class="glyphicon glyphicon-trash" aria-hidden="true"></span>
+                                                            </a><br/><span id="del_<?php echo $value->rule_id ?>"></span></td>
+                                                    </tr>
+                                                <?php
+                                                }
+                                            } else {
+                                                ?>
+                                                <tr id="rule">
+                                                    <td colspan='4'><?php
+                                                        echo "No data Exist";
+                                                        ?>
+                                                    </td>
+                                                </tr>
+                                            <?php } ?>
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="contents boxpadding" id="rules_display_section" style="display:none">
+                        <div class="panel panel-default">
+                            <div class="panel-body">
+                                <form id="ruleForm" method="post" action="" name="ruleForm">
+                                    <h4><i class="icon-minus" id="icon_data_1"></i>Rule
+                                        <input  id="ruAddCondBut" class="stdButton" onclick="ClickAddCond(event)" value="ADD CONDITION" style="visibility: visible;margin-left: 627px;" type="button">
+                                        <input id="ruAddActionBut" class="stdButton" onclick="ClickAddAction(event)" value="ADD ACTION" style="visibility: visible;" type="button"></h4>
+                                    <div class="form-group">
+                                        <label class="col-sm-3 control-label" style="padding-left: 0px;">
+                                            Form
+                                        </label>
+                                        <div class="col-sm-6">
+                                            <select class="form-control" placeholder="" onchange="getfields(this)"id="r_form" name="mrapprovalstart" required="">
+                                                <option value="">Please Select</option>
+                                                <?php foreach ($forms as $key => $value) { ?>
+                                                    <option value="<?php echo $value['form_id'] ?>"><?php echo $value['form_name'] ?></option>
+                                                    <? } ?>
+                                                </select><label for="r_form" style="display:none;color: red;" class="error">This field is required.</label>
+
+                                            </div>
+                                        </div>
+                                        <div class="form-group">
+                                            <label class="col-sm-3 control-label" style="padding-left: 0px;" for="r_condition">Select Condition</label>
+                                            <div class="col-sm-6">
+                                                <select name="r_condition" class="form-control" id="r_condition" required="required">
+                                                    <option value="">Select Condition</option>
+                                                    <option value="AND">And</option>
+                                                    <option value="OR">OR</option></select><label for="r_condition" style="display:none;color: red;" class="error">This field is required.</label>
+                                            </div>
+                                        </div>
+                                        <div id="conditionsgroup">
+                                            <div  class="form-group">
+                                                <label class="col-sm-3 control-label" style="padding-left: 0px;" for="r_condition">When</label>
+                                                <div class="col-sm-6" style="width:28%">
+                                                    <select id="n_condtionfields_1" style="width: 240px;"  class="demo-default n_condtionfield">   
+                                                    </select>
+                                                    <label class="error" style="display:none;color: red; cursor: pointer;" id="n_condtionfield_error_1">This field is required.</label>
+                                                </div>
+                                                <div class="col-sm-6" style="width:20%">
+                                                    <select id="n_condition_operands_1"  class=" demo-default n_condition_operand">
+                                                        <option value="">Select Condition</option>
+                                                        <option value="=">=</option>
+                                                        <option value="<>">!-</option>
+                                                        <option value=">">&gt</option>
+                                                        <option value="<"><</option>
+                                                    </select>
+                                                    <label class="error" style="display:none;color: red; cursor: pointer;" id="n_condition_operand_error_1">This field is required.</label>
+                                                </div>
+                                                <!--div class="col-sm-6" style="width:20%">
+                                                    <input size="25" style="" id="cond_values_1" required  class="r_value" name="cond_values_1" type="text">
+                                                </div-->
+                                                <div class="col-sm-6" style="width:20%" style="position:relative;border:0;padding:0;margin:0;">
+                                                    <select id="selectuser_1" style="display:none;position:absolute;top:0px;left:0px;width:200px; height:20px;line-height:20px;margin:0;padding:0;">
+                                                        <option value=""></option>
+                                                        <option value="cur_user">Current User</option>
+                                                    </select>
+                                                    <input class="displayValue" name="displayValue_1" placeholder="add/select a value" 
+                                                           id="displayValue_1" style="position:absolute;top:0px;left:0px;width:183px;height:20px;border:1px solid #556;" onfocus="this.select()" type="text">
+                                                    <input class="cond_values" name="cond_values_1" id="cond_values_1" type="hidden">
+                                                    <label class="error" style="color: red; cursor: pointer;display:none;margin-top: 18px;" id="n_condition_value_error_1">This field is required.</label>
+                                                </div>
+
+
+
+
+
+                                            </div>
+
+
+                                        </div>
+
+                                        <div id="actionsgroup">
+                                            <div  class="form-group">
+                                                <label class="col-sm-3 control-label" style="padding-left: 0px;" for="r_condition">Action</label> 
+                                                <div class="col-sm-6" style="width:25%">
+                                                    <select id="n_actions_1"  class=" demo-default n_actions">
+                                                        <option value="">Select Action</option>
+                                                        <option value="Edit Workflow">Edit Workflow</option>
+                                                    </select>
+                                                    <label class="error" style="display:none;color: red; cursor: pointer;" id="n_action_error_1">This field is required.</label>
+                                                </div>
+                                                <div class="col-sm-6" style="width:35%">
+                                                    <select id="n_condtionvals_1" style="width: 195px;"  class="demo-default n_condtionvals" value="Select Value" placeholder="Select Value">
+                                                    </select>
+                                                    <label class="error" style="display:none;color: red; cursor: pointer;" id="n_condtionval_error_1">This field is required.</label>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="modal-footer" style="padding-bottom:0px">
+                                            <?php // echo $this->formSubmit($form->get('submit'));      ?>
+                                            <button onclick="addNewRule('<?php echo $tracker_id ?>')" type="button" class="btn btn-primary">Save</button>
+                                            <button onclick="window.location.href='/tracker/settings/<?php echo $tracker_id ?>'"  class="btn btn-primary" type="button">Cancel</button>
+                                        </div>
+                                    </form> 
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                            </div>
+                <!-- Right Section End -->
+            </div>
+</div>
+</div>
+                    <div class="modal fade" id="addcommentasreason" data-backdrop="static" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+                        <div class="modal-dialog"  style="margin-bottom:0px;" >
+                            <div class="modal-content" id="modelContentAdd">
+                                <div class="panel-primary" style="margin:0px">
+                                    <div class="panel-heading">Comments<button aria-hidden="true" data-dismiss="modal" class="close" type="button">×</button></div>
+                                    <div class="modal-body">
+                                        <div class="form-group">
+                                            <textarea id="addcomment" class="form-control" placeholder="Add Comment" name="addcomment"></textarea>   
+                                            <span id="commenterror" style="display:none;color: red;">Please add reason for change</span>
+                                            <span id="status_for_reason"></span>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div style="clear:both"></div>
+                                <div class="modal-footer">
+                                    <button onclick="reasonforchange()" type="button" class="btn btn-primary">Save</button>
+                                    <button class="btn btn-default" type="button" data-dismiss="modal">Close</button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <!-- Content Section End -->
+
+   <div class="modal fade" id="deletecommentasreason" data-backdrop="static" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+    <div>      
+        <br />
+        <br />
+                </div>
+    <div class="modal-dialog"  style="margin-bottom:0px;" >
+                                        <div class="modal-content" id="modelContentdelete">
+
+                                            <div class="panel-primary" style="margin:0px">
+                                                <div class="panel-heading">Comments<button aria-hidden="true" data-dismiss="modal" class="close" type="button">×</button></div>
+<!--                                                <div class="form-group" style=" padding-left: 10px;" id="optionsView">
+                                                    <textarea id="addcomment" required="required"  placeholder="Add Comment" name="addcomment"></textarea>
+                                                </div>-->
+                                            <div class="modal-body">
+                                                <div class="form-group">
+                                                    <textarea id="addcommentfordelete" class="form-control" placeholder="Add reason for deletion." name="addcomment"></textarea>   
+                                                    <span id="commenterrorfordelete" style="display:none;color: red;">Please add reason for change</span>
+            </div>
+        </div>
+                                            </div>
+
+                                            <div style="clear:both"></div>
+                                            
+                                            <div class="modal-footer">
+                                                <button id="reasonfordelete"  type="button" class="btn btn-primary">OK</button>
+                                                <button class="btn btn-default" type="button" data-dismiss="modal">Close</button>
+                                            </div>
+                                        </div>
+                                    </div>
+    </div>
+        <div id="loading" style="display:none">
+            <p class="loader_img" id="loading_mask_loader">
+                <img src="/assets/spinner.gif" alt="Loading...">
+                <br>
+                <span>Please wait...</span>
+            </p>
+        </div>
+
+        <style> 
+            #loading, #page_load {
+                width: 100%;
+                height: 100%;
+                top: 0;
+                position: fixed;
+                opacity: 0.7;
+                background-color: #fff;
+                z-index: 999999;
+                left: 0px;
+            }
+            .loader_img {
+                background: none repeat scroll 0 0 #fff4e9;
+                border: 2px solid #000;
+                color:#000;
+                font-weight: bold;
+                left: 55%;
+                margin-left: -105px;
+                padding: 15px 30px;
+                position: fixed;
+                text-align: center;
+                top: 40%;
+                width: 150px;
+                z-index: 1000;
+            }
+
+            #loading-image {
+                position: absolute;
+                top: 300px;
+                /*left: 240px;*/
+                z-index: 100;
+            }
+            .mobile_subscribe {
+                background: none repeat scroll 0 0 #fff;
+                border: 1px solid #d5d5d5;
+                border-radius: 16px;
+                color: #000;
+                font-family: robotocondensed;
+                font-size: 12px;
+                margin: 0;
+                padding: 0 9px;
+                width: 89.8%;
+                height: 26px;
+            }
+            .btn-file {
+                position: relative;
+                overflow: hidden;
+            }
+            .btn-file input[type=file] {
+                position: absolute;
+                top: 0;
+                right: 0;
+                min-width: 100%;
+                min-height: 100%;
+                font-size: 100px;
+                text-align: right;
+                filter: alpha(opacity=0);
+                opacity: 0;
+                outline: none;
+                background: white;
+                cursor: inherit;
+                display: block;
+            }
+        </style>
+
+    <script type="text/javascript">
+            str = 2;
+            actionstr = 2;
+            cond_option = '';
+            action_option = '';
+            rule_id = 0;
+
+            $('#conditionsgroup').on('change', '[id^="selectuser_"]', function () {
+                var id = this.id;
+                var id = id.split('_');
+                document.getElementById('displayValue_' + id[1]).value = this.options[this.selectedIndex].text;
+                document.getElementById('cond_values_' + id[1]).value = this.options[this.selectedIndex].value;
+            });
+
+            $('#conditionsgroup').on('keyup', '[id^="displayValue_"]', function () {
+                var id = this.id;
+                var id = id.split('_');
+                document.getElementById('cond_values_' + id[1]).value = this.value;
+            });
+
+
+            $('[id^="rule_"]').click(function () {
+                $("#loading").show();
+                $("#rules_display_section").show();
+                $("#r_form").val('');
+                $("#r_condition").val('');
+                $('.n_condtionfield').each(function (i, obj) {
+                    var id = obj.id.split('_');
+                    if (id[2] > 1) {
+                        $("#add_condition_" + id[2]).remove();
+                    }
+                    $("#n_condtionvals_" + id[2]).val('');
+                    $("#n_condtionfields_" + id[2]).val('');
+                    $("#n_condition_operands_" + id[2]).val('');
+                });
+
+                $('.n_actions').each(function (i, obj) {
+                    var id = obj.id.split('_');
+                    if (id[2] > 1) {
+                        $("#add_action_" + id[2]).remove();
+                    }
+                    $("#n_actions_" + id[2]).val('');
+                    $("#cond_values_" + id[2]).val('');
+                });
+                id = this.id.split('_');
+                rule_id = id[1];
+                var url = "<?php echo $this->url('tracker', array('action' => 'getruleinfo')); ?>";
+                $.ajax({
+                    url: url,
+                    data: "rule_id=" + id[1],
+                    type: "POST",
+                    //async: false,
+                    success: function (data) {
+                        var resp = JSON.parse(data);
+                        $("#r_form").val(resp[0][0].form_id);
+                        getfields(resp[0][0].form_id);
+                        var ind = 0;
+                        var action_ind = 0;
+                        $("#r_condition").val(resp[0][0].operator);
+                        $.each(resp[0], function (i, item) {
+                            ind = i + 1;
+                            if (i > 0) {
+                                str = i + 1;
+                                ClickAddCond();
+                            }
+                            $("#n_condtionfields_" + ind).val(resp[0][i].field_id);
+                            $("#n_condition_operands_" + ind).val(resp[0][i].comparision_op);
+                            $("#cond_values_" + ind).val(resp[0][i].condition_val);
+                            if (resp[0][i].condition_val == 'cur_user')
+                            {
+                                $('#selectuser_' + ind).val(resp[0][i].condition_val);
+                                // document.getElementById('selectuser_' + ind).value = resp[0][i].condition_val;
+                                $("#selectuser_" + ind + " option[value='cur_user']").attr("selected", "selected");
+                                document.getElementById('displayValue_' + ind).value = $("#selectuser_" + ind + " option:selected").text();
+                                $('#selectuser_' + ind).show();
+                            } else {
+                                document.getElementById('displayValue_' + ind).value = resp[0][i].condition_val;
+                                $('#displayValue_' + ind).show();
+                                $('#selectuser_' + ind).show();
+                            }
+                        });
+                        $.each(resp[1], function (j, item) {
+                            action_ind = j + 1;
+                            if (j > 0) {
+                                actionstr = j + 1;
+                                ClickAddAction();
+                            }
+                            $("#n_actions_" + action_ind).val(item.action);
+                            $("#n_condtionvals_" + action_ind).val(item.action_val);
+
+                        });
+                        $("#loading").hide();
+
+                    }
+                });
+            });
+
+            $('#conditionsgroup').on('change', '[id^="n_condtionfields_"]', function () {
+                var id = this.id;
+                id = id.split('_');
+                if ($('option:selected', this).attr('type') == 'User') {
+                    $("#selectuser_" + id[2]).show();
+                }
+                else {
+                    $("#selectuser_" + id[2]).hide();
+                }
+            });
+
+            $('[id^="addrule"]').click(function () {
+                $("#loading").show();
+                $("#rules_display_section").show();
+                $("#r_form").val('');
+                $(".error").hide();
+                rule_id = 0;
+                $("#r_condition").val('');
+                $('.n_condtionfield').each(function (i, obj) {
+                    var id = obj.id.split('_');
+                    if (id[2] > 1) {
+                        $("#add_condition_" + id[2]).remove();
+                    }
+                    $("#n_condtionvals_" + id[2]).val('');
+                    $("#n_condtionfields_" + id[2]).val('');
+                    $("#n_condition_operands_" + id[2]).val('');
+                });
+
+                $('.n_actions').each(function (i, obj) {
+                    var id = obj.id.split('_');
+                    if (id[2] > 1) {
+                        $("#add_action_" + id[2]).remove();
+                    }
+                    $("#n_actions_" + id[2]).val('');
+                    $("#cond_values_" + id[2]).val('');
+                });
+                $("#loading").hide();
+
+
+            });
+            function getfields() {
+                if ($('#r_form').val() > 0) {
+                    var url = "<?php echo $this->url('tracker', array('action' => 'getformfields')); ?>";
+                    $.ajax({
+                        url: url,
+                        data: 'form_id=' + $('#r_form').val(),
+                        type: "POST",
+                        async: false,
+                        success: function (data) {
+                            var resp = JSON.parse(data);
+                            cond_option = '';
+                            $.each(resp, function (i, item) {
+                                cond_option += '<option value="' + item['field_id'] + '" type="' + item['field_type'] + '">' + item['field_name'] + '</option>';
+                            });
+                            $('[id^="n_condtionfields_"]').html('');
+                            $('[id^="n_condtionfields_"]').append(cond_option);
+                        }
+                    });
+
+                    $.ajax({
+                        url: "/tracker/getWorkflow",
+                        type: 'post',
+                        async: false,
+                        data: "tracker_id=" + <?php echo $tracker_id ?> + '&form_id=' + $('#r_form').val(),
+                        success: function (data) {
+                            var resp = JSON.parse(data);
+                            action_option = '';
+                            $.each(resp, function (i, item) {
+                                action_option += '<option value="' + item['workflow_id'] + '">' + item['workflow_name'] + '</option>';
+                            });
+                            $('[id^="n_condtionvals_"]').html('');
+                            $('[id^="n_condtionvals_"]').append(action_option);
+                        }
+                    });
+                }
+            }
+
+            function ClickAddCond() {
+                html = '<div id="add_condition_' + str + '" class="form-group">\n\
+        <label class="col-sm-3 control-label" style="padding-left: 0px;" for="r_condition"></label>\n\
+        <div class="col-sm-6" style="width:28%">\n\
+        <select  style="width: 240px;" id="n_condtionfields_' + str + '" class="demo-default n_condtionfield">\n\
+        \n\</select>\n\
+        <label class="error" style="display:none;color: red; cursor: pointer;" id="n_condtionfield_error_' + str + '">This field is required.</label>\n\
+        </div>\n\
+        <div class="col-sm-6" style="width:20%">\n\
+        <select id="n_condition_operands_' + str + '"   class=" demo-default n_condition_operand">\n\
+        <option value="">Select Condition</option>\n\
+        <option value="=">=</option><option value="<>">!-</option>\n\
+        <option value=">">&gt</option><option value="<"><</option></select>\n\
+        <label class="error" style="display:none;color: red; cursor: pointer;" id="n_condition_operand_error_' + str + '">This field is required.</label>\n\
+        </div><div class="col-sm-6" style="width:20%" \n\
+        style="position:relative;border:0;padding:0;margin:0;">\n\
+        <select id="selectuser_' + str + '" style="display:none;position:absolute;top:0px;left:0px;width:200px;\n\
+        height:20px;line-height:20px;margin:0;padding:0;">\n\
+        <option value=""></option><option value="cur_user">Current User</option></select>\n\
+        <input class="displayValue" name="displayValue_' + str + '" placeholder="add/select a value"  id="displayValue_' + str + '" style="position:absolute;top:0px;left:0px;width:183px;height:20px;border:1px solid #556;" type="text"><input name="cond_values_1" class="cond_values" id="cond_values_' + str + '" type="hidden">\n\
+        \n\
+        <label class="error" style="display:none;margin-top: 18px;color: red; cursor: pointer;" id="n_condition_value_error_' + str + '">This field is required.</label>\n\
+        </div>\n\
+        \n\
+        <div class="col-sm-6" style="width: 5%; margin-left: 0px;">\n\
+        <i class="icon-remove" onclick="delcondition(this)" style="color: red; cursor: pointer;"></i>\n\
+        </div></div>';
+                $("#conditionsgroup").append(html);
+                //  $('[id^="n_condtionfields_"]').html('');
+                $('[id^="n_condtionfields_"]').append(cond_option);
+                str++;
+
+            }
+
+            function delcondition(node)
+            {
+                r = node.parentNode.parentNode;
+                r.parentNode.removeChild(r);
+            }
+
+            function delaction(node)
+            {
+                r = node.parentNode.parentNode;
+                r.parentNode.removeChild(r);
+            }
+
+            function ClickAddAction() {
+                html = '<div id="add_action_' + actionstr + '"  class="form-group">\n\
+        <label class="col-sm-3 control-label" style="padding-left: 0px;" for="r_condition"></label>\n\
+        <div class="col-sm-6" style="width:25%">\n\
+        <select   id="n_actions_' + actionstr + '" class="demo-default n_actions">\n\
+        <option value="">Select Action</option>\n\
+        <option value="Edit Workflow">Edit Workflow</option></select>\n\
+        <label class="error" style="display:none;color: red; cursor: pointer;" id="n_action_error_' + actionstr + '">This field is required.</label>\n\
+        </div>\n\
+        <div class="col-sm-6" style="width:30%">\n\
+        <select id="n_condtionvals_' + actionstr + '"  style="width: 195px;"  class=" demo-default n_condtionvals" placeholder="Select Value"></select>\n\
+        <label class="error" style="display:none;color: red; cursor: pointer;" id="n_condtionval_error_' + actionstr + '">This field is required.</label>\n\
+        </div>\n\
+        <div class="col-sm-6" style="width: 5%;">\n\
+        <i class="icon-remove" onclick="delaction(this)" style="color: red; cursor: pointer;"></i>\n\
+        </div</div>';
+                $("#actionsgroup").append(html);
+                // $('[id^="n_condtionvals_"]').html('');
+                $('[id^="n_condtionvals_"]').append(action_option);
+                actionstr++;
+
+            }
+
+            function addNewRule(tracker_id) {
+                var flag = true;
+                var valid = $("#ruleForm").valid();
+                var elem = document.getElementsByClassName("n_condtionfield");
+                var condition_on_field = [];
+                for (var i = 0; i < elem.length; ++i) {
+                    var id = elem[i].id;
+                    if (id != '') {
+                        id = id.split('_');
+                        $('#n_condtionfield_error_' + id[2]).hide();
+                        //   $('#n_condtionfield_first').hide();
+                        if (elem[i].value == "") {
+                            if (id[2] != undefined) {
+                                $('#n_condtionfield_error_' + id[2]).show();
+                            }
+                            else {
+                                $('#n_condtionfield_1').show();
+                            }
+                            flag = false;
+                        }
+                    }
+                }
+
+
+                var elem = document.getElementsByClassName("displayValue");
+                for (var i = 0; i < elem.length; ++i) {
+                    id = elem[i].id;
+                    if (id != '') {
+                        id = id.split('_');
+                        $('#n_condition_value_error_' + id[1]).hide();
+                        if (elem[i].value == "") {
+                            $('#n_condition_value_error_' + id[1]).show();
+                            flag = false;
+                        }
+                    }
+                }
+
+                var elem = document.getElementsByClassName("n_condtionvals");
+                for (var i = 0; i < elem.length; ++i) {
+                    id = elem[i].id;
+                    if (id != '') {
+                        id = id.split('_');
+                        $('#n_condtionval_error_' + id[2]).hide();
+                        if (elem[i].value == "") {
+                            $('#n_condtionval_error_' + id[2]).show();
+                            flag = false;
+                        }
+                    }
+                }
+
+
+
+                var elem = document.getElementsByClassName("n_actions");
+                for (var i = 0; i < elem.length; ++i) {
+                    id = elem[i].id;
+                    if (id != '') {
+                        id = id.split('_');
+                        $('#n_action_error_' + id[2]).hide();
+                        if (elem[i].value == "") {
+                            $('#n_action_error_' + id[2]).show();
+                            flag = false;
+                        }
+                    }
+                }
+
+                var elem = document.getElementsByClassName("n_condition_operand");
+                for (var i = 0; i < elem.length; ++i) {
+                    id = elem[i].id;
+                    if (id != '') {
+                        id = id.split('_');
+                        $('#n_condition_operand_error_' + id[3]).hide();
+                        if (elem[i].value == "") {
+                            $('#n_condition_operand_error_' + id[3]).show();
+                            flag = false;
+                        }
+                    }
+                }
+                if (!valid || flag == false) {
+                    return false;
+                }
+                else {
+                    $("#loading").show();
+                    /*if (rule_id > 0)
+                     {
+                     $('#addcommentasreason').modal('show');
+                     $('#commenterror').hide();
+                     } else {*/
+                    var form_id = $('#r_form').val();
+                    var elem = document.getElementsByClassName("n_condtionfield");
+                    var r_cond = $("#r_condition").val();
+                    var condition_on_field = [];
+                    for (var i = 0; i < elem.length; ++i) {
+                        if (typeof elem[i].value !== "undefined") {
+                            condition_on_field.push(elem[i].value);
+                        }
+                    }
+
+                    var elem = document.getElementsByClassName("n_condition_operand");
+                    var condition_operand = [];
+                    for (var i = 0; i < elem.length; ++i) {
+                        if (typeof elem[i].value !== "undefined") {
+                            condition_operand.push(elem[i].value);
+                        }
+                    }
+
+                    var elem = document.getElementsByClassName("cond_values");
+                    var value = [];
+                    for (var i = 0; i < elem.length; ++i) {
+                        if (typeof elem[i].value !== "undefined") {
+                            value.push(elem[i].value);
+                        }
+                    }
+
+                    var elem = document.getElementsByClassName("n_condtionvals");
+                    var action_value = [];
+                    for (var i = 0; i < elem.length; ++i) {
+                        if (typeof elem[i].value !== "undefined") {
+                            action_value.push(elem[i].value);
+                        }
+                    }
+
+                    var elem = document.getElementsByClassName("n_actions");
+                    var action_name = [];
+                    for (var i = 0; i < elem.length; ++i) {
+                        if (typeof elem[i].value !== "undefined") {
+                            action_name.push(elem[i].value);
+                        }
+                    }
+                    var data = {
+                        rule_id: rule_id,
+                        tracker_id: tracker_id,
+                        form_id: form_id,
+                        r_cond: r_cond,
+                        condition_on_field: condition_on_field,
+                        condition_operand: condition_operand,
+                        value: value,
+                        comment: $('#addcomment').val(),
+                        action_value: action_value,
+                        action_name: action_name
+                    }
+                    var url = "/tracker/saverule/" + tracker_id;
+                    $.post(url, data, function (respJson) {
+                        window.location.assign('/tracker/workflow_setting/' + tracker_id);
+                        $("#loading").hide();
+                    });
+                }
+            }
+
+            function deleteRule(ruleId, formId) {
+                
+                $('#deletecommentasreason').modal('show');
+                $("#reasonfordelete").click(function(){
+                $('#commenterrorfordelete').hide();
+                if ($('#addcommentfordelete').val() == ''){
+                    $('#commenterrorfordelete').show();
+                    return false;
+                }
+            else{
+                    var url = "<?php echo $this->url('tracker', array('action' => 'deleteRule', 'tracker_id' => $tracker_id)); ?>";
+                    $.post(url, {ruleId: ruleId, formId: formId, tracker_id:<?php echo $tracker_id; ?>, comment:$('#addcommentfordelete').val()}, function (respJson) {
+                        
+                if (respJson == "fail") {
+                    $("#del_" + ruleId).css('color', 'red');
+                    $("#del_" + ruleId).html("Delete Failed !");
+                }
+                else {
+                    window.location.assign('/tracker/workflow_setting/<?php echo $tracker_id; ?>');
+                }
+            });
+        }
+        });
+    }
+
+</script>
+
+
+
+
+
+<style>
+    .loader {
+        border: 16px solid #f3f3f3;
+        border-radius: 50%;
+        border-top: 16px solid blue;
+        border-bottom: 16px solid blue;
+        width: 1px;
+        height: 1px;
+        -webkit-animation: spin 2s linear infinite;
+        animation: spin 2s linear infinite;
+    }
+
+    @-webkit-keyframes spin {
+        0% { -webkit-transform: rotate(0deg); }
+        100% { -webkit-transform: rotate(360deg); }
+    }
+
+    @keyframes spin {
+        0% { transform: rotate(0deg); }
+        100% { transform: rotate(360deg); }
+    }
+
+</style>

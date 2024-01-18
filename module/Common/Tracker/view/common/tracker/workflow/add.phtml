@@ -1,0 +1,102 @@
+<?php
+$tracker_details = $trackerRsults['tracker_details'];
+$forms = $trackerRsults['forms'];
+$form_name = $form_details['form_name'];
+$record = $form_details['record_name'];
+$tracker_name = $tracker_details['name'];
+$title = "$tracker_name Tracker - $form_name";
+$this->headTitle($title);
+$m_wf_arr = array();
+?>
+<div class="pagebar container-fluid col-md-12">
+    <!-- Sidebar Toggle -->
+    <button type="button" class="pagebar-toggle navbar-toggle pull-left">
+      <span class="pagebar-arrow"></span>
+    </button>
+    <ol class="breadcrumb">
+        <li><span><a href="/workflow/workflow_management/<?=$trackerId;?>/<?=$formId;?>">Workflow Management</a></span></li>
+        <li class="active"><span>Add Workflow</span></li>
+    </ol>
+</div>
+<div class="card">
+    <div class="card-body">
+        <div class="card">
+            <div  class="card-header">
+                <b>New Workflow</b>
+            </div>
+            <div class="card-body">
+                <form id="commentForm" method="post" action="" name="myForm" class="form-horizontal">
+                    <div class="form-group row">
+                        <label class="col-sm-4"></label>
+                        <div id="workflowErrorMessages" class="error col-sm-6"></div>
+                    </div>
+                    <div class="form-group row">
+                        <label class="col-sm-4 col-form-label">
+                            Workflow Name <span class="error ml-1">*</span>
+                        </label>
+                        <div class="col-sm-7">
+                            <table class="col-sm-12">
+                                <tbody id="tabledivbody" >
+                                    <tr class="sectionsid">
+                                        <td>
+                                            <span class="sort_order_td">#<?=$max_sort_number + 1; ?></span>
+                                            <input class="sort_rder" value="<?=$max_sort_number + 1; ?>" type="hidden"/>
+                                        </td>
+                                        <td>
+                                            <input list="workflowType_0" name="workflowStep_0" class="form-control workflowSelect"/>
+<!--                                            <datalist placeholder="Workflow name" id="workflowType_0" required>
+                                                <?php
+//                                                    foreach ($master_workflow_array as $key => $value) {
+//                                                        $mast_wf_name = $value['workflow_name'];
+//                                                        $m_wf_arr[] = $mast_wf_name;
+                                                ?>
+                                                        <option value="<?//=$mast_wf_name ?>"><?//=$mast_wf_name ?></option>
+                                                <?php
+                                                   // }
+                                                ?>
+                                            </datalist>-->
+                                            <div class="error" id="forWorkflowName_0"></div> 
+                                        </td>
+                                        <td align="center">
+                                            <i class="lnr icon-plus-circle" style="color:green;cursor: pointer;" onClick="insSpec(); return false;" title="Add New"></i>
+                                            <!--<button type="button"id="add_img" class="btn btn-primary float-right mt-2" onClick="insSpec(); return false;" align="center"> Add New</button>-->
+                                        </td>
+                                    </tr> 
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>                                
+                    <div class="form-group row">
+                        <label class="col-sm-4 col-form-label">Reason for change<span class="error ml-1">*</span></label>
+                        <div class="col-sm-7">
+                           <textarea id="addcommentforworkflow" class="form-control" placeholder="Reason for change" name="addcomment"></textarea>
+                           <div id="commenterrorforworkflow" class="error"></div>
+                        </div>
+                    </div>
+                    <span id="status"></span>
+                    <div class="card-footer">
+                        <div class="form-group row">
+                            <div class="offset-sm-4">
+                                <button onclick="addWorkflow('next')" type="button" class="btn btn-primary ml-2">Save</button>
+                                <a href="<?php echo $this->url('workflow', array('action' => 'workflow_management', 'trackerId' => $trackerId, 'form_id' => $formId)) ?>">
+                                    <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+                                </a>
+                            </div>    
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+<input type="hidden" id="inputWfHidden">
+<input type="hidden" id="inputMaxWfHidden" value="<?=$max_sort_number;?>">
+<script> 
+var jsonData = '<?php echo json_encode($m_wf_arr);?>';
+var trackerId = '<?=$trackerId;?>';
+var formId = '<?=$formId;?>';
+</script>
+<?php $this->inlineScript()
+        ->appendFile($this->basePath() . '/assets/jQuery-3.3.1/jquery-ui.min.js')
+        ->appendFile($this->basePath() . '/js/module/common/tracker/addWorkflow.js');

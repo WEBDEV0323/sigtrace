@@ -1,0 +1,153 @@
+<?php
+use Zend\Session\Container;
+$tracker_details = $trackerRsults['tracker_details'];
+$forms = $trackerRsults['forms'];
+$tracker_name = $tracker_details['name'];
+$title = "$tracker_name Tracker - New Form";
+$this->headTitle($title);
+$container = new Container('msg');
+?>
+<div class="pagebar container-fluid col-md-12">
+    <!-- Sidebar Toggle -->
+    <button type="button" class="pagebar-toggle navbar-toggle pull-left">
+      <span class="pagebar-arrow"></span>
+    </button>
+    <ol class="breadcrumb">
+      <li class="active"><span><?php echo $this->escapeHtml($title); ?></span></li>
+    </ol>
+</div>
+
+<div class="card card-default">
+    <div class="card-body">
+        <?php if ($container->message == 'created') { ?>
+            <span style="color:green;float: left">
+                Tracker Created.
+                <?php $container->getManager()->getStorage()->clear('msg'); ?>
+            </span>
+        <?php } ?>
+        <div class="card mb-2">
+            <div class="card-body">
+                <div class="btn-group" role="group" aria-label="...">
+                    <a href="<?php echo $this->url('tracker', array('action' => 'view', 'tracker_id' => $tracker_id)) ?>">
+                        <button type="button" class="btn btn-default"><span class="lnr icon-home" aria-hidden="true"></span><br/>Home</button>
+                    </a>
+                </div>
+                <div class="btn-group" role="group" aria-label="...">
+                    <a href="<?php echo $this->url('tracker', array('action' => 'settings', 'tracker_id' => $tracker_id)) ?>">
+                        <button type="button" class="btn btn-default"><span class="lnr icon-settings" aria-hidden="true"></span><br/>Settings</button>
+                    </a>
+                </div>
+
+                <?php
+                foreach ($forms as $key => $value) {
+                    $form_name = $value['form_name'];
+                    $form_id = $value['form_id'];
+                    ?>
+
+                    <div class="btn-group" role="group" aria-label="...">
+                        <a href="<?php echo $this->url('tracker', array('action' => 'form', 'tracker_id' => $tracker_id, 'action_id' => $form_id)) ?>">
+                            <button type="button" class="btn btn-default"><span class="lnr icon-list" aria-hidden="true"></span><br/><?= $form_name; ?></button>
+                        </a>
+                    </div>
+                    <?php
+                    }
+                    ?>
+                    <div class="btn-group" style="float:right" role="group" aria-label="...">
+                        <a href="<?php echo $this->url('tracker', array('action' => 'newform', 'tracker_id' => $tracker_id)) ?>">
+                            <button type="button" class="btn btn-primary"><span class="lnr icon-add" aria-hidden="true"></span><br/>New Form</button>
+                        </a>
+                    </div>
+
+                </div>
+            </div>
+            <div class="card card-default">
+                <div class="card-body">
+                    <h6>New Form</h6>
+                    <hr/>
+                    <form id="commentForm" method="post" action="" name="myForm">
+                        <div class="form-group">
+                            <label class="col-sm-3 control-label" style="padding-left: 0px;">Form Name</label>
+                            <div class="col-sm-6">
+                                <input type="text" class="form-control"  placeholder="Form Name" id="form_name" name="form_name" required>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label class="col-sm-3 control-label" style="padding-left: 0px;">A single record is called a:</label>
+                            <div class="col-sm-6">
+                                <input type="text" class="form-control"  placeholder="A single record is called a" id="record" name="record" required>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label class="col-sm-3 control-label" style="padding-left: 0px;">Description</label>
+                            <div class="col-sm-6">
+                                <textarea class="form-control"  placeholder="Description(Optional)" id="description" name="description"></textarea>
+                            </div>
+                        </div>
+                        <span id="status"></span>
+                        <div class="modal-footer" style="padding-bottom:0px">
+                            <button onclick="addNewForm(<?= $tracker_id; ?>,'save')" type="button" class="btn btn-primary">Save</button>
+                            <a href="<?php echo $this->url('tracker', array('action' => 'view', 'tracker_id' => $tracker_id)) ?>">
+                                <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+                            </a>
+                            <button onclick="addNewForm(<?= $tracker_id; ?>,'next')" type="button" class="btn btn-primary">Next</button>
+                        </div>
+                    </form>
+
+                </div>
+            </div>
+    </div>
+</div>
+
+<script>
+    $(document).ready(function() {
+        
+    });	
+
+    function addNewForm(idVa, subType){
+        //        var $validator = $("#commentForm").validate();
+        var $valid = $("#commentForm").valid();
+        if(!$valid) {
+            return false;
+        }else{
+            var form_name = $("#form_name").val();
+            var record = $("#record").val();
+            var description = $("#description").val();
+            //            var tracker_id = <?= $tracker_id; ?>;
+            $("#status").html('processing...');
+            
+            var data = {
+                form_name : form_name,
+                record : record,
+                description : description
+                //                tracker_id: tracker_id
+            }
+            var url = "<?php echo $this->url('tracker', array('action' => 'newformadd', 'tracker_id' => $tracker_id)); ?>";
+            $.post(url, data,function(respJson){
+                var resp =JSON.parse(respJson);
+                var responseCode = resp.responseCode;
+                var errMessage = resp.errMessage;
+                var form_id = resp.form_id;
+                var html = "";
+                if(responseCode == 1){
+                    $("#status").html('<font color="#088A08">'+errMessage+'</font>');
+                    if(subType =='save'){
+                        window.setTimeout('window.location.replace("/tracker/form/<?php echo $tracker_id ;?>/'+form_id+'")', 1000);
+                    }else{
+                        window.setTimeout('window.location.replace("/tracker/addworkflow/<?php echo $tracker_id ;?>/'+form_id+'")', 1000);
+                    }
+                }
+                else if(responseCode == 2){
+                    $("#status").html('<font color="#cc0000">'+errMessage+'</font>');
+                }
+                else{
+                    $("#status").html('<font color="#cc0000">'+errMessage+'</font>');
+                }
+            });
+            return false;
+        }
+    }
+
+
+
+
+</script>

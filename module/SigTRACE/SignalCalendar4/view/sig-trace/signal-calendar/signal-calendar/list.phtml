@@ -1,0 +1,98 @@
+<?php
+use Session\Container\SessionContainer;
+$session = new SessionContainer();
+$configContainer = $session->getSession('config');
+$allowedFileSize=$configContainer->config['importFileSize'];
+$title = "Report Details";
+$this->headTitle($title);
+$workflowLink = json_encode($showWorkflowLink);
+?>
+<div class="pagebar container-fluid col-md-12"> 
+    <!-- Sidebar Toggle -->
+    <button type="button" class="pagebar-toggle navbar-toggle pull-left">
+      <span class="pagebar-arrow"></span>
+    </button>
+    <ol class="breadcrumb">
+        <li><?php if ($label != '') { ?><a href="/ri/dashboard/<?=$trackerId;?>/<?=$formId;?>"><?php } ?><span>Dashboard</span><?php if ($label != '') { ?></a><?php } ?></li>
+        <?php if ($label != '') { ?>
+            <li class="active"><span><?php echo $this->escapeHtml($label); ?></span></li>
+        <?php } ?>
+    </ol>
+</div>
+<div class="card">
+    <div class="card-body">
+        <?php $flashMessage = $this->flashMessenger()->getMessages();
+       if (count($flashMessage) && isset($flashMessage[0]['success'])) {
+               echo '<div class="alert alert-dismissable alert-success">'.$flashMessage[0]['success'].'<button type="button" class="close" data-dismiss="alert" aria-hidden="true">×</button></div>';
+            }
+        ?>
+        <!-- <div id="alert_deleteRecord"></div> -->
+        <div class="card card-default mb-2">
+            <div class="card-body">
+                <div class="row">
+                    <div class="div-lable">
+                        <label style="margin-top: 0.5%;">Show:</label>
+                        <div class="showlabel" style="display: inline-block;">
+                            <select onchange="onPageSizeChanged()" id="page-size" class="form-control">
+                                <option value="5" selected>5</option>
+                                <option value="10">10</option>
+                                <option value="25">25</option>
+                                <option value="50">50</option>
+                                <option value="100">100</option>
+                                <option value="500">500</option>
+                                <option value="1000">1000</option>
+                            </select>
+                        </div>
+                        <label style="margin-top: 0.5%;">&nbsp;Entries:</label>
+                    </div>
+                    <div class="ml-auto float-right" style="margin-bottom: 10px; margin-right: 10px;">
+                    <button type="button" onclick="window.location.href='/wp/newrecord/<?php echo $trackerId;?>/<?php echo $formId;?>/<?php echo $dashboardId;?>/<?php echo $asId;?>?type=<?php echo $type;?>&filter=<?php echo $filter;?>&trace=ri'" class="btn btn-primary float-right" aria-label="Left Align" >Add New Record</button>                       
+                        <!-- <button type="button" class="btn btn-primary"  id="newRecord">New Record</button> -->
+                </div>
+            </div>
+            <div id="myGrid" class="ag-theme-material w-100 "></div>
+        </div>
+    </div>
+    </div>
+</div>
+<!-- <div class="modal fade" id="deleteRecordModel" tabindex="-1" role="dialog" aria-labelledby="deleteRecord" aria-hidden="true"> 
+    <div class="modal-dialog modal-dialog-centered" role="document"> 
+        <div class="modal-content"> 
+            <div class="modal-header"> 
+                <h5 class="modal-title" id="exampleModalLongTitle">Delete Confirmation</h5> 
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close"> 
+                    <span aria-hidden="true">&times;</span> 
+                </button> 
+            </div> 
+            <div class="modal-body"> 
+                <input type="hidden" id="href" name="href" value=""/>
+                <div class="form-group row"> 
+                    <label class="col-sm-4 col-form-label">Reason for change<span class="error ml-1">*</span></label> 
+                    <div class="col-sm-7"> 
+                        <textarea id="reason" class="form-control" placeholder="Reason for change." name="addcomment"></textarea>    
+                        <span id="forReason" class="error"></span> 
+                    </div> 
+                </div> 
+            </div> 
+            <div class="modal-footer"> 
+                <button id="reasonfordelete" type="button" class="btn btn-primary">Delete</button> 
+                <button class="btn btn-default" type="button" data-dismiss="modal">Close</button> 
+            </div> 
+        </div> 
+    </div>   -->
+<!-- </div> -->
+<script> 
+    var trackerId="<?php echo $trackerId;?>";
+    var formId="<?php echo $formId;?>";
+    var type="<?php echo $type;?>";
+    var filter="<?php echo $filter;?>"; 
+    var canDelete = "<?php echo $canDelete;?>";
+    var canEdit = "<?php echo $canEdit;?>";
+    var canRead = "<?php echo $canRead;?>";
+    var workflowLink = '<?php echo $workflowLink;?>';
+    var dashboardId = '<?php echo $dashboardId;?>';
+    var asId = '<?php echo $asId;?>';
+    
+</script>
+ <?php 
+    $this->inlineScript()->appendFile($this->basePath() . '/js/module/ritrace/dashboard/list.js', 'text/javascript');

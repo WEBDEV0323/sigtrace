@@ -1,0 +1,383 @@
+<?php
+$tracker_details = $trackerRsults['tracker_details'];
+$forms = $trackerRsults['forms'];
+$tracker_name = $tracker_details['name'];
+$title = "$tracker_name Tracker";
+$this->headTitle($title);
+?>
+
+<div class="pagebar container-fluid col-md-12">
+    <!-- Sidebar Toggle -->
+    <button type="button" class="pagebar-toggle navbar-toggle pull-left">
+      <span class="pagebar-arrow"></span>
+    </button>
+    <ol class="breadcrumb">
+      <li class="active"><span><?php echo $this->escapeHtml($title); ?></span></li>
+    </ol>
+</div>
+
+<div class="card">
+    <div class="card-body">
+        <span style="color:green"><?=$successMsg;?></span>
+            <div class="card">
+                <div class="card-body">
+                    <div  class="clearfix">
+                        <b>Settings</b>
+                    </div>    
+                    <hr/>
+                    <div class="row">
+                        <div aria-label="..." role="group" class="btn-group mx-1 mb-2">
+                            <a href="<?php echo $this->url('user', array('action' => 'user_management', 'tracker_id' => $tracker_id)) ?>">
+                                <button class="btn btn-default" type="button"><span aria-hidden="true" class="lnr icon-cog"></span><br>User Management</button>
+                            </a>
+                        </div>
+                        <div aria-label="..." role="group" class="btn-group mx-1 mb-2">
+                            <a href="<?php echo $this->url('role', array('action' => 'role_management', 'tracker_id' => $tracker_id)) ?>">
+                                <button class="btn btn-default" type="button"><span aria-hidden="true" class="lnr icon-cog"></span><br>Role Management</button>
+                            </a>
+                        </div>
+                        <div aria-label="..." role="group" class="btn-group mx-1 mb-2">
+                            <a href="<?php echo $this->url('codelist', array('action' => 'codelist_management', 'tracker_id' => $tracker_id)) ?>">
+                                <button class="btn btn-default" type="button"><span aria-hidden="true" class="lnr icon-cog"></span><br>Code List Management</button>
+                            </a>
+                        </div>
+                        <div aria-label="..." role="group" class="btn-group mx-1 mb-2">
+                            <a href="<?php echo $this->url('access', array('action' => 'access_settings', 'tracker_id' => $tracker_id)) ?>">
+                                <button class="btn btn-default" type="button"><span aria-hidden="true" class="lnr icon-cog"></span><br>Access settings</button>
+                            </a>
+                        </div>
+                        <div aria-label="..." role="group" class="btn-group mx-1 mb-2">
+                            <a href="<?php echo $this->url('email', array('action' => 'index', 'tracker_id' => $tracker_id)) ?>">
+                                <button class="btn btn-default" type="button"><span aria-hidden="true" class="lnr icon-cog"></span><br>Notification Settings</button>
+                            </a>
+                        </div>
+                        
+<!--                        <div aria-label="..." role="group" class="btn-group mx-1 mb-2">
+                            <a href="<?php echo $this->url('tracker', array('action' => 'default_report_setting', 'tracker_id' => $tracker_id)) ?>">
+                                <button class="btn btn-default" type="button"><span aria-hidden="true" class="lnr icon-cog"></span><br>Default Report Setting</button>
+                            </a>
+                        </div>-->
+                        <div aria-label="..." role="group" class="btn-group mx-1 mb-2">
+                            <a href="<?php echo $this->url('access', array('action' => 'form_access_settings', 'tracker_id' => $tracker_id)) ?>">
+                                <button class="btn btn-default" type="button"><span aria-hidden="true" class="lnr icon-cog"></span><br>Form Access Setting</button>
+                            </a>
+                        </div>
+                        <div aria-label="..." role="group" class="btn-group mx-1 mb-2">
+                            <a href="<?php echo $this->url('tracker', array('action' => 'report_access_setting', 'tracker_id' => $tracker_id)) ?>">
+                                <button class="btn btn-default" type="button"><span aria-hidden="true" class="lnr icon-cog"></span><br>Report Access Setting</button>
+                            </a>
+                        </div>
+<!--                        <div aria-label="..." role="group" class="btn-group mx-1 mb-2">
+                            <a href="<?php echo $this->url('tracker', array('action' => 'report_export_setting', 'tracker_id' => $tracker_id)) ?>">
+                                <button class="btn btn-default" type="button"><span aria-hidden="true" class="lnr icon-cog"></span><br>Report Export Setting</button>
+                            </a>
+                        </div>  <div aria-label="..." role="group" class="btn-group mx-1 mb-2">
+                            <a href="<?php echo $this->url('tracker', array('action' => 'export_tracker', 'tracker_id' => $tracker_id)) ?>">
+                                <button class="btn btn-default" type="button"><span aria-hidden="true" class="lnr icon-cog"></span><br>Export Tracker</button>
+                            </a>
+                        </div>
+                        <div aria-label="..." role="group" class="btn-group mx-1 mb-2">
+                            <a href="<?php echo $this->url('report', array('action' => 'create-report', 'id' => $tracker_id)) ?>">
+                                <button class="btn btn-default" type="button"><span aria-hidden="true" class="lnr icon-cog"></span><br>Setup Report</button>
+                            </a>
+                        </div>-->
+                        <div aria-label="..." role="group" class="btn-group mx-1 mb-2">
+                            <a href="<?php echo $this->url('workflow', array('action' => 'settings', 'tracker_id' => $tracker_id)) ?>">
+                                <button class="btn btn-default" type="button"><span aria-hidden="true" class="lnr icon-cog"></span><br>Workflow Settings</button>
+                            </a>
+                        </div>
+                        <div aria-label="..." role="group" class="btn-group mx-1 mb-2">
+                            <a href="<?php echo $this->url('tracker', array('action' => 'parameterized_tracker', 'tracker_id' => $tracker_id)) ?>">
+                                <button class="btn btn-default" type="button"><span aria-hidden="true" class="lnr icon-cog"></span><br>Audit Log</button>
+                            </a>
+                        </div>
+<!--                        <div aria-label="..." role="group" class="btn-group mx-1 mb-2">
+                            <a href="<?php echo $this->url('tracker', array('action' => 'tracker_date_setting', 'tracker_id' => $tracker_id)) ?>">
+                                <button class="btn btn-default" type="submit"><span aria-hidden="true" class="lnr icon-cog"></span><br>Tracker Date Setting</button>
+                            </a>
+                        </div>
+                        <div aria-label="..." role="group" class="btn-group mx-1 mb-2">
+                            <a href="<?php echo $this->url('tracker', array('action' => 'search_setting', 'tracker_id' => $tracker_id)) ?>">
+                                <button class="btn btn-default" type="submit"><span aria-hidden="true" class="lnr icon-cog"></span><br>Search Setting</button>
+                            </a>
+                        </div>-->
+                    </div>
+                </div>
+            </div>
+    </div>
+</div>
+
+
+<div class="modal fade" id="addAuditModel" data-backdrop="static" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+    <div class="modal-dialog"  style="margin-bottom:0px;" >
+        <div class="modal-content" id="modelContentAdd">
+
+            <div class="panel panel-primary" style="margin:0px">
+                <div class="panel-heading">New Fields<button aria-hidden="true" data-dismiss="modal" class="close" type="button">×</button></div>
+                <div style=" padding-left: 10px;">
+                    <form data-toggle="validator" id="commentForm" method="get" action="" name="myForm" class="form-horizontal">
+
+                    </form>
+
+
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+<script>
+    $(document).ready(function() {
+        $("#audModelAdd").click(function() 
+        { 
+            var str = random_string(6);
+            var selid = 'questionID'+str
+            var html = '';
+            html += '<div class="modal-body" id="divBody">'
+            
+            html += '<h4><sapn>Fields</span></h4>'
+            html += '<div class="form-group">'
+            html += '<label class="col-sm-2 control-label" style="padding-left: 0px;">Group Name</label>'
+            html += '<div class="col-sm-8">'
+            html += '<input type="text" class="form-control"  placeholder="Group Name" id="groupName" name="groupName">'
+            html += '</div>'
+            html += '</div>'
+
+            html += '<div id="addQuestions">'
+            html += '<div class="form-group">'
+            html += '<label class="col-sm-2 control-label" style="padding-left: 0px;">Field</label>'
+            html += '<div class="col-sm-8">'
+            html += '<div style="float:left">'
+            html += '<input type="text" class="form-control quesiionIDs"  placeholder="Add Field" id="questionID" name="questionID" required>'
+            html += '<input type="text" class="form-control expected" style="display:none" id="questionType_expected">'
+            html += '</div>'
+            html += '<div style="float:right">'
+            html += '<select onchange="checkMultiple(\'id_'+selid+'\', this.id, 0, \'questionType\')" type="text" class="form-control quesiionSelect" placeholder="Question type" id="questionType" name="questionStep" required>'
+            html += '<option value="number">Number</option>'
+            html += '<option value="text">Text</option>'
+            html += '<option value="textarea">Text Area</option>'
+            html += '<option value="date">Date</option>'
+            html += '<option value="checkbox">Check Box</option>'
+            html += '<option value="combobox">Combo Box</option>'
+            html += '</select>'
+            html += '</div>'
+            html += '<div style="clear:both" ></div>'
+                    
+            html += '<div id="id_'+selid+'">'
+            html += '</div>'
+                    
+            html += '</div>'
+            html += '</div>'
+            html += '</div>'
+                    
+            html += '<span id="status"></span><br/>';
+            html += '<button style="float:right" type="button"id="add_img" class="btn btn-primary" onClick="insSpec(); return false;" align="center">New Field</button>'
+            html += '<div style="clear:both"></div>'
+
+            html += '</div>'
+                    
+            html += '<div class="modal-footer">'
+            html += '<button onclick="addQusetions()" type="button" class="btn btn-primary">Save</button>'
+            html += '<button type="button" class="btn btn-default" data-dismiss="modal">Close</button>'
+            html += '</div>'
+            $('#commentForm').html(html);
+        });
+    });	
+
+    function insSpec()
+    {
+        var str = random_string(6);
+        var selid = 'questionID'+str
+        var html = "";
+        html += '<div class="form-group">'
+        html += '<label class="col-sm-2 control-label" style="padding-left: 0px;">Field</label>'
+        html += '<div class="col-sm-8">'
+        html += '<div style="float:left">'
+        html += '<input type="text" class="form-control quesiionIDs"  placeholder="Add Field" id="'+selid+'" name="questionID_'+selid+'" required>'
+        html += '<input type="text" class="form-control expected" style="display:none" id="questionType_'+selid+'_expected">'
+        html += '</div>'
+        html += '<div style="float:right">'
+        html += '<select onchange="checkMultiple(\'id_'+selid+'\', this.id, 0, \'questionType_'+selid+'\')" type="text" class="form-control quesiionSelect"  placeholder="Question type" id="questionType_'+selid+'" name="questionStep_'+selid+'" required>'
+        html += '<option value="number">Number</option>'
+        html += '<option value="text">Text</option>'
+        html += '<option value="textarea">Text Area</option>'
+        html += '<option value="date">Date</option>'
+        html += '<option value="checkbox">Check Box</option>'
+        html += '<option value="combobox">Combo Box</option>'
+        html += '</select>'
+        html += '</div>'
+        html += '<div style="clear:both" ></div>'
+        html += '<div id="id_'+selid+'"></div>'
+        html += '</div>'
+        html += '<div class="col-sm-2">'
+        html+= '<!--<i class="icon-arrow-up"></i><i class="icon-arrow-down"></i>--><i class="icon-remove" style="color: red; cursor: pointer;" onClick="delSuspectProduct(this)">X</i>';
+        html += '</div>'
+        html += '</div>'
+        $("#addQuestions").append(html);
+    }
+    
+    function checkMultiple(id, selID, start, questionType){
+        var selVal= $('#'+selID).val();
+        var html="";
+        var str = random_string(6);
+        if(selVal == 'checkbox' || selVal == 'combobox'){
+            html += "<div>";
+            html += "<div  style='padding:3px 0px'>";
+            html += '<input type="text" placeholder="Add Option" class="form-control '+questionType+'" style="float:left; width:41%" required name="id_'+str+'"/>';
+            html += "</div>";
+            html += "<div>";
+            html+= '<!--<i class="icon-arrow-up"></i><i class="icon-arrow-down"></i>--><i class="icon-remove" style="color: green; cursor:pointer; clear:both" onClick="checkMultiple(\''+id+'\', \''+selID+'\', 1, \''+questionType+'\')">+</i>';
+            if(start == 1){
+                
+                html+= '<!--<i class="icon-arrow-up"></i><i class="icon-arrow-down"></i>--><i class="icon-remove" style="color: red; cursor:pointer; clear:both" onClick="delSuspectProduct(this)">x</i>';
+            }
+            html += "</div>";
+            html += "<div style='clear:both'>";
+            html += "</div>";
+            html += "</div>";
+            if(start == 0){
+                $("#"+id).html('');
+            }
+            $("#"+id).append(html);
+        }else if(selVal == 'matrix'){
+            html += "<div>";
+            html += "<div style='padding:3px 22px'>";
+            html += '<div style="float:left">'
+            html += '<input type="number" onchange="checkColums(\''+str+'\', \''+questionType+'\')" style="width:87%" class="form-control"  placeholder="Add No of Rows" name="" id="selRow_'+str+'" required>'
+            html += '</div>'
+            html += '<div style="float:right">'
+            html += '<select style="width:80%" onchange="checkColums(\''+str+'\', \''+questionType+'\')" type="text" class="form-control quesiionSelectMatrix" placeholder="Question type" id="selCol_'+str+'" name="selCol_'+str+'" required>'
+            html += '<option value="0">No of columns</option>'
+            html += '<option value="1">1</option>'
+            html += '<option value="2">2</option>'
+            html += '<option value="3">3</option>'
+            html += '<option value="4">4</option>'
+            html += '<option value="5">5</option>'
+            html += '<option value="6">6</option>'
+            html += '</select>'
+            html += '</div>'
+            html += '<div style="clear:both"></div>'
+            html += '<div id="rowCol_'+str+'">'
+            html += '</div>'
+            html += "</div>";
+            html += "</div>";
+            $("#"+id).html(html);
+        }        
+        else{
+            $("#"+id).html(html);
+        }
+    }
+    
+    function random_string(size){
+        var str = "";
+        for (var i = 0; i < size; i++){
+            str += random_character();
+        }
+        return str;
+    }
+    
+    function random_character() {
+        var chars = "lmnopqurstuvwxyzABCDEFGHIJKLMNOPQURSTUVWXYZ";
+        return chars.substr( Math.floor(Math.random() * 62), 1);
+    }
+    function delSuspectProduct(node)
+    {
+        r = node.parentNode.parentNode;
+        r.parentNode.removeChild(r);
+    }
+
+    function addQusetions()
+    {
+        var elem = document.getElementsByClassName("quesiionIDs");
+        var names = [];
+        for (var i = 0; i < elem.length; ++i) {
+            if (typeof elem[i].value !== "undefined") {
+                names.push(elem[i].value);
+            }
+        }
+        var elem = document.getElementsByClassName("quesiionSelect");
+        var types = [];
+        for (var i = 0; i < elem.length; ++i) {
+            if (typeof elem[i].value !== "undefined") {
+                types.push(elem[i].value);
+                
+                if(elem[i].value == 'matrix'){
+                    var subLabelsRows = document.getElementsByClassName(elem[i].id+'_rows');
+                    var subLabelsCols = document.getElementsByClassName(elem[i].id+'_cols');
+                    var subLabelsRowsArr = [];
+                    var subLabelsColssArr = [];
+                    var subLabelsArr = new Object();;
+                    for (var leb = 0; leb < subLabelsRows.length; ++leb) {
+                        if (typeof elem[i].value !== "undefined") {
+                            subLabelsRowsArr.push(subLabelsRows[leb].value);
+                        }
+                    }
+                    for (var leb = 0; leb < subLabelsCols.length; ++leb) {
+                        if (typeof elem[i].value !== "undefined") {
+                            subLabelsColssArr.push(subLabelsCols[leb].value);
+                        }
+                    }
+                    subLabelsArr.rows = subLabelsRowsArr;
+                    subLabelsArr.columns = subLabelsColssArr;
+                    var subLabelStr = ""
+                    subLabelStr = JSON.stringify(subLabelsArr)
+                    $('#'+elem[i].id+'_expected').val(subLabelStr);
+                }else if(elem[i].value == 'text'){
+                    var textVal = $('#'+elem[i].id+" option:selected").text();
+                    $('#'+elem[i].id+'_expected').val(textVal);
+                }else{
+                    var subLabels = document.getElementsByClassName(elem[i].id);
+                    var subLabelsArr = [];
+                    for (var leb = 0; leb < subLabels.length; ++leb) {
+                        if (typeof elem[i].value !== "undefined") {
+                            subLabelsArr.push(subLabels[leb].value);
+                        }
+                    }
+                    var subLabelStr = subLabelsArr.join();
+                    $('#'+elem[i].id+'_expected').val(subLabelStr);
+                }
+            }
+        }
+        
+        var elem = document.getElementsByClassName("expected");
+        
+        var expected = [];
+        for (var i = 0; i < elem.length; ++i) {
+            if (typeof elem[i].value !== "undefined") {
+                expected.push(elem[i].value);
+            }
+        }
+        var $valid = $("#commentForm").valid();
+        if(!$valid) {
+            return false;
+        }else{
+            $("#status").html('processing...');
+            var tracker_id = '<?= $tracker_id; ?>';
+            var action_id = '<?= $action_id; ?>';
+            var groupName = $('#groupName').val()
+            var data = {
+                names : names,
+                types : types,
+                expected : expected,
+                action_id: action_id,
+                tracker_id : tracker_id,
+                groupName : groupName
+                
+            }
+            var url = "<?php echo $this->url('tracker', array('action' => 'addfields')); ?>";
+            $.post(url, data,function(respJson){
+                var resp =JSON.parse(respJson);
+                var responseCode = resp.responseCode;
+                var errMessage = resp.errMessage;
+                if(responseCode == 1){
+                    $("#status").html('<font color="#088A08">'+errMessage+'</font>');
+                    window.setTimeout('window.location.replace("<?php echo $this->url('tracker', array('action' => 'fields', 'tracker_id' => $tracker_id, 'action_id' => $action_id)) ?>")', 1000);
+                }
+                else{
+                    $("#status").html('<font color="#cc0000">'+errMessage+'</font>');
+                }
+            });
+        }
+    }
+</script>

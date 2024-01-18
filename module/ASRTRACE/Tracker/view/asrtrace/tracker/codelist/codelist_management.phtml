@@ -1,0 +1,274 @@
+<?php
+$title = "Code List Management";
+$this->headTitle($title);
+if(!empty($trackerRsults)){
+    $tracker_details = $trackerRsults['tracker_details'];
+    $forms = $trackerRsults['forms'];
+    $tracker_name = $tracker_details['name'];
+}
+?>
+
+<div class="pagebar container-fluid col-md-12">
+    <!-- Sidebar Toggle -->
+    <button type="button" class="pagebar-toggle navbar-toggle pull-left">
+      <span class="pagebar-arrow"></span>
+    </button>
+    <ol class="breadcrumb">
+    <li><span><a href="/dashboard/<?php echo isset($forms[0]['tracker_id'])?$forms[0]['tracker_id']:0;?>/<?php echo isset($forms[0]['form_id'])?$forms[0]['form_id']:0;?>"><?php echo $tracker_name;?></a></span></li>
+        <li><a href="/tracker/settings/<?php echo $trackerId;?>"><span>Tracker Settings</span></a></li>
+        <li class="active"><span><?php echo $this->escapeHtml($title); ?></span></li>
+    </ol>
+</div>
+<div class="card">
+    <div class="card-body">
+        <div class="card">
+            <div class="card-header">
+                <h6 class="col-md-6 float-left">List of Code Lists</h6>
+                <span class="col-md-6">
+                   <button type="button" data-toggle="modal" id="codeList_add_new" data-target="#addNewCodeListwithoptions" class="btn btn-primary float-right">Add New Code List</button>
+                </span>   
+            </div>
+            <div class="card-body">
+                <?php
+                $flashMessage = $this->flashMessenger()->getMessages();
+                if (count($flashMessage) && isset($flashMessage[0]['success'])) {
+                    echo '<div class="contents boxpadding"><div class="alert alert-dismissable alert-success" id="fashMessage">'.$flashMessage[0]['success'].'<button type="button" class="close" data-dismiss="alert" aria-hidden="true">×</button></div></div>';
+                }
+                ?>
+                <div class="table-responsive">
+                <?php
+                if (array_key_exists(0, $codelists)) {
+                    ?>
+                    <table class="table table-striped">
+                        <thead>
+                            <tr>
+                                <th>Action</th>
+                                <th>Code List Name</th>
+                                <th>Code List Options</th>
+                            </tr>
+                        </thead>
+                        <?php
+                        $ival = 0;
+                        foreach ($codelists as $field => $f_values) {
+                            $code_list_id = $f_values['code_list_id'];
+                            $code_list_name = $f_values['code_list_name'];
+                            $tracker_id_cl = $f_values['tracker_id'];
+                            ?>
+                        <tbody>
+                            <tr>
+                                <td>
+                                    <?php if ($tracker_id_cl != 0) { ?>
+                                        <button type="button" data-toggle="modal" onclick="edit_codeList_name('<?= $code_list_id; ?>','<?= $code_list_name; ?>')" id="wf_edit_<?= $code_list_id; ?>" data-target="#editNewCodeListwithoptions" class="btn btn-default"><span class="lnr icon-pencil" aria-hidden="true"></span></button>
+                                        <button type="button" data-toggle="modal" onclick="deleteCodeListOptionsClear('<?= $code_list_id; ?>')" id="wf_delete_<?= $code_list_id; ?>" data-target="#deleteCodeListwithoptions" class="btn btn-default"><span class="lnr icon-trash2" aria-hidden="true"></span></button>
+                                    <?php
+                                    } else {
+                                        echo "--";
+                                    }
+                                    ?>
+                                </td>
+                                <td><?php echo $this->escapeHtml($code_list_name); ?></td>
+                                <td>
+                                    <?php if ($tracker_id_cl != 0) { ?>
+                                    <button type="button" class="btn btn-default addOptionsCode" data-toggle="modal" id="<?= $code_list_id; ?>" data-target="#addOptionsCode"><span class="lnr icon-plus" aria-hidden="true"></span></button>
+                                    <button type="button" class="btn btn-default editModelField" data-toggle="modal" onClick="editOptionsModel('<?= $code_list_id; ?>')" id="editid_<?= $code_list_id; ?>" data-target="#editOptionsCode"><span class="lnr icon-pencil" aria-hidden="true"></span></button>
+                                    <?php } ?>
+                                    <button type="button" data-toggle="modal" onClick="viewOptionsModel('<?= $code_list_id; ?>','<?= $tracker_id_cl; ?>')" id="viewid_<?= $code_list_id; ?>" data-target="#viewOptionsCode" class="btn btn-default viewCodeListModel"><span class="lnr icon-eye" aria-hidden="true"></span></button>
+                                </td>
+                            </tr>
+                        </tbody>
+
+                            <?php
+                        }
+                        ?>
+                    </table>
+                    <?php
+                    } else {
+                        echo "No records found.";
+                    }
+                    ?>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<div class="modal fade" id="addNewCodeListwithoptions" data-backdrop="static" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="exampleModalLongTitle">Add Code List</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <form data-toggle="validator" id="commentForm_newDodeList" method="get" action="" name="myForm" class="form-horizontal"></form>
+            </div>
+            <div id="status_add_cl" class="ml-3"></div>
+            <div class="modal-footer">
+                <button onclick="addCodeListNew('<?=$trackerId;?>')" type="button" class="btn btn-primary">Save</button>
+                <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+            </div>
+        </div>
+    </div>
+</div>
+<div class="modal fade" id="editNewCodeListwithoptions" data-backdrop="static" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="exampleModalLongTitle">Edit Code List</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <form data-toggle="validator" id="commentForm_editCodeList" method="get" action="" name="myForm" class="form-horizontal">
+                    <input type="text" class="form-control"  placeholder="edit_code_list_id" id="edit_code_list_id" name="edit_code_list_id" required value="" style="display:none">
+                    <div class="form-group row">
+                        <label class="col-sm-4"></label>
+                        <div id="codelistEditErrorMessage" class="error col-sm-7"></div>
+                    </div>
+                    <div class="form-group row">
+                        <label class="col-sm-4 col-form-label">Code List Name<span class="error ml-1">*</span></label>
+                        <div class="col-sm-7">
+                            <input type="text" class="form-control"  placeholder="Code List Name" id="edit_code_list" name="edit_code_list" required value="">
+                            <span id="edit_code_list_error" class="error"></span>
+                        </div>
+                    </div>
+                    <div class="form-group row">
+                        <label class="col-sm-4 col-form-label">Reason for change<span class="error ml-1">*</span></label>
+                        <div class="col-sm-7">
+                            <textarea id="edit_reason_for_change" class="form-control" placeholder="Reason for change." name="reason_for_change"></textarea>   
+                            <span id="edit_reason_for_change_error" class="error"></span>
+                        </div>
+                    </div>
+                </form>
+            </div>
+            <div id="status_edit_error" class="ml-3"></div>
+            <div class="modal-footer">
+                <button onclick="editCodeList()" type="button" class="btn btn-primary">Save</button>
+                <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+            </div>
+        </div>
+    </div>
+</div>
+<div class="modal fade" id="deleteCodeListwithoptions" data-backdrop="static" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+    <div class="modal-dialog"  style="margin-bottom:0px;" >
+        <div class="modal-content" id="modelContentdelete">
+            <div class="modal-header">
+                <h5 class="modal-title" id="exampleModalLongTitle">Delete Confirmation</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div> 
+            <div class="modal-body">
+                <input type="hidden" id="codeListIDToDelete" value="">
+                <div class="form-group row">
+                    <label class="col-sm-5"></label>
+                    <div id="codelistDeleteErrorMessage" class="error col-sm-6"></div>
+                </div>
+                <div class="form-group row row">
+                    <label class="col-sm-4 col-form-label">Reason for change<span class="error ml-1">*</span></label>
+                    <div class="col-sm-7">
+                        <textarea id="addcommentfordelete" class="form-control" placeholder="Reason for change." name="addcomment"></textarea>   
+                        <span id="commenterrorfordelete" class="error"></span>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button id="codelistreasonfordelete" type="button" class="btn btn-primary" onclick="deleteCodelist()">Delete</button>
+                <button class="btn btn-default" type="button" data-dismiss="modal">Close</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="modal fade" id="addOptionsCode" data-backdrop="static" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="exampleModalLongTitle">Add Code List Options</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div id="new_codelist_options"></div>
+        </div>
+    </div>
+</div>
+
+<div class="modal fade" id="editOptionsCode" data-backdrop="static" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="exampleModalLongTitle">Edit Code List Options</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div id="edit_codelist_options"></div>
+        </div>
+    </div>
+</div>
+<div class="modal fade" id="viewOptionsCode" data-backdrop="static" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="exampleModalLongTitle">View Code List Options</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <div id="optionsView"></div>
+            </div>
+            <div id="status_option_edit" class="ml-3"></div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="modal fade" id="deletecommentasreason" data-backdrop="static" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true" style="padding-right: 32px;">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="exampleModalLongTitle">Delete Confirmation</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <input type="hidden" id="codeListOptionIDToDelete" value="">
+                <input type="hidden" id="codeListIDToRemoveOptionDiv" value="">
+                <input type="hidden" id="TypeToRemoveOptionDiv" value="">
+                <div class="form-group row">
+                    <label class="col-sm-5"></label>
+                    <div id="codelistOptionDeleteErrorMessage" class="error col-sm-6"></div>
+                </div>
+                <div class="form-group row">
+                    <label class="col-sm-4 col-form-label">Reason for change<span class="error ml-1">*</span></label>
+                    <div class="col-sm-7">
+                        <textarea id="addCommentForOptionsDelete" class="form-control" placeholder="Reason for change." name="addcomment"></textarea>   
+                        <span id="addCommentForOptionsDeleteError" class="error"></span>
+                    </div>
+                </div>
+            </div>
+            <div id="status_option_delete" class="ml-3"></div>
+            <div class="modal-footer">
+                <button id="reasonfordelete"  type="button" class="btn btn-primary">Delete</button>
+                <button class="btn btn-default" type="button" data-dismiss="modal">Close</button>
+            </div>
+        </div>
+    </div>
+</div>
+<style>
+    .align-center {
+        text-align: center;
+        vertical-align: middle;
+    }
+</style>
+<script>
+    var trackerId = '<?php echo $trackerId;?>';
+</script>
+<?php $this->inlineScript()->appendFile($this->basePath() . '/js/module/tracker/codelist.js');

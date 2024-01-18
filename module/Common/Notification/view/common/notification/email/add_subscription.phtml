@@ -1,0 +1,243 @@
+<?php
+
+use Session\Container\SessionContainer;
+
+$session = new SessionContainer();
+$userSession = $session->getSession('user');
+
+$title = 'Subscription Template';
+$this->headTitle($title);
+$selected_option = 0;
+$forms = array();
+if (!empty($trackerRsults)) {    
+    $tracker_details = $trackerRsults['tracker_details'];
+    $forms = $trackerRsults['forms'];
+    $tracker_name = $tracker_details['name'];
+     $sActionType = $template_id > 0 ? 'Edit Subscription' : 'Create Subscription';
+}
+?>
+
+<div class="pagebar container-fluid col-md-12">
+    <!-- Sidebar Toggle -->
+    <button type="button" class="pagebar-toggle navbar-toggle pull-left">
+        <span class="pagebar-arrow"></span>
+    </button>
+    <ol class="breadcrumb">
+       <li><span><a href="/dashboard/<?php echo isset($forms[0]['tracker_id'])?$forms[0]['tracker_id']:0;?>/<?php echo isset($forms[0]['form_id'])?$forms[0]['form_id']:0;?>"><?php echo $tracker_name;?></a></span></li>
+        <!-- <li><span><a href="/tracker/settings/<?php echo $tracker_id;?>">Tracker Settings</a></span></li> -->
+        <li><span><a href="/email/index/<?php echo $tracker_id;?>">Email List</a></span></li>
+        <li class="active"><span><?php echo $sActionType;?></span></li>
+    </ol>
+</div>
+
+<div class="card">
+    <div class="card-body">    
+        <div class="card">
+            <div  class="card-header"><h6><?php echo $sActionType;?></h6></div>
+            <div class="card-body">         
+                <div class="error" id="eventErrorMessages"></div>
+                <div class="form-group row">
+                    <label class="col-sm-4"></label>
+                    <div id="roleErrorMessages" class="error col-sm-6"></div>
+                </div>
+                
+                <div id="status_final" class="alert" aria-hidden="true"></div>
+                <form id="addNewSubscription" method="POST" class='form-horizontal form-bordered'>
+                    <div class="form-group row">
+                        <label for="NotificationName" class="control-label col-md-4">Subscription Name<span class="error ml-1">*</span></label>
+                        <div class="controls col-md-8">
+                            <input type='text' data-rule-required="true" id="NotificationName" name="NotificationName" value="<?php if (isset($result[0])) {
+                            echo $result[0]['notification_template_name']; } ?>" class='input-large form-control'>
+                            <span style="display:none;color:red" id="checkduplicate">This Name already exists in the system. Please try with a different Name.</span>
+                            <label id='NotificationName_err' class="error"></label>
+                        </div>
+                    </div>
+                    <div class="form-group row">
+                        <label class="col-sm-4 control-label" >Form Name<span class="error ml-1">*</span></label>
+                        <div class="col-sm-8">
+                            <select class="chosen-select form-control" id="formname" name="formname">
+                                    <option value="">--Choose Form--</option>
+                                <?php if (isset($formnames)) {
+                                    foreach ( $formnames as $form ) {
+                                        if(isset($result[0]) && $result[0]['notification_template_form_id'] == $form['value']) {?>
+                                    <option value="<?php echo $form['value']; ?>" selected="selected"><?php echo $form['label']; ?></option>
+                                        <?php } else {?>
+                                    <option value="<?php echo $form['value']; ?>" ><?php echo $form['label']; ?></option>
+                                <?php } } }?>
+                                </select>
+                            <label class="error" id="n_form_first"></label>
+                       </div>
+                    </div>
+                    <div class="form-group row">
+                        <label class="col-md-4 control-label" >Select Report<span class="error m1-1">*</span></label> 
+                        <div class="col-md-8">
+                            <select class="form-control selectpicker" data-live-search="true" data-actions-box="true" data-container="body" id="selectreport" name="selectreport">
+                                    <option value="">--Choose a Report--</option>
+                                    <?php if (isset($report)) {
+//                                    foreach ( $report as $form ) {
+                                        if(isset($result[0]) && json_decode($result[0]['notification_config'], true) == $report) {?>
+                                    <option value="<?php echo $report['Report Name']; ?>" selected="selected"><?php echo $report['Report Name']; ?></option>
+                                        <?php } else {?>
+                                    <option value="<?php echo $report['Report Name']; ?>" ><?php echo $report['Report Name']; ?></option>
+                                <?php }  }?>
+                            </select>
+                            <label class="error" id="n_report_first"></label>
+                        </div>
+                    </div>
+                    
+                    <div class="form-group row">
+                        <label for="notifyWhom" class="control-label col-md-4">Send To<span class="error ml-1">*</span></label>
+                        <div class="controls col-md-8">
+                            <textarea name="notifyWhom" id="notifyWhom" class="input-block-level form-control" placeholder = "Multiple email ids should be separeted by comma(,)."><?php if (isset($result[0])) {
+    echo $result[0]['notification_template_to'];
+}
+?></textarea>
+                            <label id='notifyWhom_err' class="error"></label>
+                        </div>
+                    </div>
+
+                    <div class="form-group row">
+                        <label for="CCToWhom" class="control-label col-md-4">CC To Whom</label>
+                        <div class="controls col-md-8">
+                            <textarea name="CCToWhom" id="CCToWhom" class="input-block-level form-control" placeholder = "Multiple email ids should be separeted by comma(,)."><?php if (isset($result[0])) {
+    echo $result[0]['notification_template_cc'];
+}
+?></textarea>
+                            <label id='CCToWhom_err'></label>
+                        </div>
+                    </div>
+                    <div class="form-group row">
+                        <label for="frequency" class="control-label col-sm-4">Frequency<span class="error m1-1">*</span></label>
+                        <div class="controls col-md-4">
+                            <label class="control-label col-md-8" for="daily"><input type="radio" class="form-check-input" id="daily" name="frequency" <?php if (isset($report['Frequency'])) {
+                            echo ((in_array("daily", array_map('strtolower', $report))) ? 'checked' : '' ); } ?>>Daily</label>
+                            <label class="control-label col-md-8" for="weekly"><input type="radio" class="form-check-input" id="weekly" name="frequency" <?php if (isset($report['Frequency'])) {
+                            echo ((in_array("weekly", array_map('strtolower', $report))) ? 'checked' : '' ); } ?> >Weekly</label>
+                            <div class="controls col-md-6" id="result">
+                                <label class="control-label col-md-8" for="monday"><input type="checkbox" class="form-check-input" id="monday" name="week" <?php if (isset($report['Frequency value'])) {
+                            echo ((in_array("monday", explode(',', $report['Frequency value']))) ? 'checked' : '' ); } ?>>Monday</label>
+                                <label class="control-label col-md-8" for="tuesday"><input type="checkbox" class="form-check-input" id="tuesday" name="week" <?php if (isset($report['Frequency value'])) {
+                            echo ((in_array("tuesday", explode(',', $report['Frequency value']))) ? 'checked' : '' ); } ?>>Tuesday</label>
+                                <label class="control-label col-md-8" for="wednesday"><input type="checkbox" class="form-check-input" id="wednesday" name="week" <?php if (isset($report['Frequency value'])) {
+                            echo ((in_array("wednesday", explode(',', $report['Frequency value']))) ? 'checked' : '' ); } ?>>Wednesday</label>
+                                <label class="control-label col-md-8" for="thurday"><input type="checkbox" class="form-check-input" id="thursday" name="week" <?php if (isset($report['Frequency value'])) {
+                            echo ((in_array("thursday", explode(',', $report['Frequency value']))) ? 'checked' : '' ); } ?>>Thursday</label>
+                                <label class="control-label col-md-8" for="friday"><input type="checkbox" class="form-check-input" id="friday" name="week" <?php if (isset($report['Frequency value'])) {
+                            echo ((in_array("friday", explode(',', $report['Frequency value']))) ? 'checked' : '' ); } ?>>Friday</label>
+                                <label class="control-label col-md-8" for="saturday"><input type="checkbox" class="form-check-input" id="saturday" name="week" <?php if (isset($report['Frequency value'])) {
+                            echo ((in_array("saturday", explode(',', $report['Frequency value']))) ? 'checked' : '' ); } ?>>Saturday</label>
+                                <label class="control-label col-md-8" for="sunday"><input type="checkbox" class="form-check-input" id="sunday" name="week" <?php if (isset($report['Frequency value'])) {
+                            echo ((in_array("sunday", explode(',', $report['Frequency value']))) ? 'checked' : '' ); } ?>>Sunday</label>
+                            </div>
+                            <label class="control-label col-md-8" for="monthly"><input type="radio" class="form-check-input" id="monthly" name="frequency" <?php if (isset($report['Frequency'])) {
+                            echo ((in_array("monthly", array_map('strtolower', $report))) ? 'checked' : '' ); } ?> >Monthly</label>
+                            <div class="controls" id="monthlyresult">
+                                <div class="row">
+                                <div class="controls col-md-3">
+                                <p>on day(s)</p>
+                                </div>
+                                <div class="controls col-md-5">
+                                <input type="text" data-rule-required="true"  id="month" name="month" class="input-large form-control" value='<?php if (isset($report) && $report['Frequency']=='Monthly') {
+                            echo $report['Frequency value']; } ?>'>
+                                </div>
+                                <div class="controls col-md-4">
+                                <p>of the month</p>
+                                </div>
+                                </div>
+                            </div>
+                            <div class="controls col-md-8">
+                                <label id='frequency_err' class="error"></label>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="form-group row">
+                        <label for="textfield" class="control-label col-md-4">Subject<span class="error ml-1">*</span></label>
+                        <div class="controls col-md-8">
+                            <input type='text' data-rule-required="true"  id="subject" name="subject" value="<?php if (isset($result[0])) {
+                            echo $result[0]['notification_template_subject'];} ?>" class='input-large form-control'>
+                        <label id='subject_err' class="error"></label>
+                        </div>
+                    </div>
+
+                    <div class="form-group row">
+                        <label for="textfield" class="control-label col-md-4">Email Body</label>
+                        <div class="controls col-md-8">
+                            <textarea id="summernote" name="editordata"><?php if (isset($result[0])) { echo $result[0]['notification_template_msg']; } ?></textarea>
+                        </div>
+                    </div>
+                    <?php if ($template_id > 0) { ?>
+                    <div class="form-group row">
+                        <label for="textfield" class="control-label col-md-4">Reason For Change<span class="error ml-1">*</span></label>
+                        <div class="controls col-md-8">
+                            <textarea id="reason_for_change"  data-rule-required="true" class="form-control" placeholder="Add reason for change" name="addcomment"></textarea>   
+                            <div class="col-md-12" id="reason_for_change_error"></div>
+                        </div>
+                    </div>
+                    <?php } ?>
+                    <div class="form-group float-right">
+                        <button id="savesubscription" onclick="addNewSubscription(<?php echo $tracker_id ?>,'<?php echo $template_id ?>')" type="button" class="btn btn-primary">Save</button>
+                        <a href="<?php echo $this->url('email', array('action' => 'index', 'trackerId' => $tracker_id)) ?>">
+                            <button class="btn btn-default" type="button">Cancel</button>
+                        </a>
+                    </div>
+                    <input type="hidden" name="notificationId" id="notificationId" value="<?php if (isset($result[0])) {
+                    echo $result[0]['notification_template_id']; } ?>"/>
+                    <input type="hidden" name="conditionID" id="conditionID">
+                    <input type="hidden" name="notifyID" id="notifyID">
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Modal -->
+<div class="modal fade" id="myNotificationModal" tabindex="0" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+  <div class="modal-dialog" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h4 class="modal-title" id="myModalLabel">Delete Subscription Condition</h4>
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+      </div>
+      <div class="modal-body">
+        Do you really want to delete this Subscription condition?
+      </div>
+      <div class="modal-footer">
+        <input type="hidden" id="requiredRemovedDivId">
+        <button type="button" id="btnYes" class="btn btn-primary">Delete</button>
+        <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+
+<script>
+<?php
+if(isset($result[0])) {
+    $to_array=explode(",", $result[0]['notification_template_to']);
+}
+?>
+    usersField = '<?php if(isset($to_array)) { echo json_encode($to_array);} ?>';
+    notificationCondition = '<?php if(isset($result)) { echo json_encode($result);} ?>'; //console.log(notificationCondition);
+    link= '<?php echo $this->basePath();?>';
+    selected_option="<?php echo $selected_option; ?>";            
+    tracker_id='<?php echo $tracker_id?>';
+    template_id='<?php echo $template_id ?>';
+    options = '';
+    //currentFieldVal='<?php //echo $result[0]['fields'] ?>';
+</script>
+
+
+<?php 
+$this->inlineScript()->appendFile($this->basePath() . '/js/module/common/notification/js_subscription.js');
+$this->inlineScript()
+            ->prependFile($this->basePath() . '/assets/summernote/summernote-bs4.min.js', 'text/javascript');
+?>
+<style>
+    .dropdown-select {
+        border: 1px solid #ddd;
+        color: #353535 !important;
+    }
+</style>
+

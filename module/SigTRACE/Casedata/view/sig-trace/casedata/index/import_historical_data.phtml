@@ -1,0 +1,139 @@
+<div class="crumbs">
+    <ul class="breadcrumb" id="breadcrumbs">
+            <li>
+                <i class="icon-home"></i>
+                <a href="/dashboard/<?=$trackerId;?>/<?=$formId;?>">Dashboard</a>
+            </li>
+            <li class="current">
+                <a href="javascript:void(0)">Import Historical Data</a>
+            </li>
+    </ul>
+</div>
+<div class="page-header"></div>
+<div class="row">
+    <div class="col-md-12">
+        <p class="alert" id="alert" style="display:none;"></p>
+        <div class="widget box">
+            <div class="widget-header">
+                    <h4><i class="icon-reorder"></i> Import Historical Data</h4>
+            </div>
+            <div class="widget-content">
+                <form method="POST" id="importForm" class="form-horizontal row-border" enctype="multipart/form-data">
+                    <input type="hidden" name="fileCheck" id="fileCheck" value="0" />
+                    <input type="hidden" name="formId" value="<?=$formId;?>" />
+                    <table id="dataS" class="table table-nomargin table-bordered" >
+                        <tr>
+                            <th style="width:30%;text-align: center;">File to Import</th>
+                        </tr>
+                        <tr>
+                            <td style="width:30%;text-align: center;">
+                                <div id="imp" class="controls form-group" style="margin: 0px">
+                                        <span class="btn btn-success btn-file">
+                                            <i class="glyphicon glyphicon-plus"></i>
+                                            <span>Upload&hellip;</span>
+                                            <input type="file" name="file[imp]" class="required" data-inputsize="medium" />
+                                        </span>
+                                        <button type="button" class="btn btn-danger delete" style="display:none;">
+                                            <i class="glyphicon glyphicon-trash"></i>
+                                            <span>Delete</span>
+                                        </button>
+                                        <label for="file[imp]" class="has-error help-block" generated="true" style="display:none;"></label>
+                                </div>
+                            </td>
+                        </tr>
+                    </table>
+
+                    <div class="form-actions">
+                        <!--<button class="btn btn-default pull-right" type="reset">Cancel</button>-->
+                        <a class="btn btn-default pull-right" href="<?=isset($_SERVER['HTTP_REFERER'])? $_SERVER['HTTP_REFERER']:'#';?>">Cancel</a>
+                        <button class="btn btn-primary pull-right" type="submit">Save</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+<div id="loading" style="display:none">
+    <p class="loader_img" id="loading_mask_loader">
+    <img src="/plugins/select2/select2-spinner.gif" alt="Loading..." />
+    <br/>
+    <span>Please wait...</span>
+    </p>
+</div>
+<style> 
+     #loading, #page_load {
+        width: 100%;
+        height: 100%;
+        top: 0;
+        position: fixed;
+        opacity: 0.7;
+        background-color: #fff;
+        z-index: 999999;
+        left: 0px;
+    }
+   .loader_img {
+    background: none repeat scroll 0 0 #fff4e9;
+    border: 2px solid #000;
+    color:#000;
+    font-weight: bold;
+    left: 55%;
+    margin-left: -105px;
+    padding: 15px 30px;
+    position: fixed;
+    text-align: center;
+    top: 40%;
+    width: 150px;
+    z-index: 1000;
+}
+
+#loading-image {
+  position: absolute;
+  top: 300px;
+  /*left: 240px;*/
+  z-index: 100;
+}
+.mobile_subscribe {
+    background: none repeat scroll 0 0 #fff;
+    border: 1px solid #d5d5d5;
+    border-radius: 16px;
+    color: #000;
+    font-family: robotocondensed;
+    font-size: 12px;
+    margin: 0;
+    padding: 0 9px;
+    width: 89.8%;
+    height: 26px;
+}
+.btn-file {
+    position: relative;
+    overflow: hidden;
+}
+.btn-file input[type=file] {
+    position: absolute;
+    top: 0;
+    right: 0;
+    min-width: 100%;
+    min-height: 100%;
+    font-size: 100px;
+    text-align: right;
+    filter: alpha(opacity=0);
+    opacity: 0;
+    outline: none;
+    background: white;
+    cursor: inherit;
+    display: block;
+}
+</style>
+
+<script> 
+$(document).on('change', '.btn-file :file', function() {
+  var input = $(this),
+      numFiles = input.get(0).files ? input.get(0).files.length : 1,
+      label = input.val().replace(/\\/g, '/').replace(/.*\//, '');
+      $(this).parents('.form-group').find('.delete').show();
+});
+
+$('#importForm').on('submit',function(e){
+        $('#loading').show();
+});
+</script>

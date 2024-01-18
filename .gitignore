@@ -1,0 +1,6 @@
+/nbproject/private/
+/public/files/*
+/apachelog/src/main/asrtrace_audit_log.log
+/apachelog/src/main/apachelog/*
+/vendor/phpunit/php-code-coverage/tests/*
+/config/autoload/global.php

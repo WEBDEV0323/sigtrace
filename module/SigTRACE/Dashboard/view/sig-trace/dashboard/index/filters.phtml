@@ -1,0 +1,41 @@
+<div class="card card-body" >
+    <form class="form-row" action="/dashboard/index" method="GET" id="filterForm">
+        <?php if(!empty($filters)) { ?>
+            <?php foreach ($filters as $filter) { ?>
+                <?php switch ($filter->type) {
+                  case 'date': ?>
+                <div class="form-group mb-3 ">
+                    <label for="<?=$filter->field;?>"><?=$filter->label;?></label>
+                    <input type="text" class="form-control daterange" id="<?=$filter->field;?>" name="date:<?=$filter->field;?>" value ="<?= $dateRange?>" title ="<?= $dateRange?>"  readOnly>
+                </div>
+                <?php break; ?>  
+                <?php case 'select': ?>
+                    <div class="form-group mx-sm-3 mb-2 "> 
+                        <label for="<?=$filter->field;?>"><?=$filter->label;?></label>
+                        <select class="form-control selectpicker" data-container="body" value="" data-live-search="true" id="<?=$filter->field;?>" name="select:<?=$filter->field;?>" data="<?=$filter->data;?>" multiple title="<?=$filter->label;?>" label="<?=$filter->label;?>">
+                            
+                            <?php if (isset($filter->data)) { 
+                                $app = $this->AppHelper(array("dataQuery" => $filter->data));
+                                if (isset($app[5])) { 
+                                    foreach ($app[5] as $key=>$value) { ?>
+                                        <option value="<?=$value['as_name'];?>"><?=$value['as_name'];?></option>
+                            <?php }}} ?>
+                        </select>
+                    </div>
+                <?php break; ?>
+            <?php }} ?>
+
+            <div class="form-group mx-sm-3 mb-2">
+                <label for="filterButton" > &nbsp; </label>
+                <button type="button" class="btn btn-primary mb-2 form-control" id="filterButton">Filter</button>
+            </div>
+        <?php } ?>
+                
+    </form>
+</div>
+<script>
+$(function() {
+    var selectedValues = JSON.parse('<?=$selectedValues ?>');
+    $('.selectpicker').selectpicker('val',selectedValues);
+});
+</script>

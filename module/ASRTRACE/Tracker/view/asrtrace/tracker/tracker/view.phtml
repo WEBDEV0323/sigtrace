@@ -1,0 +1,42 @@
+<?php
+$title = 'View Tracker';
+$this->headTitle($title);
+?>
+
+<div class="pagebar container-fluid col-md-12">
+    <!-- Sidebar Toggle -->
+    <button type="button" class="pagebar-toggle navbar-toggle pull-left">
+      <span class="pagebar-arrow"></span>
+    </button>
+    <ol class="breadcrumb">
+        <li><span><a href="/tracker/tracker_management">Tracker Management</a></span></li>
+        <li class="active"><span>View Tracker</span></li>
+    </ol>
+</div>
+<div class="card">
+    <div class="card-body">
+        <div class="card">
+            <div class="card-header">
+                <h6 class="col-md-6 float-left">View Tracker</h6>   
+             </div>
+            <div class="card-body">
+               <div class="form-group row">
+                   <label class="col-sm-4 col-form-label">
+                       <?php echo $this->formlabel($form->get('c_name')); ?>
+                   </label>
+                   <div class="col-sm-6">
+                       <input type="text" id="" class="form-control" <?php echo 'disabled'; ?> value="<?=isset($clientData['client_name'])?$clientData['client_name']:"";?>">
+                   </div>
+               </div>
+               <div class="form-group row">
+                   <label class="col-sm-4 col-form-label">
+                       <?php echo $this->formlabel($form->get('c_tracker')); ?>
+                   </label>
+                   <div class="col-sm-6">
+                       <input type="text" id="" class="form-control" <?php echo 'disabled'; ?> value="<?=isset($trackerData['name'])?$trackerData['name']:"";?>">
+                   </div>
+               </div>
+            </div>
+        </div>
+    </div>
+</div>

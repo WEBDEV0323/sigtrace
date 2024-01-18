@@ -1,0 +1,52 @@
+<div class="crumbs">
+    <ul class="breadcrumb" id="breadcrumbs">
+           <li>
+                <i class="icon-home"></i>
+                <a href="/tracker">Dashboard</a>
+            </li>
+            <li>
+                <a href="javascript:void(0)">Settings</a>
+            </li>
+            <li class="current">
+                <a href="javascript:void(0)">Quantitative</a>
+            </li>
+    </ul>
+</div>
+<div class="page-header"></div>
+<div class="row">
+    <div class="col-md-12">
+        <p class="alert" id="alert" style="display:none;"></p>
+        <div class="widget box">
+            <div class="widget-header">
+                <h4><i class="icon-reorder"></i> Quantitative Settings</h4>
+            </div>
+            <div class="widget-content">
+                <form style="margin: 0px" method="POST" id="quantitativeForm" class="form-horizontal row-border" enctype="multipart/form-data">
+                <table class="table table-highlight-head table-striped table-bordered table-checkable table-responsive">
+                    <thead>
+                        <tr>
+                            <th width="30%">Form Name</th>
+                            <th>Preferred Term</th>
+                            <th>SOC Name</th>
+                            <th>Seriousness</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <?=$list;?>
+                    </tbody>
+                </table>
+                <div class="form-actions" style="margin: 0px">
+                    <a class="btn btn-default pull-right" href="<?=isset($_SERVER['HTTP_REFERER'])? $_SERVER['HTTP_REFERER']:'#';?>">Cancel</a>
+                    <button class="btn btn-primary pull-right" type="submit">Save</button>
+                </div>
+            </form>
+            </div>
+        </div>
+    </div>
+</div>
+<script>
+$(document).ready(function(){
+    $('#quantitativeForm').validate();
+});   
+
+</script>

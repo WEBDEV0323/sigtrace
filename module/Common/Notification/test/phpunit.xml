@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<phpunit bootstrap="Bootstrap.php" colors="true" stderr="true" >
+    <testsuites>
+        <testsuite name="SigTrace">
+            <directory>./NotificationTest</directory>
+        </testsuite>
+    </testsuites>
+    
+    <filter>
+        <whitelist>    
+            <!-- Notification module -->
+            <directory suffix=".php">../src/Common/Notification/Model</directory>
+            <directory suffix=".php">../src/Common/Notification/Controller</directory>
+        </whitelist>
+    </filter>
+    
+    <logging>
+        <log type="coverage-html" target="../../../../../../test/unittest/code_coverage/Notification" lowUpperBound="40" highLowerBound="80" />
+    </logging>
+</phpunit>

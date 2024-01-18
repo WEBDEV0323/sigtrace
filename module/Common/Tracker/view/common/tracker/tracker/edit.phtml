@@ -1,0 +1,70 @@
+<?php
+$title = 'Add Tracker';
+$this->headTitle($title);
+?>
+<div class="pagebar container-fluid col-md-12">
+    <!-- Sidebar Toggle -->
+    <button type="button" class="pagebar-toggle navbar-toggle pull-left">
+      <span class="pagebar-arrow"></span>
+    </button>
+    <ol class="breadcrumb">
+    <li><span><a href="/tracker/tracker_management">Tracker Management</a></span></li>
+    <li class="active"><span>Edit Tracker</span></li>
+    </ol>
+</div>
+
+<div class="card">
+    <div class="card-body"> 
+        <div class="card">
+           <div class="card-header">
+                <h6 class="col-md-6 float-left">Edit Tracker</h6>
+                <span class="col-md-6">
+                   <button type="button" class="btn btn-primary float-right mr-2" onclick="window.location.href='/tracker/add'">Add New Tracker</button>
+                </span>   
+             </div>
+           <div class="card-body">
+               <?php echo $this->form()->openTag($form); ?>
+               <?php echo $this->formElement($form->get('c_hidden')); ?>
+                <div class="form-group row">
+                    <label class="col-sm-4"></label>
+                    <div id="trackerErrorMessages" class="error col-sm-6"></div>
+                </div>
+               <div class="form-group row">
+                   <label class="col-sm-4 col-form-label">
+                       <?php echo $this->formlabel($form->get('c_name')); ?>
+                   </label>
+                   <div class="col-sm-6">
+                       <input type="text" id="" class="form-control" <?php echo 'disabled'; ?> value="<?=$clientName;?>">
+                       <input type="hidden" id="c_select_client" value="<?=$clientId;?>">
+                   </div>
+               </div>
+               <div class="form-group row">
+                   <label class="col-sm-4 col-form-label">
+                       <?php echo $this->formlabel($form->get('c_tracker')); ?> <span class="error ml-1">*</span>
+                   </label>
+                   <div class="col-sm-6">
+                       <?php echo $this->formElement($form->get('c_tracker')); ?>
+                       <div class="error" id="forTrackerName"></div>
+                   </div>
+               </div>
+               <div class="form-group row">
+                    <label class="col-sm-4 col-form-label">Reason for change<span class="error ml-1">*</span></label>
+                    <div class="col-sm-6">
+                       <textarea id="reason" class="form-control" placeholder="Reason for change" name="addcomment"></textarea>
+                       <div id="forReason" class="error"></div>
+                    </div>
+                </div>
+            </div>
+            <div class="card-footer">
+                <div class="form-group row">
+                    <div class="offset-sm-4">
+                        <button id ="savebtn" type="button" class="btn btn-primary ml-2" onclick="addEditTracker()">Save</button>
+                        <button onclick="window.location.href='/tracker/tracker_management'" type="button" class="btn btn-default">Cancel</button>
+                    </div>
+                </div>
+            </div>
+            <?php echo $this->form()->closeTag($form); ?>
+        </div>
+    </div>
+</div>
+<?php $this->inlineScript()->appendFile($this->basePath() . '/js/module/common/tracker/tracker.js');

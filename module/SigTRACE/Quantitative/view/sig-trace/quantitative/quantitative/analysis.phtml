@@ -1,0 +1,58 @@
+<div class="pagebar container-fluid col-md-12">
+    <!-- Sidebar Toggle -->
+    <button type="button" class="pagebar-toggle navbar-toggle pull-left">
+      <span class="pagebar-arrow"></span>
+    </button>
+    <ol class="breadcrumb">
+        <li><a href="/dashboard/<?=$trackerId;?>/<?=$formId;?>"><span>Dashboard</span></a></li>  
+        <li class="active"><span>Quantitative Analysis</span></li>
+    </ol>
+</div>
+<div class="card">
+    <div class="card-body">
+        <div class="row">
+            <div class="col-md-12">
+                <p class="alert fade in" id="alert" style="display:none;"></p>
+                <div class="widget box">
+                    <div class="widget-header"><h4><i class="lnr icon-reorder"></i>Quantitative Analysis</h4></div>
+                     <div class="widget-content">
+                        <div class="card-columns">
+                            <?php foreach ($html as $key => $value) { ?>
+                                <div class="card btn-primary">
+                                    <a href="javascript:void(0);" onclick="window.location.href='/quantitative/view/<?=$trackerId;?>/<?=$formId;?>/<?=$value['product_id'];?>'">
+                                        <div class="card-body">
+                                            <h6 class="text-white"><?= $value['product_name']; ?><span class="float-right">0</span></h6>
+                                        </div>
+                                    </a>
+                                </div>
+                            <?php } ?>
+                            <div style="clear:both;"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+<?php 
+use Session\Container\SessionContainer;
+$session = new SessionContainer();
+$msg = $session->getSession('import_data');
+if ($msg->msg == 'IMPORTED') { ?>
+   $('#alert').show().addClass('alert-success').html('<i class="icon-remove close" data-dismiss="alert"></i>Data imported Successfully!!!'); 
+<?php 
+} else if($msg->msg == 'NOTIMPORTED') { ?>
+   $('#alert').show().addClass('alert-warning').html('<i class="icon-remove close" data-dismiss="alert"></i>Error while data importing');  
+<?php } else {
+?>
+   $('#alert').hide().removeClass('alert-warning').removeClass('alert-success').html('');
+<?php    
+} 
+$msg->getManager()->getStorage()->clear('import_data');
+?>
+window.setInterval(function(){
+  $('#alert').removeClass('alert-success').hide().html('');
+}, 3000);
+</script>

@@ -1,0 +1,105 @@
+<div class="crumbs">
+    <ul class="breadcrumb" id="breadcrumbs">
+        <li>
+            <i class="icon-home"></i>
+            <a title="" href="/product/<?=$trackerId;?>/<?=$formId;?>">Product</a>
+        </li>
+        <li>
+            <a title="" href="/product/special_situation/<?=$trackerId;?>/<?=$formId;?>/<?=$productId;?>">Special Situation</a>
+        </li>
+        <li class="current">
+            <a title="" href="javascript:void(0)">Edit</a>
+        </li>
+    </ul>
+</div>
+<div class="page-header"></div>
+
+<div class="row">
+    <div class="col-md-12">
+        <p class="alert" id="msg_alert" style="display:none;"></p>
+        <div class="widget box">
+        <div class="widget-header">
+            <h4><i class="icon-reorder"></i> Edit Special Situation</h4>
+        </div>
+        <div class="widget-content">
+            <form method="POST" id="editSituation" enctype='multipart/form-data' class="form-horizontal row-border">
+                    <input type="hidden" id="hiddenProductStatus" name="hiddenProductStatus" value="0"/>
+                    <input type="hidden" id="ss_id" name="ss_id" value="<?=$id;?>" />
+                    <div class="form-group">
+                            <label class="col-md-3 control-label">Product <span class="required">*</span></label>
+                            <div class="col-md-4 clearfix">
+                                <select class="col-md-12 select2 full-width-fix required" name="productId" id="productId">
+                                    <option selected value="<?=$productId;?>"><?=$productName;?></option>
+                                </select>
+                            </div>
+                    </div>
+                    <div class="form-group">
+                        <label class="col-md-3 control-label">Situation Name<span class="required">*</span></label>
+                        <div class="col-md-4">
+                            <input type="hidden" value="<?=$name;?>" name="oldSituation">
+                            <input oninput="nameCheck(this.value,'input')" value="<?=$name;?>" style='margin-bottom: 10px;' type="text" class="form-control required" id="situation" name="situation">
+                        </div> 
+                    </div>
+                    <div class="form-actions">
+                        <a class="btn btn-default pull-right" href="<?=isset($_SERVER['HTTP_REFERER'])? $_SERVER['HTTP_REFERER']:'#';?>">Cancel</a>
+                        <input type="submit" class="btn btn-primary pull-right" value="Edit" />
+                    </div>
+            </form>
+        </div>
+        </div>
+    </div>
+</div>
+<script>
+    $(document).ready(function(){
+         $("#editSituation").validate();
+    });
+    $("#editSituation").on('submit',function(e)
+    {
+        nameCheck($.trim($("#situation").val()),'submit');
+        if($('#hiddenProductStatus').val() == 0)
+            {
+                return false;
+            }
+        
+    });
+    function nameCheck(name, type){
+        var productId =  $("#productId").val();
+        var situationId =  $("#ss_id").val();
+        $("#situation").removeClass('red').removeClass('green');
+        if(name.length === 0)
+        {
+            $('#hiddenProductStatus').val(0);
+        }
+        else if(!name.match(/[a-zA-Z]/i)){
+            $("#situation").removeClass('green').addClass('red');
+            $('#hiddenProductStatus').val(0);
+        }
+        else
+        {
+            $.ajax({  
+                type: "POST", 
+                url: "/product/special_situation/situationCheck", 
+                data: "id="+productId+"&label="+name+"&sitId="+situationId, 
+                async : false,
+                success: function(respJson){
+                    var resp =JSON.parse(respJson);
+                    var responseCode = resp.responseCode;
+                    if(responseCode == 1){
+                        $('#hiddenProductStatus').val(1);
+                        if(type == 'input'){
+                            $("#situation").removeClass('red').addClass('green');
+                        }
+                    }
+                    else{
+                        $("#situation").removeClass('green').addClass('red');
+                        $('#hiddenProductStatus').val(0);
+                    }
+                }
+            });
+        }
+    }
+</script>
+<style>
+    .red{ border-color:#cc0000 !important;}
+    .green{ border-color:#088A08 !important;}
+</style>

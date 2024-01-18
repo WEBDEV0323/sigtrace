@@ -1,0 +1,730 @@
+<?php
+$tracker_details = $trackerRsults['tracker_details'];
+$forms = $trackerRsults['forms'];
+$form_name = $form_details['form_name'];
+$record = $form_details['record_name'];
+$tracker_name = $tracker_details['name'];
+$title = "$tracker_name Tracker - $form_name";
+$this->headTitle($title);
+unset($_SESSION['formula_fields']);
+?>
+<div class="pagebar container-fluid col-md-12">
+    <!-- Sidebar Toggle -->
+    <button type="button" class="pagebar-toggle navbar-toggle pull-left">
+      <span class="pagebar-arrow"></span>
+    </button>
+    <ol class="breadcrumb">
+      <li class="active"><span><?php echo $this->escapeHtml($title); ?></span></li>
+    </ol>
+</div>
+<div class="card">
+    <div class="card-body">
+        <div class="card card-default">
+            <div class="card-body">
+                <div class="btn-group" role="group" aria-label="...">
+                    <a href="<?php echo $this->url('tracker', array('action' => 'view', 'tracker_id' => $tracker_id)) ?>">
+                        <button type="button" class="btn btn-default"><span class="lnr icon-home" aria-hidden="true"></span><br/>Home</button>
+                    </a>
+                </div>
+                <div class="btn-group" role="group" aria-label="...">
+                    <a href="<?php echo $this->url('tracker', array('action' => 'settings', 'tracker_id' => $tracker_id)) ?>">
+                        <button type="button" class="btn btn-default"><span class="lnr icon-settings" aria-hidden="true"></span><br/>Settings</button>
+                    </a>
+                </div>
+                <?php
+                foreach ($forms as $key => $value) {
+                    $form_name = $value['form_name'];
+                    $form_id = $value['form_id'];
+                    ?>
+
+                    <div class="btn-group" role="group" aria-label="...">
+                        <a href="<?php echo $this->url('tracker', array('action' => 'form', 'tracker_id' => $tracker_id, 'action_id' => $form_id)) ?>">
+                            <button type="button" class="btn btn-<?php
+                            if ($action_id == $form_id) {
+                                echo 'primary';
+                            } else {
+                                echo 'default';
+                            }
+                            ?>"><span class="lnr icon-list" aria-hidden="true"></span><br/><?= $form_name; ?></button>
+                        </a>
+                    </div>
+                    <?php
+                    }
+                    ?>
+                    <div class="btn-group" style="float:right" role="group" aria-label="...">
+                        <a href="<?php echo $this->url('tracker', array('action' => 'newform', 'tracker_id' => $tracker_id)) ?>">
+                            <button type="button" class="btn btn-default"><span class="lnr icon-add" aria-hidden="true"></span><br/>New Form</button>
+                        </a>
+                    </div>
+
+                </div>
+            </div>
+            <div class="card card-default">
+                <div class="card-body">
+                    <div  class="clearfix">
+                        <?php $form_name = $form_details['form_name']; ?>
+                        <b>Fields - <?= $form_name; ?></b>
+                        <div  class="pull-right">
+                            <div class="btn-group" role="group" aria-label="...">
+                                <a href="<?php echo $this->url('tracker', array('action' => 'workflow', 'tracker_id' => $tracker_id, 'action_id' => $action_id)) ?>">
+                                    <button type="button" class="btn btn-default "><span class="lnr icon-settings" aria-hidden="true"></span> Workflows</button>
+                                </a>
+                            </div>
+                            <div class="btn-group" role="group" aria-label="...">
+                                <a href="<?php echo $this->url('tracker', array('action' => 'newrecord', 'tracker_id' => $tracker_id, 'action_id' => $action_id)) ?>">
+                                    <button type="button" class="btn btn-primary "><span class="lnr icon-arrow-right" aria-hidden="true"></span> Add New <?= $record; ?></button>
+                                </a>
+                            </div>
+
+                        </div>
+                    </div>
+                    <hr/>
+                    <?php
+                    if (array_key_exists(0, $fields_array)) {
+                        ?>
+                        <table class="table table-striped">
+                            <tr>
+                                <th>Sl No</th>
+                                <th>Field Name</th>
+                                <th>Label</th>
+                                <th>Type</th>
+                                <th>Sort Order</th>
+                                <th>Workflow</th>
+                                <th>Action</th>
+                            </tr>
+                            <?php
+                            $ival = 0;
+                            foreach ($fields_array as $field => $f_values) {
+                                $field_id = $f_values['field_id'];
+                                $field_name = $f_values['field_name'];
+                                $label = $f_values['label'];
+                                $field_type = $f_values['field_type'];
+                                $group = $f_values['workflow_name'];
+                                $sort_order = $f_values['sort_order'];
+                                $kpi = $f_values['kpi'];
+                                $code_list_id = $f_values['code_list_id'];
+                                $formula = addslashes($f_values['formula']);
+                                $validation_required_edit = $f_values['validation_required'];
+                                $rule_id = $f_values['rule_id'];
+                                $rule_value = $f_values['value'];
+                                $rule_msg = $f_values['message'];
+                                ?>
+                                <tr>
+                                    <td><?php $ival++;
+                    echo $this->escapeHtml($ival);
+                                ?></td>
+                                    <td><?php echo $this->escapeHtml($field_name); ?></td>
+                                    <td><?php echo $this->escapeHtml($label); ?></td>
+                                    <td><?php echo $this->escapeHtml($field_type); ?></td>
+                                    <td><?php echo "#" . $this->escapeHtml($sort_order); ?></td>
+                                    <td><?php echo $this->escapeHtml($group); ?></td>
+                                    <td>
+
+                                        <a href="#"  onclick='editFieldName("<?= $field_name; ?>","<?= $field_type; ?>","<?= $this->escapeHtml($label); ?>","<?= $field_id; ?>","<?= $kpi; ?>","<?= $code_list_id; ?>","<?= $formula; ?>","<?= $validation_required_edit; ?>","<?= $rule_id; ?>","<?= $rule_value; ?>","<?= $rule_msg; ?>")'data-toggle="modal"  class="editModelField" data-target="#FieldEditModel">
+                                            <button type="button" class="btn btn-default"><span class="lnr icon-pencil" aria-hidden="true"></span></button>
+                                        </a>
+                                        <button type="button" onclick="deleteField('<?php echo $field_id; ?>')" class="btn btn-default" aria-label="Left Align">
+                                            <span class="lnr icon-trash2" aria-hidden="true"></span>
+                                        </button>
+                                    </td>
+                                </tr>
+
+                                <?php
+                            }
+                            ?>
+                        </table>
+                        <?php
+                        } else {
+                        echo "Fields not exist.";
+                        }
+                        ?>
+                    </div>
+                </div>
+            </div>
+</div>
+
+
+<div class="modal fade" id="FieldEditModel" data-backdrop="static" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+    <div>      
+        <br />
+        <br />
+    </div> <div class="modal-dialog"  style="margin-bottom:0px;" >
+        <div class="modal-content" id="modelContentAdd">
+
+            <div class="panel panel-primary" style="margin:0px">
+                <div class="panel-heading">Edit Field<button aria-hidden="true" data-dismiss="modal" class="close" type="button">×</button></div>
+                <div style=" padding-left: 10px;">
+                <input type="hidden" value="" id="originalFieldType"/>
+                <input type="hidden" value="" id="originalRuleId"/>
+                <input type="hidden" value="" id="originalRuleValue"/>
+                <input type="hidden" value="" id="originalRuleMsg"/>
+
+                    <form data-toggle="validator" id="commentForm_editFieldName" method="get" action="" name="myForm" class="form-horizontal">
+                        <div class="modal-body">
+                            <div class="form-group">
+                                <label class="col-sm-2" style="padding-left: 10px;">Field Label Name</label>
+                                <div class="col-sm-6">
+                                    <input type="text" class="form-control"  placeholder="Field Label Name" id="edit_field_name" name="edit_field_name" required value="">
+                                    <input type="text" class="form-control"  placeholder="Field Label Name" id="edit_field_name_hidden" name="edit_field_name_hidden" required value="" style="display:none">
+                                    <input type="text" class="form-control"  placeholder="field_id" id="edit_field_id" name="edit_field_id" required value="" style="display:none">
+                                    <input type="text" class="form-control"  placeholder="field_id" id="expected_f_option" name="expected_f_option" required value="" style="display:none">
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <label class="col-sm-2" style="padding-left: 10px;">Field Type</label>
+                                <div class="col-sm-6" id="ftype_div">
+                                    <select onchange="checkMultiple('id_selid', this.id, 0, 'fieldType_edit');valDataType();" type="text" class="form-control quesiionSelect_edit" placeholder="Field type" id="fieldType_edit" name="fieldType_edit" required>
+                                        <option value="Integer">Integer</option>
+                                        <option value="Text">Text</option>
+                                        <option value="TextArea">Text Area</option>
+                                        <option value="Date">Date</option>
+                                        <option value="Date Time">Date Time</option>
+                                        <option value="Check Box">Check Box</option>
+                                        <option value="Combo Box">Combo Box</option>
+                                        <option value="Formula">Formula</option>
+                                        <option value="User">User</option>
+                                        <option value="Heading">Heading</option>
+                                        <option value="Formula Combo Box">Formula Combo Box</option>
+                                        <option value="DependentText">DependentText</option>
+                                        <option value="Formula Date">Formula Date</option>
+                                        <option value="File">File</option>
+                                    </select>
+                                    <div id="id_selid" style="display:none">
+                                        <label style="padding-top: 10px;">Options</label>
+                                            <select id="code_list_id_edit" class="form-control">
+                                                <option value="0">Select value</option>
+                                        <?php
+                                        foreach($code_lists as $key_cl=>$value_cl){
+                                            $code_list_id = $value_cl['code_list_id'];
+                                            $code_list_name = $value_cl['code_list_name'];
+                                            ?>
+                                                <option value="<?=$code_list_id;?>"><?=$code_list_name;?></option>
+                                            <?php
+                                        }
+                                        ?>
+                                            </select>
+                                    </div>
+                                     <label class="error"  style="display:none;" id="code_list_id_edit_option">This field is required.</label>
+
+                                      <div id="id_selid_role" style="display:none">
+                                        <label style="padding-top: 10px;">Options</label>
+                                            <select id="code_list_id_edit_role" class="form-control role">
+                                                <option value="0">Select value</option>
+                                        <?php
+                                        foreach($roles as $key_cl=>$value_cl){
+                                            $code_list_id = $value_cl['group_id'];
+                                            $code_list_name = $value_cl['group_name'];
+                                            ?>
+                                                <option value="<?=$code_list_id;?>" ><?=$code_list_name;?></option>
+                                            <?php
+                                        }
+                                        ?>
+                                            </select>
+                                    </div>
+                                     <label class="error"  style="display:none;" id="code_list_id_edit_role_option">This field is required.</label>
+                                </div>
+
+                            </div>
+                            <div class="form-group">
+                                <label class="col-sm-2" style="padding-left: 10px;">Kpi</label>
+                                <div class="col-sm-6">
+                                    <select type="text" class="form-control quesiionKpi_edit" placeholder="Kpi" id="kpiType_edit" name="kpiType_edit" required>
+                                        <option value="0">None</option>
+                                        <option value="1">Critical</option>
+                                        <option value="2">Major</option>
+                                        <option value="3">Important</option>
+                                    </select>
+                                </div>
+                            </div>
+                            
+                            <div class="form-group">
+                                <label class="col-sm-2" style="padding-left: 10px;">Validation Required</label>
+                                <div class="col-sm-6" id="valreq">
+                                    <select onchange="checkVal('id_validreq',this.id,0,'validation_edit')" type="text" class="form-control quesiionMandatory-edit" placeholder="Validation" id="validation_edit" name="validation_edit" required>
+                                        <option value="0">No</option>
+                                        <option value="1">Yes</option>
+                                    </select>
+                                </div>
+                            </div>
+                            
+                            
+                            
+                            <div id="id_validreq" style="display:none">
+                                <div class="form-group" id="valdiv" style="margin-left:60px;">
+
+                                </div>
+                                <div class="modal-footer" style="border:0;" >    
+                                <button style="float:right" type="button"id="add_rule" class="btn btn-primary" onClick="addRule(); return false;" align="center">Add New Rule</button>
+                                </div>
+                            </div>
+                        <span id="status_edit"></span>
+                        <textarea id="addcomment" required="required" style=" width: 98%;" class="form-control" placeholder="Add Comment" name="addcomment"></textarea> <span id="commenterror" style="display:none;color: red;">Please add reason for change</span><span id="status_for_reason"></span>
+                        <div style="clear:both"></div>
+                        <div class="modal-footer">
+                        <button onclick="editFieldList();" type="button" class="btn btn-primary" id="saveVal">Save</button>
+                            <button onclick="javascript:window.location.reload()" type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+                        </div>
+                    </form>
+
+            </div>
+        </div>
+    </div>
+</div>
+<div class="modal fade" id="addAuditModel" data-backdrop="static" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+    <div class="modal-dialog"  style="margin-bottom:0px;" >
+        <div class="modal-content" id="modelContentAdd">
+
+            <div class="panel panel-primary" style="margin:0px">
+                <div class="panel-heading">New Fields<button aria-hidden="true" data-dismiss="modal" class="close" type="button">×</button></div>
+                <div style=" padding-left: 10px;">
+                    <form data-toggle="validator" id="commentForm" method="get" action="" name="myForm" class="form-horizontal">
+
+                    </form>
+
+
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+</div>
+</div>
+<div class="modal fade" id="deletecommentasreason" data-backdrop="static" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+    <div>      
+        <br />
+        <br />
+    </div>
+    <div class="modal-dialog"  style="margin-bottom:0px;" >
+                                        <div class="modal-content" id="modelContentdelete">
+
+                                            <div class="panel-primary" style="margin:0px">
+                                                <div class="panel-heading">Comments<button aria-hidden="true" data-dismiss="modal" class="close" type="button">×</button></div>
+<!--                                                <div class="form-group" style=" padding-left: 10px;" id="optionsView">
+                                                    <textarea id="addcomment" required="required"  placeholder="Add Comment" name="addcomment"></textarea>
+                                                </div>-->
+                                            <div class="modal-body">
+                                                <div class="form-group">
+                                                    <textarea id="addcommentfordelete" class="form-control" placeholder="Add reason for deletion." name="addcomment"></textarea>   
+                                                    <span id="commenterrorfordelete" style="display:none;color: red;">Please add reason for change</span>
+                                                </div>
+                                            </div>
+                                            </div>
+
+                                            <div style="clear:both"></div>
+                                            
+                                            <div class="modal-footer">
+                                                <button id="reasonfordelete"  type="button" class="btn btn-primary">OK</button>
+                                                <button class="btn btn-default" type="button" data-dismiss="modal">Close</button>
+                                            </div>
+                                        </div>
+                                    </div>
+    </div>
+<input type="hidden" id="inputWfHidden">
+<input type="hidden" id="input_hidden_codelist" value="">
+<input type="hidden" id="input_hidden_roles" value="">
+<input type="hidden" id="inputMaxRuleHidden" value="">
+<script>
+    cond_option = '';
+    sel_rule_id='';
+     var str = 2;
+    $(document).ready(function() {
+        var jsonData = <?php echo json_encode($workflow_array); ?>;
+        var jsonString = JSON.stringify(jsonData);
+        $('#inputWfHidden').val(jsonString);
+
+        var jsonData = <?php echo json_encode($code_lists); ?>;
+        var jsonString = JSON.stringify(jsonData);
+        $('#input_hidden_codelist').val(jsonString);
+        var jsonData = <?php echo json_encode($roles); ?>;
+        var jsonString = JSON.stringify(jsonData);
+        $('#input_hidden_roles').val(jsonString);
+
+
+    })
+
+    function editFieldName(fieldName, fieldType, label, f_id, kpi, option, formula,validation_required,rule_id,rule_value,rule_message)
+    {
+        sel_rule_id=rule_id;
+     $("#edit_field_name_hidden").val(fieldName);
+       $("#edit_field_name").val(label);
+       $("#fieldType_edit").val(fieldType);
+       $("#edit_field_id").val(f_id);
+       $("#kpiType_edit").val(kpi);
+       $("#code_list_id_edit").val(option);
+       $("#validation_edit").val(validation_required);
+      
+       $("#rule_value_edit_1").val(rule_value);
+       $("#rule_message_edit_1").val(rule_message);
+       $("#originalFieldType").val(fieldType);
+       $("#originalRuleId").val(rule_id);
+       $("#originalRuleValue").val(rule_value);
+       $("#originalRuleMsg").val(rule_message);
+
+       if(fieldType == 'Check Box' || fieldType == 'Combo Box' || fieldType == 'Formula Combo Box'){
+            $("#id_selid").show();
+             $("#id_selid_role").hide();
+        }
+        else if(fieldType == 'User'){
+              var respCheckListJson = $('#input_hidden_roles').val();
+              var resp_checklist =JSON.parse(respCheckListJson);
+               $("#id_selid").hide();
+               $("#id_selid_role").show();
+               $("#code_list_id_edit_role").val(formula);
+         }
+
+        else{
+           $("#id_selid").hide();
+            $("#id_selid_role").hide();
+
+
+        }
+        if(validation_required=='1')
+        {
+            var res = rule_id.split("==>");
+            var ruleVal = rule_value.split("==>");
+            var ruleMsg = rule_message.split("==>");
+             if (res.length >= 1) {
+                 $("#valdiv").html("");
+                $.each(res, function( index, value ) {
+                    editRule(res[index],ruleVal[index],ruleMsg[index],res.length,index);                    
+                });
+            }
+            $("#id_validreq").show();
+        }
+        else
+        {
+			checkVal();
+            $("#id_validreq").hide();
+        }
+
+    }
+    
+    function editFieldList()
+    {
+       var fieldName = $("#edit_field_name").val().trim();
+       var fieldType = $("#fieldType_edit").val();
+       var f_id = $("#edit_field_id").val();
+       var kpi = $("#kpiType_edit").val();
+       var code_list_id = $("#code_list_id_edit").val();
+       var role_id = $("#code_list_id_edit_role").val();
+       var edit_field_name_hidden = $("#edit_field_name_hidden").val();
+       var comment= $("#addcomment").val();
+       var validation_required_edit = $("#validation_edit").val();
+       var rule_id = new Array(); 
+       var rule_value = new Array(); 
+       var rule_message = new Array();
+        $('select[name*="rule_id_"]').each(function() 
+        {
+            rule_id.push($(this).val());
+        });
+       
+       $('input[name*="value_"]').each(function() 
+        {
+            rule_value.push($(this).val());
+        });
+       
+       $('textarea[name*="message_"]').each(function() 
+        {
+            rule_message.push($(this).val());
+        });
+
+
+       if(fieldType == 'Check Box' || fieldType == 'Combo Box' || fieldType == 'Formula Combo Box'){
+           if( $("#code_list_id_edit").val()!=0){
+           code_list_id = $("#code_list_id_edit").val();
+            $('#code_list_id_edit_option').hide();
+           }
+           else{
+               $('#code_list_id_edit_option').show();
+                return false;
+           }
+        } else{
+            code_list_id = 0;
+
+        }
+        if(fieldType == 'User'){
+           role_id = $("#code_list_id_edit_role").val();
+           if( $("#code_list_id_edit_role").val()!=0){
+           role_id = $("#code_list_id_edit_role").val();
+            $('#code_list_id_edit_role_option').hide();
+           }
+           else{
+               $('#code_list_id_edit_role_option').show();
+                return false;
+           }
+        } else{
+            role_id=0;
+        }
+       
+        
+        var $valid = $("#commentForm_editFieldName").valid();
+        if(!$valid) {
+            return false;
+        }else{
+
+            $("#status_edit").html('processing...');
+            var tracker_id = tracker_id;
+
+            var data = {
+                fieldName : fieldName,
+                edit_field_name_hidden : edit_field_name_hidden,
+                fieldType : fieldType,
+                f_id : f_id,
+                kpi : kpi,
+                code_list_id : code_list_id,
+                tracker_id: <?=$tracker_id;?>,
+                form_id: <?=$action_id;?>,
+                role_id:role_id,
+                validation_req:validation_required_edit,
+                rule_id:rule_id,
+                rule_message:rule_message,
+                rule_value:rule_value,
+                 comment:comment
+            }
+            var url = "<?php echo $this->url('tracker', array('action' => 'editfieldbyid','tracker_id' => $tracker_id, 'action_id' => $action_id)) ?>";
+            $.post(url, data,function(respJson){
+                var resp =JSON.parse(respJson);
+                var responseCode = resp.responseCode;
+                var errMessage = resp.errMessage;
+                if(responseCode == 1){
+                    $("#status_edit").html('<font color="#088A08">'+errMessage+'</font>');
+                    window.setTimeout('window.location.replace("<?php echo $this->url('tracker', array('action' => 'fields', 'tracker_id' => $tracker_id, 'action_id'=>$action_id)) ?>")', 1000);
+                }
+                else{
+                    $("#status_edit").html('<font color="#cc0000">'+errMessage+'</font>');
+                }
+            });
+        }
+
+    }
+
+    function deleteField(fieldID)
+    {
+         $('#deletecommentasreason').modal('show');
+        $("#reasonfordelete").click(function(){
+            $('#commenterrorfordelete').hide();
+            if ($('#addcommentfordelete').val() == ''){
+                $('#commenterrorfordelete').show();
+                return false;
+            }
+            else{
+            var id=$(this).closest('tr').attr("id");
+            var tracker_id = '<?= $tracker_id; ?>';
+            var action_id = '<?= $action_id; ?>';
+            $.ajax({
+                url: "/tracker/deleteField/"+tracker_id+"/"+action_id+"/"+fieldID,
+                type:'post',
+                dataType:'json',
+                data:{fieldID:fieldID, tracker_id:tracker_id, form_id:action_id, comment:$('#addcommentfordelete').val()},
+                success:function(data) {
+                    if(data=='Deleted')
+                    {
+                        location.reload();
+                    }
+                }
+            })
+        }
+        });
+    }
+     function checkMultiple(id, selID, start, questionType){
+        var selVal= $('#'+selID).val();
+        var html="";
+
+        if(selVal == 'Check Box' || selVal == 'Combo Box'){
+            $("#"+id).show();
+            $("#"+id+"_role").hide();
+        }
+        else if(selVal == 'User'){
+               $("#"+id+"_role").show();
+                $("#"+id).hide();
+         }
+        else{
+            $("#"+id).hide();
+             $("#"+id+"_role").hide();
+
+        }
+    }
+    function valDataType(){
+        var fieldType = $('#fieldType_edit').val();
+        var valReq = $('#validation_edit').val();
+        if(valReq=="1" && fieldType!=""){
+            $("#valdiv").html("");
+            if($("#originalFieldType").val() == fieldType){
+                var originalRuleId = $("#originalRuleId").val();
+                var originalRuleVal = $("#originalRuleValue").val();
+                var originalRuleMsg = $("#originalRuleMsg").val();
+                var res = originalRuleId.split("==>");
+                var ruleVal = originalRuleVal.split("==>");
+                var ruleMsg = originalRuleMsg.split("==>");
+                if (res.length >= 1) {
+                    $.each(res, function( index, value ) {
+                        editRule(res[index],ruleVal[index],ruleMsg[index],res.length,index);
+                    });
+                }
+            }else{
+               addRule(); 
+            }
+            
+            
+        }
+        
+    }
+     
+    function checkVal()
+    {
+		
+        valDataType();
+        var html="";
+        var selValReq= $('#validation_edit').val();
+        if(selValReq == '1')
+        {
+           $("#id_validreq").show();
+           if($("#valdiv > div").length == 0){
+            }
+           
+                               $.ajax({
+                        url: "/tracker/getValidationRule",
+                        type: 'post',
+                        
+                        data: "fieldtype=" + $('#fieldType_edit').val(),
+                        success: function (data) { 
+                            var resp = JSON.parse(data);
+                            cond_option = '<option value=""> Rule Name </option>';
+                            $.each(resp, function (i, item)
+                            {
+                                cond_option += '<option value="' + item['rule_id'] + '">' + item['rule_name'] + '</option>';
+                            }
+                            );
+                           $('[id^="n_conditionrule_"]').html('');
+                            $('[id^="n_conditionrule_"]').append(cond_option);    
+                            $("#n_conditionrule_1").val(sel_rule_id);
+                        }
+                    });
+           
+        
+            
+        }
+        else
+        {
+            $("#id_validreq").hide();
+        }
+    }
+    
+    
+  
+    function editRule(ruleId,ruleValue, ruleMsg,rulesCount,index)
+    {
+        var fieldType = $('#fieldType_edit').val();
+        var valReq = $('#validation_edit').val();
+        var incr_number = 'cond_'+index
+        var html = "<div condition='"+incr_number+"' class='form-group'>";
+        if(valReq === '1' && fieldType !== ""){
+           $.ajax({
+                url: "/tracker/getValidationRule",
+                type: 'post',
+                data: "fieldtype="+fieldType,
+                success: function (data) {
+                    var resp = JSON.parse(data);
+                    var cond_option = '<option value="" default> Rule Name </option>';
+                    $.each(resp, function (i, item)
+                    {
+                        cond_option += '<option value="' + item['rule_id']+'"' ;
+                        if(ruleId == item['rule_id']){ cond_option += " selected ";}
+                        cond_option += '>' + item['rule_name'] + '</option>';
+                    }
+                    );
+                    if($("#valdiv > div").length >= rulesCount){
+                        $("#valdiv").html('');
+                    }
+                    html +='<div class="col-sm-2">';
+                    html +='<label>Rule</label>';
+                    html +='<select name="rule_id_'+index+'" id="n_condition_'+index+'" class="form-control validationRuleId" required>'+cond_option+'</select>';
+                    html +='</div>';
+                    html +='<div class="col-sm-2">';
+                    html +='<label>Value</label>';
+                    html +=' <input name="value_'+index+'" type="text" class="form-control validationRuleValue"  placeholder="Rule Value" id="rule_value_edit_'+index+'" name="rule_value_edit" required value="'+ruleValue+'">';
+                    html +='</div>';
+                    html +='<div class="col-sm-6">';
+                    html +='<label>Message</label>';
+                    html +='<textarea name="message_'+index+'" class="form-control validationRuleMsg"   id="rule_message_edit_'+index+'" name="rule_message_edit" required value="">'+ruleMsg+'</textarea>';
+                    html +='</div>';
+                    if($("#valdiv > div").length !=0 ){
+                        html += '<div class="col-sm-1" style="margin-top:60px;"><i class="icon-remove" style="color: red; cursor: pointer;" onClick="delRule(this)"></i></div>'; 
+                    }
+                        html +='</div>';
+                    
+                    $("#valdiv").append(html);                  
+                }
+            }); 
+        }
+       
+        
+      
+    }
+    
+    
+    function addRule()
+    {
+        var fieldType = $('#fieldType_edit').val();
+        var valReq = $('#validation_edit').val();
+        var incr_number = 'cond_'+str
+        var html = "<div condition='"+incr_number+"' class='form-group'>";
+        if(valReq === '1' && fieldType !== ""){
+           $.ajax({
+               
+                url: "/tracker/getValidationRule",
+                type: 'post',
+                data: "fieldtype="+fieldType,
+                success: function (data) {
+                    var resp = JSON.parse(data);
+                    var cond_option = '<option value="" default> Rule Name </option>';
+                    $.each(resp, function (i, item)
+                    {
+                        cond_option += '<option value="' + item['rule_id'] + '">' + item['rule_name'] + '</option>';
+                    }
+                    );
+                    html +='<div class="col-sm-2">';
+                    html +='<label>Rule</label>';
+                    html +='<select name="rule_id_'+str+'" id="n_condition_'+str+'" class="form-control validationRuleId" required >'+cond_option+'</select>';
+                    html +='</div>';
+                    html +='<div class="col-sm-2">';
+                    html +='<label>Value</label>';
+                    html +='<input name="value_'+str+'" type="text" class="form-control validationRuleValue"  placeholder="Rule Value" id="rule_value_edit_'+str+'" name="rule_value_edit" required value="">';
+                    html +='</div>';
+                    html +='<div class="col-sm-6">';
+                    html +='<label>Message</label>';
+                    html +='<textarea name="message_'+str+'" class="form-control validationRuleMsg"   id="rule_message_edit_'+str+'" name="rule_message_edit" required value=""></textarea>';
+                    html +='</div>';
+                                                
+                        if($("#valdiv > div").length !=0 ){
+                            html += '<div class="col-sm-1" style="margin-top:60px;"><i class="icon-remove" style="color: red; cursor: pointer;" onClick="delRule(this)"></i></div>'; 
+                        }
+                        html +='</div>';
+                    $("#valdiv").append(html);
+                    str++;
+                }
+            }); 
+        }
+       
+        
+      
+    }
+    function delRule(node)
+    {
+        r = node.parentNode.parentNode;
+        r.parentNode.removeChild(r);
+        sendOrderToServer();
+    }
+    
+    function sendOrderToServer() {
+        var elem = document.getElementsByClassName("form-control quesiionRulename");
+        var max_sort_rule = parseInt($('#inputMaxRuleHidden').val());
+        for (var i = 0; i < elem.length; ++i) {
+            elem[i].innerHTML = "#"+(max_sort_rule+1+i);
+        }
+        var elem = document.getElementsByClassName("sort_rder");
+        for (var i = 0; i < elem.length; ++i) {
+            elem[i].value = max_sort_num+1+i;
+        }
+    }  
+</script>

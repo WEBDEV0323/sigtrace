@@ -1,0 +1,24 @@
+<?php
+$this->headTitle('Audit Trail');
+?>
+<div class="pagebar container-fluid col-md-12">
+    <!-- Sidebar Toggle -->
+    <button type="button" class="pagebar-toggle navbar-toggle pull-left">
+      <span class="pagebar-arrow"></span>
+    </button>
+    <ol class="breadcrumb">
+        <li><a href="/"><span>Dashboard</span></a></li>
+        <li class="active"><span>Audit Log</span></li>
+    </ol>
+</div>
+
+<div class="card">
+  <div class="card-body">
+    <div class="card card-default mb-2">
+        <div class="card-body">
+            <?$kibanaUrl= $kibana_url."?embed=true&_g=(refreshInterval%3A(display%3AOff%2Cpause%3A!f%2Cvalue%3A0)%2Ctime%3A(from%3Anow-2y%2Cmode%3Aquick%2Cto%3Anow))";?>
+            <iframe src="<?=$kibanaUrl;?>" height="600" width="100%"></iframe>
+        </div>
+    </div>
+  </div>
+</div>

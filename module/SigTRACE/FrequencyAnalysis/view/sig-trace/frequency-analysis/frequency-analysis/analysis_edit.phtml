@@ -1,0 +1,211 @@
+<div class="crumbs">
+    <ul class="breadcrumb" id="breadcrumbs">
+            <li>
+                <i class="icon-home"></i>
+                <a href="/dashboard/<?=$trackerId;?>/<?=$formId;?>">Dashboard</a>
+            </li>
+            <li>
+                <a href="/signal/assessment/<?=$trackerId;?>/<?=$formId?>">Frequency analysis</a>
+            </li>
+            <li class="current">
+                <a href="javascript:void(0)">Edit</a>
+            </li>
+    </ul>
+</div>
+<div class="page-header"></div>
+<div class="row">
+    <div class="col-md-12">
+        <div class="widget box">
+            <div class="widget-header">
+                    <h4><i class="icon-reorder"></i>Frequency analysis Edit</h4>
+            </div>
+            <div class="widget-content">
+                <form method="POST" id="assessmentForm" class="form-horizontal row-border" enctype="multipart/form-data">
+                    <?php foreach($lists as $list){ ?>
+                    <div class="controls form-group">
+                        <label class="col-md-3 control-label">Product Name</label>          
+                        <div class="col-md-9 clearfix" style="padding-top: 7px;"><?=$list[2]?></div>
+                        <input type="hidden" name="product_name" id="product_name" value="<?=$list[2]?>" />
+                    </div>
+                    <div class="controls form-group">
+                        <label class="col-md-3 control-label">Preferred Term</label>          
+                        <div class="col-md-9 clearfix" style="padding-top: 7px;"><?=$list[3]?></div>
+                        <input type="hidden" name="preferred_term" id="preferred_term" value="<?=$list[3]?>" />
+                    </div>
+                    <div class="controls form-group">
+                        <label class="col-md-3 control-label">Type</label>          
+                        <div class="col-md-8 clearfix">
+                            <select name="type" class="col-md-12 select2">
+<!--                                <option value="IIR">IIR</option>
+                                <option value="IPR">IPR</option>
+                                <option value="LE">LE</option>
+                                <option value="SS">SS</option>
+                                <option value="CME">CME</option>-->
+<option value="Risk">Risk</option>
+<option value="Listed">Listed</option>
+<option value="Special Situation">Special Situation</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="controls form-group">
+                        <label class="col-md-3 control-label">Cumulative(Total Period)</label>
+                            <div class="controls clearfix">
+                                <label class="col-md-2 control-label">Serious</label>          
+                                <div class="col-md-6 clearfix" style="padding-top: 7px;"><?=$list[5]?></div>
+                            </div>
+                        <label class="col-md-3 control-label"></label>
+                            <div class="controls clearfix">
+                                <label class="col-md-2 control-label">Non-Serious</label>          
+                                <div class="col-md-6 clearfix" style="padding-top: 7px;"><?=$list[6]?></div>
+                            </div>
+                        <label class="col-md-3 control-label"></label>
+                            <div class="controls clearfix">
+                                <label class="col-md-2 control-label">Total</label>          
+                                <div class="col-md-6 clearfix" style="padding-top: 7px;"><?=$list[7]?></div>
+                            </div>
+                        <label class="col-md-3 control-label"></label>
+                            <div class="controls clearfix">
+                                <label class="col-md-2 control-label">Exposure</label>          
+                                <div class="col-md-6 clearfix" style="padding-top: 7px;">
+                                    <input type="text" name="cumulative_exposure" id="cumulative_exposure" class="form-control" value="<?=$list[8]?>" />
+                                </div>
+                            </div>
+                    </div>
+                    <div class="controls form-group">
+                         <label class="col-md-3 control-label">Period 1(Previous Quarter)</label>
+                            <div class="controls clearfix">
+                                <label class="col-md-2 control-label">Serious</label>          
+                                <div class="col-md-6 clearfix" style="padding-top: 7px;"><?=$list[9]?></div>
+                            </div>
+                         <label class="col-md-3 control-label"></label>
+                            <div class="controls clearfix">
+                                <label class="col-md-2 control-label">Non-Serious</label>          
+                                <div class="col-md-6 clearfix" style="padding-top: 7px;"><?=$list[10]?></div>
+                            </div>
+                         <label class="col-md-3 control-label"></label>
+                            <div class="controls clearfix">
+                                <label class="col-md-2 control-label">Total</label>          
+                                <div class="col-md-6 clearfix" style="padding-top: 7px;"><?=$list[11]?></div>
+                            </div>
+                         <label class="col-md-3 control-label"></label>
+                            <div class="controls clearfix">
+                                <label class="col-md-2 control-label">Exposure</label>          
+                                <div class="col-md-6 clearfix" style="padding-top: 7px;">
+                                    <input type="text" name="previous_exposure" id="previous_exposure" class="form-control" value="<?=$list[12]?>" />
+                                </div>
+                            </div>
+                    </div>
+                    
+                    
+                    <div class="controls form-group">
+                        <label class="col-md-3 control-label">Period 2(Current Quarter)</label>
+                            <div class="controls clearfix">
+                                <label class="col-md-2 control-label">Serious</label>
+                                <div class="col-md-6 clearfix" style="padding-top: 7px;"><?=$list[13]?></div>
+                            </div>
+                        <label class="col-md-3 control-label"></label>
+                            <div class="controls clearfix">
+                                <label class="col-md-2 control-label">Non-Serious</label>
+                                <div class="col-md-6 clearfix" style="padding-top: 7px;"><?=$list[14]?></div>
+                            </div>
+                        <label class="col-md-3 control-label"></label>
+                            <div class="controls clearfix">
+                                <label class="col-md-2 control-label">Total</label>
+                                <div class="col-md-6 clearfix" style="padding-top: 7px;"><?=$list[15]?></div>
+                            </div>
+                        <label class="col-md-3 control-label"></label>
+                            <div class="controls clearfix">
+                                <label class="col-md-2 control-label">Exposure</label>          
+                                <div class="col-md-6 clearfix" style="padding-top: 7px;">
+                                    <input type="text" name="current_exposure" id="current_exposure" class="form-control" value="<?=$list[16]?>" />
+                                </div>
+                            </div>
+                    </div>                  
+                    <?php } ?>
+                    <div class="form-actions">
+                        <!--<button class="btn btn-default pull-right" type="reset">Cancel</button>-->
+                        <a class="btn btn-default pull-right" href="<?=isset($_SERVER['HTTP_REFERER'])? $_SERVER['HTTP_REFERER']:'#';?>">Cancel</a>
+                        <button class="btn btn-primary pull-right" type="submit">Save</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+<div id="loading" style="display:none">
+    <p class="loader_img" id="loading_mask_loader">
+    <img src="/plugins/select2/select2-spinner.gif" alt="Loading..." />
+    <br/>
+    <span>Please wait...</span>
+    </p>
+</div>
+
+<script>
+    $('#assessmentForm').on('submit',function(){
+       $('#loading').show(); 
+    });
+</script>
+<style> 
+     #loading, #page_load {
+        width: 100%;
+        height: 100%;
+        top: 0;
+        position: fixed;
+        opacity: 0.7;
+        background-color: #fff;
+        z-index: 999999;
+        left: 0px;
+    }
+    .loader_img {
+    background: none repeat scroll 0 0 #fff4e9;
+    border: 2px solid #000;
+    color:#000;
+    font-weight: bold;
+    left: 55%;
+    margin-left: -105px;
+    padding: 15px 30px;
+    position: fixed;
+    text-align: center;
+    top: 40%;
+    width: 150px;
+    z-index: 1000;
+}
+
+#loading-image {
+  position: absolute;
+  top: 300px;
+  /*left: 240px;*/
+  z-index: 100;
+}
+.mobile_subscribe {
+    background: none repeat scroll 0 0 #fff;
+    border: 1px solid #d5d5d5;
+    border-radius: 16px;
+    color: #000;
+    font-family: robotocondensed;
+    font-size: 12px;
+    margin: 0;
+    padding: 0 9px;
+    width: 89.8%;
+    height: 26px;
+}
+.btn-file {
+    position: relative;
+    overflow: hidden;
+}
+.btn-file input[type=file] {
+    position: absolute;
+    top: 0;
+    right: 0;
+    min-width: 100%;
+    min-height: 100%;
+    font-size: 100px;
+    text-align: right;
+    filter: alpha(opacity=0);
+    opacity: 0;
+    outline: none;
+    background: white;
+    cursor: inherit;
+    display: block;
+}
+</style>

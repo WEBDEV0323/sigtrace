@@ -1,0 +1,32 @@
+<?php 
+$title = 'Dashboard';
+?>
+<div class="pagebar container-fluid col-md-12">
+    <!-- Sidebar Toggle -->
+    <button type="button" class="pagebar-toggle navbar-toggle pull-left">
+      <span class="pagebar-arrow"></span>
+    </button>
+    <ol class="breadcrumb">
+      <li class="active"><span><?php echo $this->escapeHtml($title); ?></span></li>
+    </ol>   
+</div>
+
+<div class="card">
+    <div class="card-body" id="dLoading">
+        <div v-if="loading" class="loading">
+            <img src="/assets/dashboard_spinner.gif" width="15%" class="mx-auto d-block" alt="loading..." />
+        </div>
+        <div v-if="!loading" class="none" id="body-data" v-html="data"></div>
+    </div>
+</div>
+<script type="text/javascript">
+    var trackerId = '<?=$trackerId;?>';
+    var formId = '<?=$formId;?>';
+</script>
+<?php
+$this->inlineScript()
+        ->appendFile($this->basePath() . '/assets/Vue/vue.min.js')
+        ->appendFile($this->basePath() . '/assets/Vue/vue-resource.min.js')
+        ->appendFile($this->basePath() . '/js/module/sigtrace/dashboard/app.js')
+        ->appendFile($this->basePath() . '/assets/custom/js/app.js', 'text/javascript')
+        ->appendFile($this->basePath() . '/assets/custom/js/api.js', 'text/javascript');

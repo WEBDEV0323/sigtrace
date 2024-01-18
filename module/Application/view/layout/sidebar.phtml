@@ -1,0 +1,245 @@
+<?php 
+use Session\Container\SessionContainer;
+$session = new SessionContainer();
+$userContainer = $session->getSession('user');
+
+//if (isset($userContainer->u_id)) {
+//    $user_details = $userContainer->user_details;
+//    $role_id = $user_details['group_id'];
+//    if (isset($userContainer->trackerRoles) && !empty($userContainer->trackerRoles)) {
+//        $role_id = $userContainer->trackerRoles[$trackerId]['session_group_id'];
+//    }
+//}
+$var = $this->layout()->getVariables();
+$app = $this->AppHelper($var);
+$forms = isset($app[0]['forms'])?$app[0]['forms']:array();
+$workFlows = isset($app[0]['workflows'])?$app[0]['workflows']:array();
+$reports = isset($app[1])?$app[1]:array();
+$calendar= isset($app[2])?$app[2]:array();
+$trackers= isset($app[3])?$app[3]:array();
+$sidemenu = isset($app['menu'][1])?$app['menu'][1]:array(); //echo "<pre>"; print_r($sidemenu); die;
+$permittedResources = isset($app['menu'][2])?$app['menu'][2]:array();
+// $formType=$app[6]['form_type'];
+$userRoleType = $userContainer->offsetGet('roleNameType');
+$validationWorkFlows = $app[7];
+$url = filter_input(INPUT_SERVER, 'REQUEST_URI');
+?>
+<!-- Sidebar Start-->
+<aside class="left-panel" tabindex="5000" style="overflow: hidden; outline: none;" id="sidebar">
+  <!-- Sidebar Toggle -->
+  <button type="button" class="sidebar-toggle navbar-toggle pull-left">
+    <span class="sidebar-arrow"></span>
+  </button>
+  <!-- Profile-card -->
+  <div class="profile-card">
+    <div class="profile-title"></div>
+  </div>
+  <!-- Navbar Start -->
+  <nav class="navigation">
+    <div class="clearfix"></div>
+    <?php  if(!empty($sidemenu)){ ?>
+        <ul class="list-unstyled components">
+            <?php foreach($sidemenu as $menu){ 
+                    switch($menu['dependent_on']){
+                        case '':
+                            $abc = array();
+                            break;
+                        default:
+                            $abc = explode(',',$menu['dependent_on']);
+                            break;
+                    }
+            ?>
+                <?php if(empty($abc) || (count($abc) == 1 && isset(${$abc[0]})) || (count($abc)== 2 && isset(${$abc[0]}) && isset(${$abc[1]}))){ ?>
+                         <?php if(isset($menu['blocks']) && !empty($menu['blocks']) || ($menu['action_name'] == 'product' && (in_array($menu['action_id'],$permittedResources)|| intval($userRoleType) == 1))){?>
+                            <li <?php if ($menu['have_blocks'] == 1) { ?>class="has-submenu" <?php } ?>>
+                                <a 
+                                   <?php if($menu['action_url'] == ''){  ?> href="javascript:void(0);" <?php } else{ ?>
+                                   href="<?php if($menu['action_url'] == '/validation/product'){echo 'javascript:void(0);';}else{ echo $menu['action_url'];?><?php if($menu['dependent_on'] != ''){ $dep = explode(',',$menu['dependent_on']); for($i=0;sizeof($dep)>$i; $i++){ ?>/<?=${$dep[$i]};?><?php }}}?>" 
+                                   <?php } ?>>
+                                    <?php if (isset($menu['icon_class']) && $menu['icon_class'] != "") { ?>
+                                    <i class="lnr <?=$menu['icon_class'];?>"></i>
+                                    <?php } ?>
+                                    <span class="nav-label"><?=$menu['action_label'];?></span>
+                                    <span class="menu-arrow"></span>
+                                </a>
+                                <?php if(isset($menu['blocks']) && !empty($menu['blocks']) || ($menu['action_url'] == '/validation/product' && sizeof($validationWorkFlows) > 0)){ ?>
+                                <ul class="collapse list-unstyled">
+                                    <?php if($menu['action_url']== '/validation/product' && (in_array($menu['action_id'],$permittedResources) || intval($userRoleType) == 1)){ ?> 
+
+                                                <?php foreach($menu['blocks'] as $block){ ?>
+                                                    <?php if($block['action_url']== '/qualitative/workflow' && (in_array($block['action_id'],$permittedResources) || intval($userRoleType) == 1)){ ?>
+                                                    <li <?php if ($block['have_blocks'] == 1) { ?>class="has-submenu" <?php } ?>>
+                                                        <a 
+                                                            <?php if($block['action_url'] == '' || $block['action_url'] == '/qualitative/workflow'){  ?> 
+                                                                href="javascript:void(0);" 
+                                                            <?php } else{ ?>
+                                                                href="<?=$block['action_url'];?><?php if($block['dependent_on'] != ''){ $dep = explode(',',$block['dependent_on']); for($i=0;sizeof($dep)>$i; $i++){ ?>/<?=${$dep[$i]};?><?php }}?>" 
+                                                            <?php } ?>
+                                                                >
+                                                            <?php if ($block['have_blocks'] == 1) { ?><span class="nav-label"><?php } ?>
+                                                            <?=$block['action_label']?>
+                                                            <?php if ($block['have_blocks'] == 1) { ?></span><?php } ?>
+                                                            <?php if ($block['have_blocks'] == 1) { ?><span class="menu-arrow"></span><?php } ?>
+                                                        </a>
+                                                        <?php if(!empty($workFlows) && ($block['action_url']== '/qualitative/workflow' && (in_array($block['action_id'],$permittedResources) || intval($userRoleType) == 1))){ ?>
+                                                                <ul class="collapse list-unstyled">
+                                                                    <?php  foreach($workFlows as $workFlow){ ?>
+                                                                        <li>
+                                                                            <a href="/qualitative/workflow/<?=$tracker_id;?>/<?=$workFlow['form_id'];?>/<?=$workFlow['workflow_id'];?>">
+                                                                                <?=$workFlow['workflow_name'];?>
+                                                                            </a>
+                                                                        </li>    
+                                                                    <?php } ?>
+                                                                </ul>
+                                                        <?php } ?>
+                                                    </li>
+                                                    <?php }else{ ?>
+                                                        <li <?php if ($block['have_blocks'] == 1) { ?>class="has-submenu" <?php } ?>>
+                                                            <a 
+                                                                <?php if($block['action_url'] == '' || $block['action_url'] == '/qualitative/workflow'){  ?> 
+                                                                    href="javascript:void(0);" 
+                                                                <?php } else{ ?>
+                                                                    href="<?=$block['action_url'];?><?php if($block['dependent_on'] != ''){ $dep = explode(',',$block['dependent_on']); for($i=0;sizeof($dep)>$i; $i++){ ?>/<?=${$dep[$i]};?><?php }}?>" 
+                                                                <?php } ?>
+                                                                    >
+                                                                <?php if ($block['have_blocks'] == 1) { ?><span class="nav-label"><?php } ?>
+                                                                <?=$block['action_label']?>
+                                                                <?php if ($block['have_blocks'] == 1) { ?></span><?php } ?>
+                                                                <?php if ($block['have_blocks'] == 1) { ?><span class="menu-arrow"></span><?php } ?>
+                                                            </a>
+                                                            <?php if(!empty($workFlows) && ($block['action_url']== '/qualitative/workflow' && (in_array($block['action_id'],$permittedResources) || intval($userRoleType) == 1))){ ?>
+                                                                    <ul class="collapse list-unstyled">
+                                                                        <?php  foreach($workFlows as $workFlow){ ?>
+                                                                            <li>
+                                                                                <a href="/qualitative/workflow/<?=$tracker_id;?>/<?=$workFlow['form_id'];?>/<?=$workFlow['workflow_id'];?>">
+                                                                                    <?=$workFlow['workflow_name'];?>
+                                                                                </a>
+                                                                            </li>    
+                                                                        <?php } ?>
+                                                                    </ul>
+                                                            <?php } ?>
+                                                        </li>
+                                                    <?php } ?>
+                                                <?php } ?>
+                                                <?php  foreach($validationWorkFlows as $workFlow){ ?>
+                                                    <li>
+                                                        <a href="/validation/product/<?=$tracker_id;?>/<?=$workFlow['form_id'];?>/<?=$workFlow['workflow_id'];?>">
+                                                            <?=$workFlow['workflow_name'];?>
+                                                        </a>
+                                                    </li>    
+                                                <?php } ?>
+
+                                    <?php } else{ ?>
+                                            <?php foreach($menu['blocks'] as $block){ ?>
+                                                <li <?php if ($block['have_blocks'] == 1) { ?>class="has-submenu" <?php } ?>>
+                                                    <a 
+                                                        <?php if($block['action_url'] == '' || $block['action_url'] == '/qualitative/workflow'){  ?> 
+                                                            href="javascript:void(0);" 
+                                                        <?php } else{ ?>
+                                                            href="<?=$block['action_url'];?><?php if($block['dependent_on'] != ''){ $dep = explode(',',$block['dependent_on']); for($i=0;sizeof($dep)>$i; $i++){ ?>/<?=${$dep[$i]};?><?php }}?>" 
+                                                        <?php } ?>
+                                                            >
+                                                            <?php if ($block['have_blocks'] == 1) { ?><span class="nav-label"><?php } ?>
+                                                            <?=$block['action_label']?>
+                                                            <?php if ($block['have_blocks'] == 1) { ?></span><?php } ?>
+                                                            <?php if ($block['have_blocks'] == 1) { ?><span class="menu-arrow"></span><?php } ?>
+                                                    </a>
+                                                    <?php if(!empty($workFlows) && (($block['action_url'])== '/qualitative/workflow' && (in_array($block['action_id'],$permittedResources) || intval($userRoleType) == 1))){ ?>
+                                                            <ul class="collapse list-unstyled">
+                                                                <?php  foreach($workFlows as $workFlow){ ?>
+                                                                    <li>
+                                                                        <a href="/qualitative/workflow/<?=$tracker_id;?>/<?=$workFlow['form_id'];?>/<?=$workFlow['workflow_id'];?>">
+                                                                            <?=$workFlow['workflow_name'];?>
+                                                                        </a>
+                                                                    </li>    
+                                                                <?php } ?>
+                                                            </ul>
+                                                    <?php } ?>
+                                                </li>
+                                        <?php } ?>
+                                    <?php } ?>
+                                </ul>
+                                <?php } ?>
+                            </li>
+                         <?php } else if($menu['controller_id'] > 0){ ?>
+                            <li>
+                                <a
+                                   <?php if($menu['action_url'] == ''){  ?> href="javascript:void(0);" <?php } else{ ?>
+                                   href="<?php if($menu['action_url'] == '/validation/product'){echo 'javascript:void(0);';}else{ echo $menu['action_url'];}?><?php if($menu['dependent_on'] != ''){ $dep = explode(',',$menu['dependent_on']); for($i=0;sizeof($dep)>$i; $i++){ ?>/<?=${$dep[$i]};?><?php }}?>" 
+                                   <?php } ?> 
+                                   >
+                                    <?php if (isset($menu['icon_class']) && $menu['icon_class'] != "") { ?>
+                                    <i class="lnr <?=$menu['icon_class'];?>"></i>
+                                    <?php } ?>
+                                    <span class="nav-label"><?= $menu['action_label'];?></span>
+                                </a>
+                            </li>
+                         <?php } ?>
+                <?php } ?>
+            <?php } ?>
+        </ul>
+    <?php } ?>
+    <!--ul class="list-unstyled components">
+        <?php 
+//            $dashboardUrl = '/tracker';
+//            if ($trackers['trackerCounts'] == 1 && isset($trackers['trackers'][0]['tracker_id']) && isset($trackers['trackers'][0]['form_id'])) {
+//                $dashboardUrl = '/dashboard/'.$trackers['trackers'][0]['tracker_id'].'/'.$trackers['trackers'][0]['form_id']; 
+//            }
+        ?>
+        <li <?php // if ($dashboardUrl == $url) { echo "class='active'"; }?>>
+            <a href="<?php // echo $dashboardUrl;?>"><i class="lnr icon-home"></i><span class="nav-label">Dashboard</span></a>
+        </li>
+        <?php
+//        if (isset($userContainer->u_id)) {
+//                $role_id = $user_details['group_id'];
+//                $user_type = $user_details['user_type'];
+//                if ($role_id == 1) {
+                        ?>
+                    <li class="has-submenu <?php // if (boolval(strlen(strstr($url , '/customer'))) !== false || boolval(strlen(strstr($url , '/tracker/add'))) !== false || boolval(strlen(strstr($url , '/tracker/tracker_management'))) !== false) {echo "active";}?>">
+                        <a href="#clientSubmenu"><i class="lnr icon-users2"></i><span class="nav-label">Customer</span><span class="menu-arrow"></span></a>
+                        <ul class="collapse list-unstyled" style="<?php // if (boolval(strlen(strstr($url , '/customer'))) !== false || boolval(strlen(strstr($url , '/tracker/add'))) !== false || boolval(strlen(strstr($url , '/tracker/tracker_management'))) !== false) {echo 'display:block;';}?>">
+                            <li><a href="<?php // echo $this->url('customer', array('action' => 'add')) ?>">Add New Customer</a></li>
+                            <li><a href="<?php // echo $this->url('customer') ?>">View Customers</a></li>
+                            <li><a href="<?php // echo $this->url('tracker', array('action' => 'add')) ?>">Add New Tracker</a></li>
+                            <li><a href="<?php // echo $this->url('tracker', array('action' => 'tracker_management')) ?>">View Trackers</a></li>
+                        </ul>
+                    </li>  
+                    <li <?php // if (boolval(stripos($url , 'tracker/auditlog'))) { echo "class='active'"; }?>><a href="<?php // echo $this->url('tracker',array('action' => 'auditlog')) ?>"><i class="lnr icon-graph"></i><span class="nav-label">Audit Log</span></a></li>      
+            <?php
+//                    }
+//                }
+                ?>
+                <?php // if (!empty($forms)) { ?>
+                <li class="has-submenu <?php // if (boolval(strpos($url , 'dashboard/'.$tracker_id."/".$form_id)) && '/dashboard/'.$tracker_id."/".$form_id !== $dashboardUrl) { echo "active"; }?>">
+                    <a href="#workflowSubmenu"><i class="lnr icon-list"></i><span class="nav-label">Workflows</span><span class="menu-arrow"></span></a>  
+                    <ul class="collapse list-unstyled">
+                    <?php // foreach($forms as $form){ ?>
+                        <li><a href="<?php // echo $this->url('dashboard', array('action' => 'index', 'tracker_id' => $form['tracker_id'], 'form_id' => $form['form_id'])) ?>"><?//=$form['form_name'];?></a></li>
+                    <?php // } ?> 
+                   </ul>
+                </li>
+                <?php // } ?>
+                
+                <?php // if (!empty($reports)) { ?>
+                    <li class="has-submenu <?php // if (strpos($url , 'report/')) { echo "active"; }?>">
+                        <a href="#reportSubmenu"><i class="lnr icon-list"></i><span class="nav-label">Reports</span><span class="menu-arrow"></span></a>  
+                        <ul class="collapse list-unstyled">
+                        <?php // foreach($reports as $report){ ?>
+                        <?php // if ($report['report_filters'] == '') { ?>
+                            <li><a href="<?php // echo $this->url('report', array('action' => 'index', 'tracker_id' => $tracker_id, 'form_id' => $form_id, 'report_id'=>$report['report_id'])) ?>"><?//=$report['report_name'];?></a></li>
+                        <?php // } else { ?>
+                            <li><a href="<?php // echo $this->url('report', array('action' => 'filter', 'tracker_id' => $tracker_id, 'form_id' => $form_id, 'report_id'=>$report['report_id'])) ?>"><?//=$report['report_name'];?></a></li>
+                        <?php // }} ?> 
+                       </ul>
+                    </li>
+                <?php // } ?>
+                
+                <?php // if (!empty($calendar[0]) && !empty($calendar[1])) { ?>
+                <li <?php // if (boolval(stripos($url , 'client'))) { echo "class='active'"; }?>><a href="<?php // echo $this->url('calendar',array('action' => 'view', 'tracker_id' => $tracker_id,'form_id' => $form_id)) ?>"><i class="lnr icon-calendar-full"></i><span class="nav-label">Calendar</span></a></li>
+
+                <li <?php // if (boolval(stripos($url , 'client'))) { echo "class='active'"; }?>><a href="<?php // echo $this->url('tracker',array('action' => 'importRecords', 'tracker_id' => $tracker_id,'action_id' => $form_id)) ?>"><i class="lnr icon-upload"></i><span class="nav-label">Import Data</span></a></li>
+
+                <?php // } ?>
+    </ul-->
+</nav> 
+</aside>

@@ -1,0 +1,97 @@
+<?php 
+    $title = 'Source List';
+?>
+<div class="pagebar container-fluid col-md-12">
+    <ol class="breadcrumb">
+        <li><span><a href="/dashboard/activesubstance/<?php echo $trackerId.'/'.$formId;?>">Molecule List</a></span></li>
+        <li class="active"><span><?php echo $this->escapeHtml($title); ?></span></li>
+    </ol>
+</div>
+
+<div class="card">
+  <div class="card-body">
+    <div class="card-columns card-body" data-always-visible="1" data-rail-visible="0" id="quantitativeAnalysisGrids">                                  
+        <div class="card btn-primary gridTab" formId="<?=$formId;?>" soruce="ICSR" tabid="<?=$tabId?>" asid="<?=$asId?>" >
+            <a href="javascript:void(0);" onclick="window.location.href = '#'">
+                <div class="card-body">
+                    <h6 class="card-title text-white">ICSR</h6>
+                </div>
+            </a>
+        </div>
+        <div class="card btn-primary gridTab" formId="<?=$formId;?>" soruce="Literature" tabid="<?=$tabId?>" asid="<?=$asId?>" >
+            <a href="javascript:void(0);" onclick="window.location.href = '#'">
+                <div class="card-body">
+                    <h6 class="card-title text-white">Literature</h6>
+                </div>
+            </a>
+        </div>
+        <div class="card btn-primary gridTab" formId="<?=$formId;?>" soruce="Aggregate Reports" tabid="<?=$tabId?>" asid="<?=$asId?>" >
+            <a href="javascript:void(0);" onclick="window.location.href = '#'">
+                <div class="card-body">
+                    <h6 class="card-title text-white">Aggregate Reports</h6>
+
+                </div>
+            </a>
+        </div>
+    </div>
+
+    <div class="card-columns card-body" data-always-visible="1" data-rail-visible="0" id="quantitativeAnalysisGrids">                                  
+        <div class="card btn-primary gridTab" formId="<?=$formId;?>" soruce="Risk Management Plans" tabid="<?=$tabId?>" asid="<?=$asId?>" >
+            <a href="javascript:void(0);" onclick="window.location.href = '#'">
+                <div class="card-body">
+                    <h6 class="card-title text-white">Risk Management Plans</h6>
+                </div>
+            </a>
+        </div>
+        <div class="card btn-primary gridTab" formId="<?=$formId;?>" soruce="Regulatory Recommendations" tabid="<?=$tabId?>" asid="<?=$asId?>" >
+            <a href="javascript:void(0);" onclick="window.location.href = '#'">
+                <div class="card-body">
+                    <h6 class="card-title text-white">Regulatory Recommendations</h6>
+                </div>
+            </a>
+        </div>
+        <div class="card btn-primary gridTab" formId="<?=$formId;?>" soruce="Clinical Trial" tabid="<?=$tabId?>" asid="<?=$asId?>" >
+            <a href="javascript:void(0);" onclick="window.location.href = '#'">
+                <div class="card-body">
+                    <h6 class="card-title text-white">Clinical Trial</h6>
+
+                </div>
+            </a>
+        </div>
+    </div>
+
+    <div class="card-columns card-body" data-always-visible="1" data-rail-visible="0" id="quantitativeAnalysisGrids">                                  
+        <div class="card btn-primary gridTab" formId="<?=$formId;?>" soruce="eRMR" tabid="<?=$tabId?>" asid="<?=$asId?>" >
+            <a href="javascript:void(0);" onclick="window.location.href = '#'">
+                <div class="card-body">
+                    <h6 class="card-title text-white">eRMR</h6>
+                </div>
+            </a>
+        </div>
+        <div class="card btn-primary gridTab" formId="<?=$formId;?>" soruce="Other Sources" tabid="<?=$tabId?>" asid="<?=$asId?>" >
+            <a href="javascript:void(0);" onclick="window.location.href = '#'">
+                <div class="card-body">
+                    <h6 class="card-title text-white">Other Sources</h6>
+                </div>
+            </a>
+        </div>
+    </div>                             
+  </div>
+</div>
+
+<script>
+    var trackerId = '<?=$trackerId;?>';
+    var formId = '<?=$formId;?>';
+    var url = document.location.toString();
+    $(function () {
+        $('#myTab li:first-child a').tab('show');
+    });
+    
+</script>
+<style>
+    .ui-datepicker-today .ui-state-highlight { background: ...; }
+
+</style>
+<?php
+$this->inlineScript()
+    ->appendFile($this->basePath() . '/js/module/sigtrace/dashboard/sourcelist.js');

@@ -1,0 +1,299 @@
+<?php
+$tracker_details = $trackerResults['tracker_details'];
+$forms = $trackerResults['forms'];
+$tracker_name = $tracker_details['name'];
+$title = "$tracker_name - Report Access Settings";
+$this->headTitle($title);
+
+$id = 0;
+$form_id = 0;
+$form_ids = 0;
+$wfid = 0;
+$roleid = 0;
+$wfids = 0;
+$roleids = 0; //
+
+$wfs = $resultset[0];
+$roles = $resultset[1];
+$report_access_setting= $resultset[2];
+?>
+<div class="pagebar container-fluid col-md-12">
+    <!-- Sidebar Toggle -->
+    <button type="button" class="pagebar-toggle navbar-toggle pull-left">
+      <span class="pagebar-arrow"></span>
+    </button>
+    <ol class="breadcrumb">
+        <li><span>Settings</span></li>
+        <li><span>Access Settings</span></li>
+        <li class="active"><span>Report Access Settings</span></li>
+    </ol>
+</div>
+<div class="card">
+    <div class="card-body">
+        <div class="card card-default">
+            <div class="card-header"><b>Report Access Settings</b></div>
+            <div class="card-body">
+                <?php
+                    $id = 1;
+                    $form_name='';
+                    $form_id = 0;
+                    foreach ($wfs as $value_wfs) {
+                        if($form_id != $value_wfs['form_id']  && !empty($value_wfs['report_id']) ){
+                            $form_name = $value_wfs['form_name'];
+                            $form_id = $value_wfs['form_id'];
+                        ?>
+                            <div class="card card-default mb-3">
+                            <div class="card-header"><?php echo "<h6>$form_name</h6>"; ?></div>
+                            <div class="card-body">
+                                <table id="accessdata_update<?php echo $id ?>" class="table table-striped display stripe row-border order-column" cellspacing="0" width="100%" >
+                                    <thead>
+                                        <tr>
+                                            <th>Role Name</th>
+                                            <?php
+                                            $flag=0;
+                                            foreach ($wfs as $value_wf) {
+                                                if(!empty($value_wf['report_id']) ){
+                                                    if($value_wf['form_id'] == $form_id){
+                                                        $flag=1;
+                                                        echo "<th style='width:100%;'><h6>".$value_wf['report_name']."</h6></th>";
+                                                    }
+                                                }
+                                            }
+                                            ?>
+                                            <th></th>
+                                        </tr>
+                                    </thead>
+                                    <tbody id="recordsbody">
+                                    <?php
+                                    if (array_key_exists(0, $roles)) {
+                                        $id_of_form=0;
+                                        foreach ($roles as $key_role_arr => $value_role_arr) {
+                                            $role_id = $value_role_arr['rid'];
+                                            $group_name = $value_role_arr['role_name'];
+                                            $group_archived = $value_role_arr['archived'];
+                                            $flags=0;
+                                            if ($group_archived == 0) {
+                                                ?>
+                                                <tr>
+                                                    <td><?= $group_name ?></td>
+                                                    <?php  foreach ($wfs as $value_wf) {
+                                                        // $flag=0;
+                                                        if($value_wf['form_id'] == $form_id && !empty($value_wf['report_id'])) {
+                                                            $can_access = '';
+                                                            if (!empty($report_access_setting)) {
+                                                                foreach ($report_access_setting as $access_setting) {
+                                                                    $can_access = '';
+                                                                    if ($access_setting['report_id'] == $value_wf['report_id'] && $access_setting['form_id'] == $value_wf['form_id'] && $access_setting['role_id'] == $role_id) {
+                                                                        $can_access = $access_setting['can_access'];
+                                                                        break;
+                                                                    }
+                                                                }
+                                                            }
+                                                            $flags=1;
+                                                            $id_of_form=$value_wf['form_id'];
+                                                            //   echo $value_wf->form_id;
+                                                            //echo $form_id;
+                                                            ?>
+                                                            <td>
+                                                                <?php
+                                                                if ($group_name == "Administrator" || $group_name == "SuperAdmin") {
+                                                                    echo "Full Access";
+                                                                } else {
+                                                                    ?>
+                                                                    <select type="text" class="form-control" placeholder="Add Option" class=""  id="id_can_update_<?= $form_id ?>_<?= $role_id ?>_<?= $value_wf['report_id']; ?>">
+                                                                        <option value="">Select option</option>
+                                                                        <option value="Yes" <?php
+                                                                        if ($can_access == "Yes") {
+                                                                            echo 'selected';
+                                                                        }
+                                                                        ?>>Yes</option>
+                                                                        <option value="No" <?php
+                                                                        if ($can_access == "No") {
+                                                                            echo 'selected';
+                                                                        }
+                                                                        ?>>No</option>
+
+                                                                    </select>
+                                                                <?php } ?>
+                                                            </td>
+                                                        <?php } }
+                                                    ?>
+                                                    <?php
+                                                    if ($group_name != "Administrator" && $flags==1) {
+                                                        ?>
+                                                        <td>
+                                                            <div style="font-size: 11px !important;" id="status_<?= $id_of_form ?>_<?= $role_id ?>"></div>
+                                                            <button onclick="save_update_settings('<?= $id_of_form ?>','<?= $role_id ?>')" type="button" class="btn btn-primary">Save</button>
+                                                        </td>
+                                                    <?php } ?>
+                                                    <?php if ($group_name == "Administrator") {?>
+                                                        <td></td>
+                                                    <?php } ?>
+                                                </tr>
+                                                <?php
+                                            }
+                                        }
+                                    }
+                                    ?>
+                                    </tbody> 
+                                </table>
+                            </div>
+                            </div>
+                            <?php  
+                            $id++;
+                        }
+                    }
+                ?>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="modal fade" id="addcommentasreason" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">        
+    <div class="modal-dialog modal-dialog-centered" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="exampleModalLongTitle">Reason for change</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <div class="form-group row">
+                    <label class="col-sm-4 col-form-label">Reason for change<span class="error ml-1">*</span></label>  
+                    <div class="col-sm-7"> 
+                        <textarea id="addcomment" class="form-control" placeholder="Reason for change" name="addcomment"></textarea>   
+                        <span id="commenterror" style="display:none;color: red;">Please add reason for change</span>
+                        <span id="status_for_reason"></span>
+                    </div> 
+                </div>
+            </div>
+            <div style="clear:both"></div>
+            <div class="modal-footer">
+               <button onclick="reasonforchange()" type="button" class="btn btn-primary">Save</button>
+               <button onclick="closereasonforchange()" class="btn btn-default" type="button" data-dismiss="modal">Close</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+
+    $(document).ready(function() {
+        $("table[id^='accessdata_update']").each(function () {
+            var id=this.id;
+            var table_update=$("#"+id).dataTable( {
+                "bDestroy": true,
+                "scrollY":   800,
+                "scrollX":   true,
+                "bPaginate": false,
+                "bInfo" : false,
+                "bFilter": false,
+                "scrollCollapse": true,
+                fixedColumns: {
+                    "bSortable": false,
+                    "targets"  : -1
+                },
+                columnDefs: [
+                    { orderable: false, targets: -1 }
+                ]
+            });
+        });
+    });
+    
+    function closereasonforchange() {
+        $("#status_"+form_id+"_"+role_id).html('');
+    }
+    
+    function reasonforchange() {
+        var tracker_id="<?php echo $tracker_id  ?>";
+        if ($('#addcomment').val() == ''){
+            $('#commenterror').show();
+            return false;
+        }
+        $('#commenterror').hide();
+        var update='';
+        var bSelect = true;
+        var report_ids = [];
+        var can_updates=[];
+        $("select[id^='id_can_update_"+form_id+"_"+role_id+"']").each(function () {
+            var res=(this.id).split('_');
+            var id=this.id;
+            var can_update = $("#"+id).val();
+            if( can_update != ""){
+                update=can_update;
+            } else {
+                bSelect = false;
+            }
+            report_ids.push(res[5]);
+            can_updates.push(can_update);
+        });
+        $("#status_"+form_id+"_"+role_id).html('processing...');
+        if (!bSelect){
+            $("#addcommentasreason").modal('toggle');
+            $("#status_"+form_id+"_"+role_id).html('<font color="red">Select Values</font>');
+            window.setTimeout("closeUserCreateAlert('status_"+form_id+"_"+role_id+"')", 3000);
+            return false;
+        }
+        var data = {
+            can_update : can_updates,
+            role_id:role_id,
+            report_id : report_ids,
+            form_id:form_id,
+            comment:$('#addcomment').val()
+        }
+        var url = "<?php echo $this->url('settings', array('action' => 'saveReportAccessSetting','trackerId'=>$tracker_id)); ?>";
+        $.post(url, data,function(respJson){
+            var resp =JSON.parse(respJson);
+            var responseCode = resp.responseCode;
+            var errMessage = resp.errMessage;
+            if(responseCode == 1){
+                $("#addcommentasreason").modal('toggle');
+                $("#status_"+form_id+"_"+role_id).html('<font color="#088A08">'+errMessage+'</font>');
+                window.setTimeout("closeUserCreateAlert('status_"+form_id+"_"+role_id+"')", 3000);
+            }
+            else{
+                $("#status").html('<font color="#cc0000">'+errMessage+'</font>');
+                window.setTimeout("closeUserCreateAlert('status_"+form_id+"_"+role_id+"')", 3000);
+            }
+        });
+    }
+
+
+    function save_update_settings(form_ids,role_ids) {
+        var bSelect = true;
+        role_id=role_ids;
+        form_id=form_ids;
+        $("select[id^='id_can_update_"+form_id+"_"+role_id+"']").each(function () {
+            var res=(this.id).split('_');
+            var id=this.id;
+            var can_update = $("#"+id).val();
+            if( can_update == ""){
+                bSelect = false;
+            } 
+        });
+        $("#status_"+form_id+"_"+role_id).html('processing...');
+        if (!bSelect){
+            $("#status_"+form_id+"_"+role_id).html('<font color="red">Select Values</font>');
+            window.setTimeout("closeUserCreateAlert('status_"+form_id+"_"+role_id+"')", 3000);
+            return false;
+        } else {
+            $('#addcommentasreason').modal('show');
+            $('#commenterror').hide();
+            $('#addcomment').val('');
+        }
+    }
+
+    function closeUserCreateAlert(id) {
+        $("#"+id).html('');
+    }
+</script>
+
+<style>
+    th, td { white-space: nowrap; }
+
+    div.dataTables_wrapper {
+      width: 100%;
+      margin: 0 auto;
+    }
+</style>

@@ -1,0 +1,307 @@
+<?php
+$trackerDetails = $trackerResults['tracker_details'];
+$forms = $trackerResults['forms'];
+$trackerName = $trackerDetails['name'];
+$iAccessFormId = isset($forms[0]['form_id'])?$forms[0]['form_id']:0;
+$title = "$trackerName - Calendar";
+$this->headTitle($title);
+$trackerId  = isset($trackerId) ? $this->escapeUrl($trackerId) : $this->escapeUrl(0);
+$formId     = isset($formId) ? $this->escapeUrl($formId) : $this->escapeUrl(0);
+$trackerUrl = "/tracker/form/" . $trackerId  . "/" . $formId;
+$calendarUrl = "<a href='/calendar/view/" . $trackerId  . "/" . $formId . "'>View Calendar</a>";
+$calendarAdd = "/calendar/add/" . $trackerId  . "/" . $formId;
+?>
+
+<div class="pagebar container-fluid col-md-12">
+    <!-- Sidebar Toggle -->
+    <button type="button" class="pagebar-toggle navbar-toggle pull-left">
+      <span class="pagebar-arrow"></span>
+    </button>
+    <ol class="breadcrumb">
+        <li><span><a href='<?php echo $trackerUrl;?>'><?php echo $this->escapeHtml($trackerName);?></a></span></li>
+        <li><span><?php echo $calendarUrl;?></span></li>
+        <li class="active"><span>Events List</span></li>
+    </ol>
+</div>
+<div class="card">
+    <div class="card-body">
+        <div class="card">
+            <div  class="card-header">
+                <h6 class="col-md-6 float-left">List of Events</h6>
+                <span class="col-md-6">
+                   <button type="button" class="btn btn-primary float-right" onclick="window.location.href='<?php echo $calendarAdd;?>'">Add New Event</button>
+                </span>
+            </div>
+            <div class="card-body">
+                <?php
+                $flashMessage = $this->flashMessenger()->getMessages();
+                if (count($flashMessage) && isset($flashMessage[0]['success'])) {
+                    echo '<div class="contents boxpadding"><div class="alert alert-dismissable alert-success" id="fashMessage">'.$flashMessage[0]['success'].'<button type="button" class="close" data-dismiss="alert" aria-hidden="true">×</button></div></div>';
+                } else if(count($flashMessage) && isset($flashMessage[0]['failure'])) {
+                    echo '<div class="contents boxpadding"><div class="alert alert-dismissable alert-danger" id="fashMessage">'.$flashMessage[0]['failure'].'<button type="button" class="close" data-dismiss="alert" aria-hidden="true">×</button></div></div>';
+                }
+                ?> 
+                <div class="form-group row">
+                    <label class="col-sm-4"></label>
+                    <div id="roleErrorMessages" class="error col-sm-6"></div>
+                </div>                
+                <div class="card card-default ">
+                        <div class="card-body">
+                            <div class="row">
+                                Page Size:
+                                <div class="ml-2" style="width:80px!important;">
+                                    <select onchange="onPageSizeChanged()" id="page-size" class="form-control">
+                                        <option value="5" selected>5</option>
+                                        <option value="10">10</option>
+                                        <option value="25">25</option>
+                                        <option value="50">50</option>
+                                        <option value="100">100</option>
+                                        <option value="500">500</option>
+                                        <option value="1000">1000</option>
+                                    </select>
+                                </div>
+                            </div>
+                            <div id="myGrid" style="height:50vh;overflow:hidden;" class="ag-theme-material w-100                    "></div>
+                        </div>
+                </div>
+            </div>
+            <div class="modal fade" id="deleteEvent" tabindex="-1" role="dialog" aria-labelledby="deleteUserModal" aria-hidden="true"> 
+                            <div class="modal-dialog modal-dialog-centered" role="document"> 
+                    <div class="modal-content"> 
+                        <div class="modal-header"> 
+                            <h5 class="modal-title" id="exampleModalLongTitle">Delete Confirmation</h5> 
+                            <button type="button" class="close" data-dismiss="modal" aria-label="Close"> 
+                                <span aria-hidden="true">&times;</span> 
+                            </button> 
+                        </div> 
+                        <div class="modal-body"> 
+                            <div class="form-group row"> 
+                                <label class="col-sm-4 col-form-label">Reason for change<span class="error ml-1">*</span></label> 
+                                <div class="col-sm-7"> 
+                                    <textarea id="reason" class="form-control" placeholder="Reason for change." name="addcomment"></textarea>    
+                                    <span id="forReason" class="error"></span> 
+                                </div> 
+                            </div> 
+                        </div> 
+                        <div class="modal-footer"> 
+                            <button id="reasonfordelete" onclick="deleteEventAction()" type="button" class="btn btn-primary">Delete</button> 
+                            <button class="btn btn-default" type="button" data-dismiss="modal">Close</button> 
+                        </div> 
+                    </div> 
+                </div>  
+            </div>
+        </div>
+    </div>
+</div>
+<script>
+    var columnDefs = [
+         {headerName: "Action", field: "id", suppressMenu:true, filter: false,lockPosition: true, suppressSorting:true,cellRenderer: 'myCellRenderer'},
+         {headerName: "Event Name", field: "event_name"},
+         {headerName: "Description", field: "event_data"},
+         {headerName: "Start Date", field: "start_date"},
+         {headerName: "End Date", field: "end_date"}
+    ];
+function dateComparator(date1, date2) {
+    var date1Number = monthToComparableNumber(date1);
+    var date2Number = monthToComparableNumber(date2);
+
+    if (date1Number===null && date2Number===null) {
+        return 0;
+    }
+    if (date1Number===null) {
+        return -1;
+    }
+    if (date2Number===null) {
+        return 1;
+    }
+    return date1Number - date2Number;
+}
+
+// eg 29/08/2004 gets converted to 20040829
+function monthToComparableNumber(date) {
+    if (date === undefined || date === null || date.length !== 10) {
+        return null;
+    }
+    var yearNumber = date.substring(6,10);
+    var monthNumber = date.substring(3,5);
+    var dayNumber = date.substring(0,2);
+
+    var result = (yearNumber*10000) + (monthNumber*100) + dayNumber;
+    return result;
+}
+// Start of POC code
+var filterParams = {
+    filterOptions: [
+     'empty',
+    {
+        displayKey: 'contains',
+        displayName: 'Contains',
+        test: function (filterValue, cellValue) {
+        var filterValue = filterValue.toLowerCase();
+        if (cellValue != null){
+            return cellValue.indexOf(filterValue) >= 0;   
+        } else {
+            return null;
+        }
+        },
+         hideFilterInput: false,
+    },
+    {
+    displayKey: 'notcontains',
+        displayName: 'Not Contains',
+        test: function (filterValue, cellValue) {
+            filterValue = filterValue.toLowerCase();
+        if (cellValue != null){
+            return cellValue.indexOf(filterValue) <= 0;
+        } else {
+            return null;
+        }
+        },
+         hideFilterInput: false,
+    },
+      {
+        displayKey: 'equals',
+        displayName: 'Equals',
+        test: function (filterValue, cellValue) {
+           filterValue = filterValue.toLowerCase();
+           return cellValue != null && cellValue == filterValue;
+        },
+        hideFilterInput: false,
+    },
+    {
+        displayKey: 'notequals',
+        displayName: 'Not Equals',
+        test: function (filterValue, cellValue) {
+          filterValue = filterValue.toLowerCase();
+          return cellValue != null && cellValue != filterValue;
+        },
+        hideFilterInput: false,
+    },
+    {
+        displayKey: 'startswith',
+        displayName: 'Starts With',
+        test: function (filterValue, cellValue) {
+          filterValue = filterValue.toLowerCase();
+        if (cellValue != null){
+            return cellValue.indexOf(filterValue) === 0; 
+        } else {
+            return null;
+        } 
+            },
+        hideFilterInput: false,
+    },
+    {
+        displayKey: 'endswith',
+        displayName: 'Ends With',
+        test: function (filterValue, cellValue) {
+          filterValue = filterValue.toLowerCase();
+            if (cellValue != null){
+                var index = cellValue.lastIndexOf(filterValue);
+            return index >= 0 && index === (cellValue.length - filterValue.length);
+            } else {
+            return null;
+            }
+        },
+        hideFilterInput: false,
+    },
+        {
+            displayKey: 'blanks',
+            displayName: 'Blanks',
+            test: function (filterValue, cellValue) {
+            return cellValue == null || cellValue == "";
+            },
+            hideFilterInput: true,
+        },
+    ],
+    suppressAndOrCondition: false,
+  }
+  
+  // End of POC code
+
+var gridOptions = {
+    defaultColDef: {
+        minWidth: 150,
+        
+        //filter: 'agTextColumnFilter',
+        filterParams: { applyButton: true, clearButton:true},
+        filterParams: filterParams,
+    },
+    //floatingFilter:true,
+    columnDefs: columnDefs,
+    rowData: null,
+    enableSorting: true,
+    multiSortKey: 'ctrl',
+    enableFilter: true,
+    rowSelection: 'multiple',
+    animateRows: true,
+    sortingOrder: ['desc','asc',null],
+    //paginationAutoPageSize:true,
+    pagination: true,
+    paginationPageSize: 5,
+    paginationNumberFormatter: function(params) {
+        return params.value.toLocaleString();
+    },
+    enableColResize: true,
+    enableRangeSelection: true,
+    components: {
+        'myCellRenderer': MyCellRenderer
+    }  
+};
+function onPageSizeChanged(newPageSize) {
+    var value = document.getElementById('page-size').value;
+    gridOptions.api.paginationSetPageSize(Number(value));
+}
+
+function getBooleanValue(cssSelector) {
+    return document.querySelector(cssSelector).checked === true;
+}
+
+function onBtExport() {
+    var params = {};
+    gridOptions.api.exportDataAsCsv(params);
+}
+// function to act as a class
+function MyCellRenderer () {}
+// gets called once before the renderer is used
+MyCellRenderer.prototype.init = function(params) {
+    var tracker_id="<?php echo $this->escapeJs($trackerId)?>";
+    var form_id = "<?php echo $this->escapeJs($formId)?>";
+    // create the cell
+    this.eGui = document.createElement('div');
+    this.eGui.innerHTML='<button class="btn btn-default" aria-label="Left Align" onclick="window.location.href=\'/calendar/edit/'+tracker_id+'/'+form_id+'/'+params.value+'\'">'+'<span class="lnr icon-pencil" aria-hidden="true"></span></button>';      
+    this.eGui.innerHTML+=' <button id="deletebutton" data-toggle="modal" class="btn btn-default" \n\
+                                aria-label="Left Align" onclick="reloadPopUp('+params.value+','+tracker_id+','+form_id+')">'+'<span class="lnr icon-trash2" aria-hidden="true"></span></button> ';  
+};
+// gets called once when grid ready to insert the element
+MyCellRenderer.prototype.getGui = function() {
+    return this.eGui;
+};
+
+// gets called whenever the user gets the cell to refresh
+// MyCellRenderer.prototype.refresh = function(params) {
+//     // set value into cell again
+//     this.eValue.innerHTML = params.valueFormatted ? params.valueFormatted : params.value;
+//     // return true to tell the grid we refreshed successfully
+//     return true;
+// };
+
+// // gets called when the cell is removed from the grid
+// MyCellRenderer.prototype.destroy = function() {
+//     // do cleanup, remove event listener from button
+//     this.eButton.removeEventListener('click', this.eventListener);
+// };
+
+// setup the grid after the page has finished loading
+document.addEventListener('DOMContentLoaded', function() {
+    var gridDiv = document.querySelector('#myGrid');
+    new agGrid.Grid(gridDiv, gridOptions);
+    agGrid.simpleHttpRequest({url: '<?php echo $this->basePath() . '/calendar/fetchAllData/'.$trackerId.'/'.$formId;?>'}).then(function(data) {
+        gridOptions.api.setRowData(data);
+
+    });
+
+});
+
+
+</script>
+<?php $this->inlineScript()->appendFile($this->basePath() . '/js/module/common/calendar/listEvents.js');

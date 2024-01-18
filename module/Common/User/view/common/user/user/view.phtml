@@ -1,0 +1,63 @@
+<?php
+$trackerDetails = $trackerResults['tracker_details'];
+$forms = $trackerResults['forms'];
+$trackerName = $trackerDetails['name'];
+$title = "$trackerName - User";
+$this->headTitle($title);
+echo $this->formElement($form->get('t_hidden'));
+?>
+<div class="pagebar container-fluid col-md-12">
+    <!-- Sidebar Toggle -->
+    <button type="button" class="pagebar-toggle navbar-toggle pull-left">
+      <span class="pagebar-arrow"></span>
+    </button>
+    <ol class="breadcrumb">
+        <li><span>Settings</span></li>
+        <li><span>Tracker Settings</span></li>
+        <li><span><a href="/user/user_management/<?php echo $trackerId;?>">User Management</a></span></li>
+        <li class="active"><span>View User</span></li>
+    </ol>
+</div>
+<div class="card">
+    <div class="card-body">
+        <div class="card">
+            <div  class="card-header">
+                <h6 class="col-md-6 float-left">View User</h6>
+                <span class="float-right">
+                   <button type="button" class="btn btn-primary" onclick="window.location.href='/user/add/<?php echo $trackerId ?>'">Add New User</button>
+                </span>
+            </div>
+            <div class="card-body">
+                <form id="commentForm" method="post" name="myForm">
+                    <div class="form-group row">
+                        <label class="col-sm-4 col-form-label">User Name</label>
+                        <div class="col-sm-6"><?php echo $result[0]['u_name'] ?></div>
+                    </div>
+                    <div class="form-group row">
+                        <label class="col-sm-4 col-form-label">User Email</label>
+                        <div class="col-sm-6"><?php echo $result[0]['email'] ?></div>
+                    </div>
+                    <div class="form-group row">
+                        <label class="col-sm-4 col-form-label">Role Name</label>
+                        <div class="col-sm-6">
+                            <?php
+                            foreach ($groups as $opt => $opt_values) {
+                                $group_id = $opt_values['rid'];
+                                foreach ($result as $res) {
+                                    if ($userId > 0 && $group_id == $res['rid']) {
+                                        echo $opt_values['role_name'].'<br/>';
+                                    }
+                                }
+
+                            }
+                            ?>
+                        </div>
+                    </div>
+<!--                        <div class="form-group row">
+                            <label class="col-sm-4 col-form-label">Status</label>
+                            <div class="col-sm-6"><?php //echo $result[0]['status'];?></div>
+                        </div>-->
+        </div>
+    </div>
+</div>
+</div>

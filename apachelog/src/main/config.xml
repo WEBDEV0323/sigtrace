@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<log4php:configuration xmlns:log4php="http://logging.apache.org/log4php/">
+  <appender name="fileappender" class="LoggerAppenderDailyFile">
+    <layout class="LoggerLayoutSimple"/>
+    <param name="file" value="AuditLogs/sigtrace-audit_log-%s.log"/>
+    <param name="datePattern" value="Y-m-d"/>
+  </appender>
+  <logger name="Foo">
+    <appender_ref ref="fileappender"/>
+  </logger>
+</log4php:configuration>

@@ -1,0 +1,57 @@
+<div class="crumbs">
+    <ul class="breadcrumb" id="breadcrumbs">
+            <li>
+                <i class="icon-home"></i>
+                <a href="/product/<?=$trackerId;?>/<?=$formId;?>">Product</a>
+            </li>
+            <li>
+                <a href="/product/label-event/<?=$trackerId;?>/<?=$formId;?>/<?=$productId;?>">Label Event</a>
+            </li>
+            <li class="current">
+                    <a title="" href="javascript:void(0)">History</a>
+            </li>
+    </ul>
+</div>
+<div class="page-header"></div>
+<div class="row">
+    <div class="col-md-12">
+        <p class="alert alert-success" id="success_alert" style="display:none;"></p>
+        <div class="widget box">
+            <div class="widget-header">
+                    <h4><i class="icon-reorder"></i> History</h4>
+            </div>
+            <div class="widget-content no-padding">
+                <table class="table table-highlight-head table-striped table-bordered table-hover table-checkable table-responsive datatable" style="display:table">
+                    <thead>
+                        <tr>
+                            <th>Present Name</th>
+                            <th>Previous Name</th>
+                            <th>Date of Change</th>
+                            <th>Status</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <?php foreach($history as $h){?>
+                        <tr>
+                            <td><?=$h['log_new_value']?></td>
+                            <td><?=$h['log_old_value']?></td>
+                            <td><?=$h['log_date']?></td>
+                            <td><?php if($h['log_active_status'] == 1){ echo 'Active';}else{ echo 'NA';}?></td>
+                        </tr>
+                    <?php } ?>
+
+
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+<script>
+$(document).ready(function() {
+    $('.datatable').dataTable( {
+        bDestroy: true,
+        aaSorting: [[2, 'desc']],
+    });
+});
+</script>

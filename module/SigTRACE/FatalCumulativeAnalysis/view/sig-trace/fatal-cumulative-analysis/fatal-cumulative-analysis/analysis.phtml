@@ -1,0 +1,52 @@
+<?php 
+$title = 'Fatal Cumulative Analysis';
+?>
+<div class="pagebar container-fluid col-md-12">
+    <!-- Sidebar Toggle -->
+    <button type="button" class="pagebar-toggle navbar-toggle pull-left">
+      <span class="pagebar-arrow"></span>
+    </button>
+    <ol class="breadcrumb">
+      <li class="active"><span><?php echo $this->escapeHtml($title); ?></span></li>
+    </ol>
+</div>
+<div class="card">
+    <div class="card-body">
+        <div class="card">
+            <div class="card-header"><h6><?php echo $this->escapeHtml($title); ?></h6></div>
+            <div class="card-body">
+                <div class="widget-content no-padding">
+                    <table class="table table-columnfilter table-highlight-head table-striped table-bordered table-hover table-checkable table-responsive datatable">
+                        <thead>
+                            <tr>
+                                <?php foreach($headers as $head){ ?>
+                                <th><?=$head['label'];?></th> 
+                                <?php } ?>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <?php foreach($lists as $list){ ?>
+                                <tr>
+                                    <?php for($i = 1; count($list) > $i ; $i++){ ?>
+                                        <td><?=$list[$i];?></td>
+                                    <?php } ?>
+                                </tr>
+                              <?php } ?>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<script>
+$(document).ready(function() {
+    $('.datatable').dataTable( {
+            "bDestroy": true,
+            "bScrollInfinite": true,
+            "bScrollCollapse": true,
+            "paging":         true,
+            "aLengthMenu": [[5, 10, 25, 50, -1], [5, 10, 25, 50, "All"]]
+    });
+});    
+</script>

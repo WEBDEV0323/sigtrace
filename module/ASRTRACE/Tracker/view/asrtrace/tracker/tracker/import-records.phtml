@@ -1,0 +1,208 @@
+<?php
+use Zend\Session\Container;
+use Session\Container\SessionContainer;
+$session = new SessionContainer();
+$container = new Container('user');
+
+$tracker_details = $trackerRsults['tracker_details'];
+
+$tracker_name = $tracker_details['name'];
+$title = $tracker_name;
+$this->headTitle($title);
+$user_details = $container->user_details;
+$role_id = $user_details['group_id'];
+$role_name = $user_details['group_name'];
+$container = new Container('msg');
+
+$configContainer = $session->getSession('config');
+$allowedFileSize=$configContainer->config['importFileSize'];
+?>
+
+<div class="pagebar container-fluid col-md-12">
+    <!-- Sidebar Toggle -->
+    <button type="button" class="pagebar-toggle navbar-toggle pull-left">
+      <span class="pagebar-arrow"></span>
+    </button>
+    <ol class="breadcrumb">
+        <li><a href="/"><span>Dashboard</span></a></li>
+        <li class="active"><span>Import Data</span></li>
+    </ol>
+</div>
+<div class="card">
+    <div class="card-body">
+        <?php $flashMessage = $this->flashMessenger()->getMessages();
+            if (count($flashMessage)) {
+               echo '<div class="alert alert-dismissable alert-success">'.$flashMessage[0]['success'].'<button type="button" class="close" data-dismiss="alert" aria-hidden="true">×</button></div>';
+            }
+        ?>
+        <?php if ($container->message == 'deleted') { ?>
+            <span style="color:green;float: left">
+                Record deleted.
+                <?php $container->getManager()->getStorage()->clear('msg'); ?>
+            </span>
+        <?php } ?>
+        <div class="card card-default mb-2">
+            <div id="alert_csv"> </div>
+            <div class="card-body">
+                <div class="row">
+                    Page Size:
+                    <div class="col-md-1">
+                        <select onchange="onPageSizeChanged()" id="page-size" class="form-control">
+                            <option value="5" selected>5</option>
+                            <option value="10">10</option>
+                            <option value="25">25</option>
+                            <option value="50">50</option>
+                            <option value="100">100</option>
+                            <option value="500">500</option>
+                            <option value="1000">1000</option>
+                        </select>
+                    </div>
+                    
+                    <div class="ml-auto float-right">
+                        <button type="button" class="btn btn-primary" data-toggle="modal" data-target="#importCsvModal" id="importCsv">Import Data</button>
+                        <!-- <button type="button" onclick="onBtExport()" class="btn btn-primary">Export Data</button> -->
+                    </div>
+                </div>
+                <div id="myGrid" style="height: 50vh; overflow:hidden;" class="ag-theme-material w-100"></div>
+            </div>
+        </div>
+
+    </div>
+</div>
+
+ <div class="modal fade" id="importCsvModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+  <div class="modal-dialog" role="document">
+    <div class="modal-content">
+        <form method='post' action='' enctype="multipart/form-data">
+      <div class="modal-header">
+        <h5 class="modal-title" id="exampleModalLabel">Import Data</h5>
+        <button type="button" class="close" onclick="clearErrorMessages()" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body">
+            <div class="input-group">
+              <div class="custom-file">
+                <input type="file" class="custom-file-input form-control" id="importCsvFile" aria-describedby="addon-wrapping" name="importCsvFile" accept=".csv">
+                <label class="custom-file-label" for="importCsvFile">Choose file</label>
+              </div>
+            </div>
+        <div class="error" id="ImportCsvFileMsg">
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-primary" onclick="onBtImport('<?=$tracker_id?>','<?=$action_id?>','<?=$allowedFileSize?>')" id="btnImport">Import</button>
+        <button type="button" class="btn btn-light" onclick="clearErrorMessages()" data-dismiss="modal">Close</button>
+      </div>
+    </form>
+    </div>
+  </div>
+</div>
+
+ <?php 
+    $this->inlineScript()->appendFile($this->basePath() . '/js/module/tracker/importCsv.js', 'text/javascript');
+ ?> 
+ <script type="text/javascript" charset="utf-8">
+    // specify the columns agNumberColumnFilter
+    var columnDefs = [];
+function dateComparator(date1, date2) {
+    var date1Number = monthToComparableNumber(date1);
+    var date2Number = monthToComparableNumber(date2);
+
+    if (date1Number===null && date2Number===null) {
+        return 0;
+    }
+    if (date1Number===null) {
+        return -1;
+    }
+    if (date2Number===null) {
+        return 1;
+    }
+    return date1Number - date2Number;
+}
+
+// eg 29/08/2004 gets converted to 20040829
+function monthToComparableNumber(date) {
+    if (date === undefined || date === null || date.length !== 10) {
+        return null;
+    }
+    var yearNumber = date.substring(6,10);
+    var monthNumber = date.substring(3,5);
+    var dayNumber = date.substring(0,2);
+
+    var result = (yearNumber*10000) + (monthNumber*100) + dayNumber;
+    return result;
+}
+var gridOptions = {
+    defaultColDef: {
+        minWidth: 150,
+    },
+    //floatingFilter:true,
+    columnDefs: columnDefs,
+    rowData: null,
+    enableSorting: true,
+    multiSortKey: 'ctrl',
+    enableFilter: true,
+    rowSelection: 'multiple',
+    animateRows: true,
+    sortingOrder: ['desc','asc',null],
+    //paginationAutoPageSize:true,
+    pagination: true,
+    paginationPageSize: 5,
+    paginationNumberFormatter: function(params) {
+        return params.value.toLocaleString();
+    },
+    enableColResize: true,
+    enableRangeSelection: true,
+    components: {
+        'myCellRenderer': MyCellRenderer
+    }  
+};
+function onPageSizeChanged(newPageSize) {
+    var value = document.getElementById('page-size').value;
+    gridOptions.api.paginationSetPageSize(Number(value));
+}
+
+function getBooleanValue(cssSelector) {
+    return document.querySelector(cssSelector).checked === true;
+}
+
+function onBtExport() {
+    var params = {};
+    gridOptions.api.exportDataAsCsv(params);
+}
+// function to act as a class
+function MyCellRenderer () {}
+// gets called once before the renderer is used
+MyCellRenderer.prototype.init = function(params) {
+    var tracker_id="<?php echo $tracker_id?>";
+    var form_id="<?php echo $action_id?>";
+    // create the cell
+    this.eGui = document.createElement('div');
+    this.eGui.innerHTML='<a aria-label="Left Align" href="/tracker/viewrecord/'+tracker_id+'/'+form_id+'/'+params.value + '">'+'<i style="font-size: 1.5em;">&#x1f441;</i></a>';
+     
+    this.eGui.innerHTML+=' <a aria-label="Left Align" href="/tracker/editrecord/'+tracker_id+'/'+form_id+'/'+params.value + '">'+'<span style="font-size: 1.5em;"><b>&#128393;</b></span></a>';      
+};
+
+// gets called once when grid ready to insert the element
+MyCellRenderer.prototype.getGui = function() {
+    return this.eGui;
+};
+
+// setup the grid after the page has finished loading
+document.addEventListener('DOMContentLoaded', function() {
+    var gridDiv = document.querySelector('#myGrid');
+    new agGrid.Grid(gridDiv, gridOptions);
+
+     agGrid.simpleHttpRequest({url: '<?php echo $this->basePath() . '/tracker/getAllColumnName/'.$tracker_id.'/'.$action_id.'/1';?>'}).then(function(data) {
+        gridOptions.api.setColumnDefs(data);
+
+    });
+    agGrid.simpleHttpRequest({url: '<?php echo $this->basePath() . '/tracker/fetchAllData/'.$tracker_id.'/'.$action_id;?>'}).then(function(data) {
+        gridOptions.api.setRowData(data);
+
+    });
+
+});
+  </script>
+<?php

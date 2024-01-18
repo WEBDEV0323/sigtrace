@@ -1,0 +1,372 @@
+<?php
+$tracker_details = $trackerRsults['tracker_details'];
+$forms = $trackerRsults['forms'];
+$tracker_name = $tracker_details['name'];
+$title = "$tracker_name - Report Export Settings";
+$this->headTitle($title);
+
+$id = 0;
+$form_id = 0;
+$form_ids = 0;
+$wfid = 0;
+$roleid = 0;
+$wfids = 0;
+$roleids = 0; //
+
+
+$wfs = $resultset[0];
+$roles = $resultset[1];
+$report_access_setting= $resultset[2];
+//print_r($report_access_setting);die;
+
+?>
+
+
+<div class="container-liquid">
+    <div class="row">
+        <div class="col-xs-12">
+            <div class="sec-box">
+                <!--                <a class="closethis">Close</a>-->
+                <header>
+                    <h2 class="heading"><?php echo $this->escapeHtml($title); ?></h2>
+                </header>
+                <div class="contents boxpadding">
+                    <div class="panel panel-default">
+                        <div class="panel-body">
+                            <div class="btn-group" role="group" aria-label="...">
+                                <a href="<?php echo $this->url('tracker', array('action' => 'view', 'tracker_id' => $tracker_id)) ?>">
+                                    <button type="button" class="btn btn-default"><span class="glyphicon glyphicon-home" aria-hidden="true"></span><br/>Home</button>
+                                </a>
+                            </div>
+                            <div class="btn-group" role="group" aria-label="...">
+                                <a href="<?php echo $this->url('tracker', array('action' => 'settings', 'tracker_id' => $tracker_id)) ?>">
+                                    <button type="button" class="btn btn-info"><span class="glyphicon glyphicon-asterisk" aria-hidden="true"></span><br/>Settings</button>
+                                </a>
+                            </div>
+                            <?php
+                            foreach ($forms as $key => $value) {
+                                $form_name = $value['form_name'];
+                                $form_id = $value['form_id'];
+                                ?>
+
+                                <div class="btn-group" role="group" aria-label="...">
+                                    <a href="<?php echo $this->url('tracker', array('action' => 'form', 'tracker_id' => $tracker_id, 'action_id' => $form_id)) ?>">
+                                        <button type="button" class="btn btn-default"><span class="glyphicon glyphicon-list-alt" aria-hidden="true"></span><br/><?= $form_name; ?></button>
+                                    </a>
+                                </div>
+                                <?
+                            }
+                            ?>
+                            <div class="btn-group" style="float:right" role="group" aria-label="...">
+                                <a href="<?php echo $this->url('tracker', array('action' => 'newform', 'tracker_id' => $tracker_id)) ?>">
+                                    <button type="button" class="btn btn-default"><span class="glyphicon glyphicon-plus-sign" aria-hidden="true"></span><br/>New Form</button>
+                                </a>
+                            </div>
+
+                        </div>
+                    </div>
+                    <div class="panel panel-default" >
+                        <div class="panel-body">
+                            <div  class="clearfix">
+                                <b>Report Export Settings</b>
+                            </div>
+                            <hr/>
+                            <?
+                            $id = 1;
+                            $form_name='';
+                            $form_id=0;
+
+                            foreach ($wfs as $value_wfs) {
+                                if($form_id!=$value_wfs->form_id  && !empty($value_wfs->report_id) ){
+                                ?>
+                                <div class="panel panel-default" style="width:800px">
+                                        <?
+                                        $form_name=$value_wfs->form_name;
+                                        $form_id=$value_wfs->form_id;
+                                        ?>
+
+                                    <div class="panel-body">
+                                        <?php  echo "<h4>Form - $form_name-Report Export Settings</h4><hr/>";?>
+                                        <table id="accessdata_update<?php echo $id ?>" class="display stripe row-border order-column" cellspacing="0" width="100%" >
+                                            <thead>
+                                            <tr>
+                                                <th>Group Name</th>
+                                                <?php
+                                                $flag=0;
+                                                foreach ($wfs as $value_wf) {
+                                                    if($value_wf->form_id==$form_id){
+                                                        $flag=1;
+                                                        echo "<th style='width:100px;'><h6>$value_wf->report_name </h6></th>";
+                                                    }
+                                                }
+                                                ?>
+                                                <?php if($flag==1){ ?>
+                                                    <th></th>
+                                                <?php } ?>
+                                            </tr>
+                                            </thead>
+                                            <tbody id="recordsbody">
+                                            <?
+                                            if (array_key_exists(0, $roles)) {
+                                                $id_of_form=0;
+                                                foreach ($roles as $key_role_arr => $value_role_arr) {
+                                                    $role_id = $value_role_arr->group_id;
+                                                    $group_name = $value_role_arr->group_name;
+                                                    $group_archived = $value_role_arr->group_archived;
+                                                    $flags=0;
+                                                    if ($group_archived == 0) {
+                                                        ?>
+                                                        <tr>
+                                                            <td><?= $group_name ?></td>
+                                                            <?php  foreach ($wfs as $value_wf) {
+                                                                // $flag=0;
+                                                                if($value_wf->form_id==$form_id && !empty($value_wf->report_id)) {
+                                                                    $can_access = '';
+                                                                    if (!empty($report_access_setting)) {
+                                                                        foreach ($report_access_setting as $access_setting) {
+                                                                            $can_access = '';
+                                                                            if ($access_setting->report_id == $value_wf->report_id && $access_setting->form_id == $value_wf->form_id && $access_setting->role_id == $role_id) {
+                                                                                $can_access = $access_setting->can_access;
+                                                                                break;
+                                                                            }
+                                                                        }
+                                                                    }
+                                                                    $flags=1;
+                                                                    $id_of_form=$value_wf->form_id;
+                                                                    //   echo $value_wf->form_id;
+                                                                    //echo $form_id;
+                                                                    ?>
+                                                                    <td>
+                                                                        <?
+                                                                        if ($group_name == "Administrator" || $group_name == "SuperAdmin") {
+                                                                            echo "Full Access";
+                                                                        } else {
+                                                                            ?>
+                                                                            <select type="text" placeholder="Add Option" class=""  id="id_can_update_<?= $form_id ?>_<?= $role_id ?>_<?= $value_wf->report_id; ?>">
+                                                                                <option value="">Select option</option>
+                                                                                <option value="Yes" <?
+                                                                                if ($can_access == "Yes") {
+                                                                                    echo 'selected';
+                                                                                }
+                                                                                ?>>Yes</option>
+                                                                                <option value="No" <?
+                                                                                if ($can_access == "No") {
+                                                                                    echo 'selected';
+                                                                                }
+                                                                                ?>>No</option>
+
+                                                                            </select>
+                                                                        <? } ?>
+                                                                    </td>
+                                                                <?php } }
+                                                            ?>
+                                                            <?
+                                                            if ($group_name != "Administrator" && $flags==1) {
+                                                                ?>
+                                                                <td>
+                                                                    <div id="status_<?= $id_of_form ?>_<?= $role_id ?>"></div>
+                                                                    <button onclick="save_update_settings('<?= $id_of_form ?>','<?= $role_id ?>')" type="button" class="btn btn-primary">Save</button>
+                                                                </td>
+                                                            <? } ?>
+                                                            <?php if ($group_name == "Administrator") {?>
+                                                                <td></td>
+                                                            <? } ?>
+                                                        </tr>
+                                                        <?
+                                                    }
+                                                }
+                                            }
+                                            ?>
+                                            </tbody>
+                                        </table>
+                                    </div>
+
+
+                        <br/>
+
+
+                        <?
+                        $id++; ?>
+                                    </div>
+
+                   <?php }
+                          // break;
+                            }
+                    ?>
+                </div>
+            </div>
+        </div>
+
+    </div>
+</div>
+</div>
+<!-- Row End -->
+</div>
+
+</div>
+  <div class="modal fade" id="addcommentasreason" data-backdrop="static" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+                                                                 <div>      
+        <br />
+        <br />
+    </div>
+      <div class="modal-dialog"  style="margin-bottom:0px;" >
+                                        <div class="modal-content" id="modelContentAdd">
+
+                                            <div class="panel-primary" style="margin:0px">
+                                                <div class="panel-heading">Comments<button aria-hidden="true" data-dismiss="modal" class="close" type="button">×</button></div>
+                                            <div class="modal-body">
+                                                <div class="form-group">
+                                                    <textarea id="addcomment" class="form-control" placeholder="Add Comment" name="addcomment"></textarea>   
+                                                    <span id="commenterror" style="display:none;color: red;">Please add reason for change</span>
+                                                    <span id="status_for_reason"></span>
+                                                </div>
+                                            </div>
+                                            </div>
+
+                                            <div style="clear:both"></div>
+                                            
+                                            <div class="modal-footer">
+                                               <button onclick="reasonforchange()" type="button" class="btn btn-primary">Save</button>
+                                                <button class="btn btn-default" type="button" data-dismiss="modal">Close</button>
+                                            </div>
+                                        </div>
+                                    </div>
+    </div>
+<!-- Content Section End -->
+</div>
+<!-- Right Section End -->
+</div>
+</div>
+
+<div class="container-liquid">
+
+    <!-- Row End -->
+</div>
+
+<script>
+
+    $(document).ready(function() {
+
+
+        // $.fn.dataTable.ext.errMode = 'throw';
+        $("table[id^='accessdata_update']").each(function () {
+            var id=this.id;
+            var table_update=$("#"+id).dataTable( {
+                "bDestroy": true,
+                "scrollY":   800,
+                "scrollX":   true,
+                "bPaginate": false,
+                "bInfo" : false,
+                "bFilter": false,
+                "scrollCollapse": true,
+                fixedColumns: {
+                    leftColumns: 1
+                }
+               // "bAutoWidth": false
+            });
+//            new  $.fn.dataTable.FixedColumns( table_update, {
+//               leftColumns: 1,
+//                //rightColumns: 1
+//
+//           } );
+
+
+        });
+
+
+
+
+
+
+    });
+
+
+    function save_update_settings(form_ids,role_ids)
+    {
+        
+        $('#addcommentasreason').modal('show');
+        $('#commenterror').hide();
+        $('#addcomment').val('');
+        role_id=role_ids;
+        form_id=form_ids;
+    }
+    
+    function reasonforchange(){
+        var tracker_id="<?php echo $tracker_id  ?>";
+        if ($('#addcomment').val() == ''){
+            $('#commenterror').show();
+            return false;
+        }
+        $('#commenterror').hide();
+        var update='';
+        var report_ids = [];
+        var can_updates=[];
+        $("select[id^='id_can_update_"+form_id+"_"+role_id+"']").each(function () {
+            var res=(this.id).split('_');
+            var id=this.id;
+            var can_update = $("#"+id).val();
+            if( can_update != ""){
+                update=can_update;
+            }
+           // if( can_update != "") {
+                report_ids.push(res[5]);
+                can_updates.push(can_update);
+           // }
+        });
+        $("#status_"+form_id+"_"+role_id).html('processing...');
+        if( update == ""){
+            $("#addcommentasreason").modal('toggle');
+            $("#status_"+form_id+"_"+role_id).html('<font color="red">Select Values</font>');
+            window.setTimeout("closeUserCreateAlert('status_"+form_id+"_"+role_id+"')", 3000);
+            return false;
+        }
+        var data = {
+            can_update : can_updates,
+            role_id:role_id,
+            report_id : report_ids,
+            form_id:form_id,
+            comment:$('#addcomment').val()
+        }
+        var url = "<?php echo $this->url('tracker', array('action' => 'savereportexportsetting','tracker_id'=>$tracker_id)); ?>";
+        $.post(url, data,function(respJson){
+            var resp =JSON.parse(respJson);
+            var responseCode = resp.responseCode;
+            var errMessage = resp.errMessage;
+            if(responseCode == 1){
+                $("#addcommentasreason").modal('toggle');
+                $("#status_"+form_id+"_"+role_id).html('<font color="#088A08">'+errMessage+'</font>');
+                window.setTimeout("closeUserCreateAlert('status_"+form_id+"_"+role_id+"')", 3000);
+            }
+            else{
+                $("#status").html('<font color="#cc0000">'+errMessage+'</font>');
+                window.setTimeout("closeUserCreateAlert('status_"+form_id+"_"+role_id+"')", 3000);
+            }
+        });
+    }
+
+
+        
+
+
+
+
+
+
+
+
+    function closeUserCreateAlert(id) {
+        $("#"+id).html('');
+    }
+</script>
+
+
+<style>
+    th, td { white-space: nowrap; }
+
+    div.dataTables_wrapper {
+      width: 785px;
+        margin: 0 auto;
+    }
+
+
+</style>

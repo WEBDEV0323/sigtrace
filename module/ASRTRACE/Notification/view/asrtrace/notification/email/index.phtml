@@ -1,0 +1,176 @@
+<?php
+use Zend\Session\Container;
+$title = 'Email Template';
+$this->headTitle($title);
+$container = new Container('msg');
+$forms = array();
+if(!empty($trackerRsults)){
+  $tracker_details = $trackerRsults['tracker_details'];
+  $forms = $trackerRsults['forms'];
+  $tracker_name = $tracker_details['name'];
+}
+?>
+
+<div class="pagebar container-fluid col-md-12">
+    <!-- Sidebar Toggle -->
+    <button type="button" class="pagebar-toggle navbar-toggle pull-left">
+      <span class="pagebar-arrow"></span>
+    </button>
+    <ol class="breadcrumb">
+        <li><span><a href="/dashboard/<?php echo isset($tracker_id)?$tracker_id:0;?>/<?php echo isset($forms[0]['form_id'])?$forms[0]['form_id']:0;?>"><?php echo $tracker_name;?></a></span></li>
+        <li><span><a href="/tracker/settings/<?php echo $tracker_id;?>">Tracker Settings</a></span></li>
+        <li class="active"><span>Notifications/Reminders List</span></li>
+    </ol>
+</div>
+
+<div class="card">
+    <div class="card-body">
+        <div class="card card-default">
+            <div class="card-body">    
+                <?php
+                $flashMessage = $this->flashMessenger()->getMessages();
+                if (count($flashMessage) && isset($flashMessage[0]['success'])) {
+                    echo '<div class="contents boxpadding"><div class="alert alert-dismissable alert-success" id="fashMessage">'.$flashMessage[0]['success'].'<button type="button" class="close" data-dismiss="alert" aria-hidden="true">×</button></div></div>';
+                } else if(count($flashMessage) && isset($flashMessage[0]['failure'])) {
+                    echo '<div class="contents boxpadding"><div class="alert alert-dismissable alert-danger" id="fashMessage">'.$flashMessage[0]['failure'].'<button type="button" class="close" data-dismiss="alert" aria-hidden="true">×</button></div></div>';
+                }
+                ?> 
+                
+                <div class="float-right">
+                  <div class="btn-group" role="group">
+                    <button type="button" class="btn btn-primary " data-toggle="modal" data-target="#exampleModalCenter"> Add New Email</button>  
+                  </div>
+                </div>                    
+                <div class="contents boxpadding">
+                    <table id="list_notifications" class="display table table-striped">
+                        <thead>
+                            <tr>
+                                <th>Action</th>
+                                <th>Template Name</th>
+                                <th>Form Name</th>
+                                <th>Type</th>
+                                <th>Updated By</th>
+                            </tr>
+                        </thead>
+                        <tbody id="templatebody">
+                            <?php
+                            $ival = 0;
+                            foreach ($alltemplate as $alltemplate => $values) {
+                                $val = 1;
+                                ?>
+                                <tr>
+
+                                    <td> <?php if ($values['notification_type'] == "Notification") {?>
+                                        <button type="button" onclick="window.location.href='/email/addtemplate/<?php echo $tracker_id ?>/<?php echo $values['notification_template_id'] ?>'" class="btn btn-default" aria-label="Left Align">
+                                            <span class="lnr icon-pencil" aria-hidden="true"></span>
+                                        </button> 
+                                    <?php } else {?>
+                                        <button type="button" onclick="window.location.href='/email/add_reminder/<?php echo $tracker_id ?>/<?php echo $values['notification_template_id'] ?>'" class="btn btn-default" aria-label="Left Align">
+                                            <span class="lnr icon-pencil" aria-hidden="true"></span>
+                                        </button> 
+                                    <?php } ?>
+                                        <button type="button" onclick="deleteTemplate('<?php echo $values['tracker_id'] ?>','<?php echo $values['notification_template_id'] ?>')" class="btn btn-default" aria-label="Left Align">
+                                            <span class="lnr icon-trash2" aria-hidden="true"></span>
+                                        </button>
+                                    </td>
+                                    <td><?php echo $this->escapeHtml($values['notification_template_name']); ?></td>
+                                    <td><?php echo $this->escapeHtml($values['form_name']); ?></td>
+                                    <td><?php echo $this->escapeHtml($values['notification_type']); ?></td>
+                                    <td><?php echo $this->escapeHtml($values['u_name']); ?></td>
+                                </tr>
+
+                                <?php
+                            }
+                            ?>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+<!-- Modal -->
+<div class="modal fade" id="exampleModalCenter" tabindex="-1" role="dialog" aria-labelledby="exampleModalCenterTitle" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="exampleModalLabel"><b>Create a New Email</b></h5>
+      </div>
+      <div class="modal-body">
+          <div class="form-check">
+        <input class="form-check-input" type="radio" name="emailRadios" id="emailRadiosN" value="/email/addtemplate/<?php echo $tracker_id ?>">
+          <label class="form-check-label" for="emailRadiosN">
+            <i class="lnr icon-envelope"></i>
+            <b>Notification</b>
+          </label>
+            <p>ASRTRACE sends email notifications when records meeting certain criteria are added, modified or deleted.</p>
+       </div>
+            <hr>
+             <div class="form-check">
+          <input class="form-check-input" type="radio" name="emailRadios" id="emailRadiosR" value="/email/add_reminder/<?php echo $tracker_id ?>">
+          <label class="form-check-label" for="emailRadiosR">
+            <i class="lnr icon-clock"></i>
+            <b>Reminder</b>
+          </label>
+          <p>ASRTRACE will email a reminder to a user a specific number of days before or after the date in a field.</p>
+      </div></div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-primary" id="createEmail">Create</button>
+        <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="modal fade" id="deletecommentasreason" data-backdrop="static" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="exampleModalLongTitle">Delete Confirmation</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">×</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <div class="form-group row">
+                    <label class="col-sm-4 col-form-label">Reason for change<span class="error ml-1">*</span></label>
+                    <div class="col-sm-7">
+                        <textarea id="addcommentfordelete" class="form-control" placeholder="Reason for change." name="addcomment"></textarea>   
+                        <span id="commenterrorfordelete" style="display:none;color: red;">Please add reason for change</span>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button id="reasonfordelete"  type="button" class="btn btn-primary">Delete</button>
+                <button id="closereasonfordelete" class="btn btn-default" type="button" data-dismiss="modal">Close</button>
+            </div>
+        </div>
+    </div>
+</div>
+<style>
+
+
+    /* mouse over link */
+    /* a:hover {
+        color: #FF00FF;
+    } */
+
+    /* selected link */
+    /* a:active {
+        color: #0000FF;
+    } */
+</style>
+
+
+
+
+<?php // $this->inlineScript()
+//            ->prependFile($this->basePath() . '/assets/selectize/js/selectize.min.js', 'text/javascript');
+ $this->inlineScript()->appendFile($this->basePath() . '/js/module/client/js_client.js');
+ $this->inlineScript()->appendFile($this->basePath() . '/js/module/notification/js_notification.js');
+ $this->inlineScript()
+            ->prependFile($this->basePath() . '/assets/summernote/summernote-bs4.min.js', 'text/javascript');
+
+

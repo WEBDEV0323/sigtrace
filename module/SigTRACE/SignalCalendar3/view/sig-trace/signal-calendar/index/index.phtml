@@ -1,0 +1,383 @@
+<div class="crumbs">
+    <ul class="breadcrumb" id="breadcrumbs">
+        <li>
+            <i class="icon-home"></i>
+            <a href="/dashboard/<?=$trackerId;?>/<?=$formId;?>">Dashboard</a>
+        </li>
+        <li class="current">
+            <a href="javascript:void(0)">workflows</a>
+        </li>
+    </ul>
+</div>
+<div class="page-header"></div>
+<div class="row">
+    <div class="col-md-12">
+        <p class="alert fade in" id="alert" style="display:none;"></p>
+        <div class="widget box">
+            <div class="widget-header"><h4><i class="icon-reorder"></i>Quantitative Analysis</h4>
+                <div class="toolbar no-padding">
+                        <div class="btn-group">
+                                <span class="btn btn-xs widget-collapse"><i class="icon-angle-down"></i></span>
+                        </div>
+                </div> 
+            </div>
+             <div class="widget-content">
+                <?php foreach ($html as $key => $value) { ?>
+                    <div class="col-md-3">
+                            <a class="btn btn-icon btn-success input-block-level" href="javascript:void(0);" onclick="window.location.href='/quantitative/view/<?=$trackerId;?>/<?=$formId;?>/<?=$value['product_id'];?>'">
+                                <div>&nbsp;</div>
+                                <div><?=$value['product_name'];?></div>
+                                <div>&nbsp;</div>
+                                <span class="label label-success"></span>
+                            </a>
+                    </div>
+                <?php } ?>
+                <div style="clear:both;"></div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row">
+    <div class="col-md-12">
+    <div class="widget box">
+        <div class="widget-header"><h4><i class="icon-reorder"></i>Qualitative Analysis</h4>
+            <div class="toolbar no-padding">
+									<div class="btn-group">
+										<span class="btn btn-xs widget-collapse"><i class="icon-angle-down"></i></span>
+									</div>
+								</div> 
+        </div>
+        <div class="widget-content">
+            <div class="tabbable tabbable-custom">
+                <ul class="nav nav-tabs">
+                        <li class="active"><a data-toggle="tab" href="#tab_feed_a">Qualitative Analysis Form</a></li>
+                        <li><a data-toggle="tab" href="#tab_feed_b">Quality Check</a></li>
+                        <li><a data-toggle="tab" href="#tab_feed_c">DSL review of qualitative analysis form</a></li>
+                </ul>
+                <div class="tab-content">
+                    <div class="tab-pane active" id="tab_feed_a">
+                        <div class="scroller" data-height="300px" data-always-visible="1" data-rail-visible="0">
+                            <div class="widget-content">
+            <div class="tabbable tabbable-custom">
+                <ul class="nav nav-tabs">
+                        <li class="active"><a data-toggle="tab" href="#tab_feed_1">Current Quarter</a></li>
+                        <li><a data-toggle="tab" href="#tab_feed_2">All</a></li>
+                </ul>
+                <div class="tab-content">
+                    <div class="tab-pane active" id="tab_feed_1">
+                        <div class="scroller" data-height="300px" data-always-visible="1" data-rail-visible="0">
+                            <?php foreach($current[0] as $product){ 
+                                    if($product['product_name'] != ''){
+                                ?>
+                                <div class="col-md-3">
+                                        <a class="btn btn-icon btn-success input-block-level" href="javascript:void(0);" onclick="window.location.href='<?php echo $this->url('qualitative_workflow', array('action' => 'workflow_current','trackerId' => $trackerId,'formId'=>$formId,'workflowId'=>$workflowId,'productId'=>$product['product_id']));?>'">
+                                            <div>&nbsp;</div>    
+                                            <div><?=$product['product_name'];?></div>
+                                            <div>&nbsp;</div>
+                                            <!--<span class="label label-success">4</span>-->
+                                        </a>
+                                </div>
+                                    <?php }} ?>
+                        </div> 
+                    </div> 
+
+                    <div id="tab_feed_2" class="tab-pane">
+                        <div class="scroller" data-height="300px" data-always-visible="1" data-rail-visible="0">
+                            <?php foreach($all[0] as $product){ 
+                                    if($product['product_name'] != ''){
+                                ?>
+                                <div class="col-md-3">
+                                        <a class="btn btn-icon btn-success input-block-level" href="javascript:void(0);" onclick="window.location.href='<?php echo $this->url('qualitative_workflow', array('action' => 'workflow_all','trackerId' => $trackerId,'formId'=>$formId,'workflowId'=>$workflowId,'productId'=>$product['product_id']));?>'">
+                                            <div>&nbsp;</div>    
+                                            <div><?=$product['product_name'];?></div>
+                                            <div>&nbsp;</div>
+                                            <!--<span class="label label-success">4</span>-->
+                                        </a>
+                                </div>
+                                    <?php }} ?>
+                        </div> 
+                    </div> 
+                </div> 
+            </div>
+
+        </div>
+                        </div> 
+                    </div> 
+                    <div class="tab-pane" id="tab_feed_b">
+                        <div class="scroller" data-height="300px" data-always-visible="1" data-rail-visible="0">
+                            <div class="widget-content">
+            <div class="tabbable tabbable-custom">
+                <ul class="nav nav-tabs">
+                        <li class="active"><a data-toggle="tab" href="#tab_feed_3">Current Quarter</a></li>
+                        <li><a data-toggle="tab" href="#tab_feed_4">All</a></li>
+                </ul>
+                <div class="tab-content">
+                    <div class="tab-pane active" id="tab_feed_3">
+                        <div class="scroller" data-height="300px" data-always-visible="1" data-rail-visible="0">
+                            <?php foreach($current[1] as $product){ 
+                                    if($product['product_name'] != ''){
+                                ?>
+                                <div class="col-md-3">
+                                        <a class="btn btn-icon btn-success input-block-level" href="javascript:void(0);" onclick="window.location.href='<?php echo $this->url('qualitative_workflow', array('action' => 'workflow_current','trackerId' => $trackerId,'formId'=>$formId,'workflowId'=>$workflowId,'productId'=>$product['product_id']));?>'">
+                                            <div>&nbsp;</div>    
+                                            <div><?=$product['product_name'];?></div>
+                                            <div>&nbsp;</div>
+                                            <!--<span class="label label-success">4</span>-->
+                                        </a>
+                                </div>
+                                    <?php }} ?>
+                        </div> 
+                    </div> 
+
+                    <div id="tab_feed_4" class="tab-pane">
+                        <div class="scroller" data-height="300px" data-always-visible="1" data-rail-visible="0">
+                            <?php foreach($all[1] as $product){ 
+                                    if($product['product_name'] != ''){
+                                ?>
+                                <div class="col-md-3">
+                                        <a class="btn btn-icon btn-success input-block-level" href="javascript:void(0);" onclick="window.location.href='<?php echo $this->url('qualitative_workflow', array('action' => 'workflow_all','trackerId' => $trackerId,'formId'=>$formId,'workflowId'=>$workflowId,'productId'=>$product['product_id']));?>'">
+                                            <div>&nbsp;</div>    
+                                            <div><?=$product['product_name'];?></div>
+                                            <div>&nbsp;</div>
+                                            <!--<span class="label label-success">4</span>-->
+                                        </a>
+                                </div>
+                                    <?php }} ?>
+                        </div> 
+                    </div> 
+                </div> 
+            </div>
+
+        </div>
+                        </div> 
+                    </div> 
+                    <div class="tab-pane" id="tab_feed_c">
+                        <div class="scroller" data-height="300px" data-always-visible="1" data-rail-visible="0">
+                            <div class="widget-content">
+            <div class="tabbable tabbable-custom">
+                <ul class="nav nav-tabs">
+                        <li class="active"><a data-toggle="tab" href="#tab_feed_5">Current Quarter</a></li>
+                        <li><a data-toggle="tab" href="#tab_feed_6">All</a></li>
+                </ul>
+                <div class="tab-content">
+                    <div class="tab-pane active" id="tab_feed_5">
+                        <div class="scroller" data-height="300px" data-always-visible="1" data-rail-visible="0">
+                            <?php foreach($current[2] as $product){ 
+                                    if($product['product_name'] != ''){
+                                ?>
+                                <div class="col-md-3">
+                                        <a class="btn btn-icon btn-success input-block-level" href="javascript:void(0);" onclick="window.location.href='<?php echo $this->url('qualitative_workflow', array('action' => 'workflow_current','trackerId' => $trackerId,'formId'=>$formId,'workflowId'=>$workflowId,'productId'=>$product['product_id']));?>'">
+                                            <div>&nbsp;</div>    
+                                            <div><?=$product['product_name'];?></div>
+                                            <div>&nbsp;</div>
+                                            <!--<span class="label label-success">4</span>-->
+                                        </a>
+                                </div>
+                                    <?php }} ?>
+                        </div> 
+                    </div> 
+
+                    <div id="tab_feed_6" class="tab-pane">
+                        <div class="scroller" data-height="300px" data-always-visible="1" data-rail-visible="0">
+                            <?php foreach($all[2] as $product){ 
+                                    if($product['product_name'] != ''){
+                                ?>
+                                <div class="col-md-3">
+                                        <a class="btn btn-icon btn-success input-block-level" href="javascript:void(0);" onclick="window.location.href='<?php echo $this->url('qualitative_workflow', array('action' => 'workflow_all','trackerId' => $trackerId,'formId'=>$formId,'workflowId'=>$workflowId,'productId'=>$product['product_id']));?>'">
+                                            <div>&nbsp;</div>    
+                                            <div><?=$product['product_name'];?></div>
+                                            <div>&nbsp;</div>
+                                            <!--<span class="label label-success">4</span>-->
+                                        </a>
+                                </div>
+                                    <?php }} ?>
+                        </div> 
+                    </div> 
+                </div> 
+            </div>
+
+        </div>
+                        </div> 
+                    </div> 
+                </div> 
+            </div>
+
+        </div>
+    </div>
+    </div>
+</div>
+
+<div class="row">
+    <div class="col-md-12">
+    <div class="widget box">
+        <div class="widget-header"><h4><i class="icon-reorder"></i>Qualitative Analysis Summery</h4>
+            <div class="toolbar no-padding">
+									<div class="btn-group">
+										<span class="btn btn-xs widget-collapse"><i class="icon-angle-down"></i></span>
+									</div>
+								</div> 
+        </div>
+        <div class="widget-content">
+            <div class="tabbable tabbable-custom">
+                <ul class="nav nav-tabs">
+                        <li class="active"><a data-toggle="tab" href="#tab_feed_11">Current Quarter</a></li>
+                        <li><a data-toggle="tab" href="#tab_feed_22">All</a></li>
+                </ul>
+                <div class="tab-content">
+                    <div class="tab-pane active" id="tab_feed_11">
+                        <div class="scroller" data-height="300px" data-always-visible="1" data-rail-visible="0">
+                            <?php foreach($currentvalidation[0] as $product){ 
+                                    if($product[0] != ''){
+                                ?>
+                                <div class="col-md-3">
+                                        <a class="btn btn-icon btn-success input-block-level" href="javascript:void(0);" onclick="window.location.href='<?php echo $this->url('validation', array('action' => 'validate_view','trackerId' => $trackerId,'formId'=>$formId,'workflowId'=>$workflowId,'productName'=>base64_encode($product[0]),'type'=>base64_encode('Current')));?>'">
+                                            <div>&nbsp;</div>    
+                                            <div><?=$product[0];?></div>
+                                            <div>&nbsp;</div>
+                                            <!--<span class="label label-success">4</span>-->
+                                        </a>
+                                </div>
+                                    <?php }} ?>
+                        </div> 
+                    </div> 
+
+                    <div id="tab_feed_22" class="tab-pane">
+                        <div class="scroller" data-height="300px" data-always-visible="1" data-rail-visible="0">
+                            <?php foreach($allvalidation[0] as $product){ 
+                                    if($product[0] != ''){
+                                ?>
+                                <div class="col-md-3">
+                                        <a class="btn btn-icon btn-success input-block-level" href="javascript:void(0);" onclick="window.location.href='<?php echo $this->url('validation', array('action' => 'validate_view','trackerId' => $trackerId,'formId'=>$formId,'workflowId'=>$workflowId,'productName'=>base64_encode($product[0]),'type'=>base64_encode('All')));?>'">
+                                            <div>&nbsp;</div>    
+                                            <div><?=$product[0];?></div>
+                                            <div>&nbsp;</div>
+                                            <!--<span class="label label-success">4</span>-->
+                                        </a>
+                                </div>
+                                    <?php }} ?>
+                        </div> 
+                    </div> 
+                </div> 
+            </div>
+
+        </div>
+    </div>
+    </div>
+</div>
+
+<div class="row">
+    <div class="col-md-12">
+    <div class="widget box">
+        <div class="widget-header"><h4><i class="icon-reorder"></i>Validation</h4>
+            <div class="toolbar no-padding">
+									<div class="btn-group">
+										<span class="btn btn-xs widget-collapse"><i class="icon-angle-down"></i></span>
+									</div>
+								</div> 
+        </div>
+        <div class="widget-content">
+            <div class="tabbable tabbable-custom">
+                <ul class="nav nav-tabs">
+                        <li class="active"><a data-toggle="tab" href="#tab_feed_111">Current Quarter</a></li>
+                        <li><a data-toggle="tab" href="#tab_feed_222">All</a></li>
+                </ul>
+                <div class="tab-content">
+                    <div class="tab-pane active" id="tab_feed_111">
+                        <div class="scroller" data-height="300px" data-always-visible="1" data-rail-visible="0">
+                            <?php foreach($currentvalidation[1] as $product){ 
+                                    if($product[0] != ''){
+                                ?>
+                                <div class="col-md-3">
+                                        <a class="btn btn-icon btn-success input-block-level" href="javascript:void(0);" onclick="window.location.href='<?php echo $this->url('validation', array('action' => 'validate_view','trackerId' => $trackerId,'formId'=>$formId,'workflowId'=>$workflowId,'productName'=>base64_encode($product[0]),'type'=>base64_encode('Current')));?>'">
+                                            <div>&nbsp;</div>    
+                                            <div><?=$product[0];?></div>
+                                            <div>&nbsp;</div>
+                                            <!--<span class="label label-success">4</span>-->
+                                        </a>
+                                </div>
+                                    <?php }} ?>
+                        </div> 
+                    </div> 
+
+                    <div id="tab_feed_222" class="tab-pane">
+                        <div class="scroller" data-height="300px" data-always-visible="1" data-rail-visible="0">
+                            <?php foreach($allvalidation[1] as $product){ 
+                                    if($product[0] != ''){
+                                ?>
+                                <div class="col-md-3">
+                                        <a class="btn btn-icon btn-success input-block-level" href="javascript:void(0);" onclick="window.location.href='<?php echo $this->url('validation', array('action' => 'validate_view','trackerId' => $trackerId,'formId'=>$formId,'workflowId'=>$workflowId,'productName'=>base64_encode($product[0]),'type'=>base64_encode('All')));?>'">
+                                            <div>&nbsp;</div>    
+                                            <div><?=$product[0];?></div>
+                                            <div>&nbsp;</div>
+                                            <!--<span class="label label-success">4</span>-->
+                                        </a>
+                                </div>
+                                    <?php }} ?>
+                        </div> 
+                    </div> 
+                </div> 
+            </div>
+
+        </div>
+    </div>
+    </div>
+</div>
+
+<div class="row">
+    <div class="col-md-12">
+    <div class="widget box">
+        <div class="widget-header"><h4><i class="icon-reorder"></i> Assessment </h4>
+            <div class="toolbar no-padding">
+									<div class="btn-group">
+										<span class="btn btn-xs widget-collapse"><i class="icon-angle-down"></i></span>
+									</div>
+								</div> 
+        </div>
+        <div class="widget-content">
+            <div class="tabbable tabbable-custom">
+                <ul class="nav nav-tabs">
+                        <li class="active"><a data-toggle="tab" href="#tab_feed_33">Current Quarter</a></li>
+                        <li><a data-toggle="tab" href="#tab_feed_44">All</a></li>
+                </ul>
+                <div class="tab-content">
+                    <div class="tab-pane active" id="tab_feed_33">
+                        <div class="scroller" data-height="300px" data-always-visible="1" data-rail-visible="0">
+                            <?php foreach($currentvalidation[2] as $product){ 
+                                    if($product[0] != ''){
+                                ?>
+                                <div class="col-md-3">
+                                        <a class="btn btn-icon btn-success input-block-level" href="javascript:void(0);" onclick="window.location.href='<?php echo $this->url('validation', array('action' => 'validate_view','trackerId' => $trackerId,'formId'=>$formId,'workflowId'=>$workflowId,'productName'=>base64_encode($product[0]),'type'=>base64_encode('Current')));?>'">
+                                            <div>&nbsp;</div>    
+                                            <div><?=$product[0];?></div>
+                                            <div>&nbsp;</div>
+                                            <!--<span class="label label-success">4</span>-->
+                                        </a>
+                                </div>
+                                    <?php }} ?>
+                        </div> 
+                    </div> 
+
+                    <div id="tab_feed_44" class="tab-pane">
+                        <div class="scroller" data-height="300px" data-always-visible="1" data-rail-visible="0">
+                            <?php foreach($allvalidation[2] as $product){ 
+                                    if($product[0] != ''){
+                                ?>
+                                <div class="col-md-3">
+                                        <a class="btn btn-icon btn-success input-block-level" href="javascript:void(0);" onclick="window.location.href='<?php echo $this->url('validation', array('action' => 'validate_view','trackerId' => $trackerId,'formId'=>$formId,'workflowId'=>$workflowId,'productName'=>base64_encode($product[0]),'type'=>base64_encode('All')));?>'">
+                                            <div>&nbsp;</div>    
+                                            <div><?=$product[0];?></div>
+                                            <div>&nbsp;</div>
+                                            <!--<span class="label label-success">4</span>-->
+                                        </a>
+                                </div>
+                                    <?php }} ?>
+                        </div> 
+                    </div> 
+                </div> 
+            </div>
+
+        </div>
+    </div>
+    </div>
+</div>

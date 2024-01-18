@@ -1,0 +1,47 @@
+<!-- Header -->
+<header class="navbar-expand-sm container-fluid">
+    <div class="logo-expanded">
+      <i class="lnr icon-biobug"></i>
+      <span class="nav-label logo-bio">BIOCLINICA</span>
+      <span class="nav-label logo-product">ASRTRACE</span>
+    </div>
+</header>
+   <p>&nbsp;</p>
+<?php
+    $this->headTitle('Error Page');
+?>
+<div class="wrapper-profile pt-3">
+    <div class="card">
+        <div class="card-body">
+            <div class="card card-default mb-2">
+                <div class="card-body">
+                    <p class="text-center">
+                        <p class="font-weight-bold">
+                            <?echo $message?>
+                        <p>
+                        <!-- Thank you <a href="/logout">click here to logout</a>  -->
+                        <div id="dvCountDown" style="display: none">
+                            You will be redirected after <span id="lblCount"></span>&nbsp;seconds to Sign Out page.
+                        </div>
+                    </p>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+$(function () {
+    var seconds = 10;
+    $("#dvCountDown").show();
+    $("#lblCount").html(seconds);
+    setInterval(function () {
+        seconds--;
+        $("#lblCount").html(seconds);
+        if (seconds == 0) {
+            $("#dvCountDown").hide();
+            window.location = "/logout";
+        }
+    }, 1000);
+});
+</script>

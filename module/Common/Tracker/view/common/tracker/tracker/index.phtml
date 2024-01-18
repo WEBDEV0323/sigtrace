@@ -1,0 +1,75 @@
+<?php
+use Session\Container\SessionContainer;
+$session = new SessionContainer();
+$title = 'Dashboard';
+$this->headTitle($title);
+$container = $session->getSession("user");
+if (isset($container->u_id)) {
+    $user_details = $container->user_details ;
+}
+?>
+<div class="pagebar container-fluid col-md-12">
+    <!-- Sidebar Toggle -->
+    <button type="button" class="pagebar-toggle navbar-toggle pull-left">
+      <span class="pagebar-arrow"></span>
+    </button>
+    <ol class="breadcrumb">
+      <li class="active"><span><?php echo $this->escapeHtml($title); ?></span></li>
+    </ol>
+    <?php $role_id = $user_details['group_id'];
+            if ($role_id == 1) { ?>
+                <div class="pagebar-nav">
+                    <ul class="nav navbar-nav">
+                      <li>
+                        <button onclick="window.location.href='/tracker/add'" id="clientModel" type="button" class="btn btn-pagebar">Add New Tracker</button>
+                      </li>
+                    </ul>
+              </div>
+     <?php } ?>
+</div>
+<div class="card container-fluid">
+    <div class="card-body">
+        <?php $flashMessage = $this->flashMessenger()->getMessages();
+            if (count($flashMessage) && isset($flashMessage[0]['success'])) {   
+               echo '<div class="contents boxpadding"><div class="alert alert-dismissable alert-success">' . $flashMessage[0]['success'].'<button type="button" class="close" data-dismiss="alert" aria-hidden="true">×</button></div></div>'; 
+            } 
+        ?>
+        <div class="card-columns">
+            <?php
+            $trackerCounts = (int)$dashboardResults['trackerCounts'];
+            if ($trackerCounts > 0) {
+                $trackers = $dashboardResults['trackers'];
+                $i = 0;
+                foreach ($trackers as $key => $value) {
+                    $tracker_id = $value['tracker_id'];
+                    $form_id = $value['form_id'];
+                    $tracker_name = $value['name'];
+                    $action = (boolval($value['isDashboardSet']) == false)?"list":"index";
+
+                    $depArray = $dashboardUrl[$i]['dependent_on'] != ''? explode(",", $dashboardUrl[$i]['dependent_on']):array();
+                    $urlParams = $dashboardUrl[$i]['action_url'];
+                    foreach($depArray as $Id) {
+                        $urlParams .= '/'.$value[$Id];
+                    }
+                    ?>
+                    <div class="card btn-primary">
+                        <?php if ($form_id > 0 && $tracker_id > 0) { ?>
+                        <a href="<?php echo $urlParams;//$this->url('dashboard', array('action' => $action, 'tracker_id' => $tracker_id, 'form_id' => $form_id)) ?>"> 
+                        <?php } ?>
+                            <div class="card-body">
+                                <h6 class="text-white"><?= $tracker_name; ?></h6>
+                            </div>
+                        <?php if ($form_id > 0 && $tracker_id > 0) { ?>
+                        </a>
+                        <?php } ?>
+                    </div>
+                    <?php
+                    $i++;
+                }
+            } else {
+                echo "No trackers are assigned to You.";
+            }
+            ?>
+        </div>   
+    </div>
+</div>

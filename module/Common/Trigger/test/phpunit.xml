@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<phpunit bootstrap="Bootstrap.php" colors="true" stderr="true">
+    <testsuites>
+        <testsuite name="SigTrace">
+            <directory>./TriggerTest</directory>
+            <file>./TriggerTest/Controller/TriggerControllerTest.php</file>
+        </testsuite>
+    </testsuites>
+    <filter>
+        <whitelist>    
+            <directory suffix=".php">../src/Common/Trigger/Model</directory>
+            <directory suffix=".php">../src/Common/Trigger/Controller</directory>
+        </whitelist>
+        
+    </filter>
+    
+    <logging>
+        <log type="coverage-html" target="../../../../../test/unittest/code_coverage/trigger" lowUpperBound="40" highLowerBound="80" />
+    </logging>
+</phpunit>

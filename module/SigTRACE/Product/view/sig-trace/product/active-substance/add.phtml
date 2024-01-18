@@ -1,0 +1,87 @@
+<?php
+use Session\Container\SessionContainer;
+$session = new SessionContainer();
+$userContainer = $session->getSession('user');
+$forms = isset($trackerResults['forms'])?$trackerResults['forms']:array();
+$trackerDetails = isset($trackerResults['tracker_details'])?$trackerResults['tracker_details']:array();
+$trackerName = isset($trackerDetails['name'])?$trackerDetails['name']."":"";
+$trackerId = isset($forms[0]['tracker_id']) ? (int)$forms[0]['tracker_id'] : 0;
+$formId = isset($forms[0]['form_id']) ? (int)$forms[0]['form_id'] : 0;
+$title = "$trackerName Active Substances";
+$this->headTitle($title);
+?>
+<div class="pagebar container-fluid col-md-12">
+    <!-- Sidebar Toggle -->
+    <button type="button" class="pagebar-toggle navbar-toggle pull-left">
+      <span class="pagebar-arrow"></span>
+    </button>
+    <ol class="breadcrumb">        
+        <li><span><a href="/dashboard/<?php echo $trackerId;?>/<?php echo $formId;?>"><?php echo $trackerName;?></a></span></li>
+        <li><span>Product Settings</span></li>        
+        <li class="active"><span><a href='/activesubstance/activesubstance_management/<?php echo $trackerId ?>'>Active Substance Management</a></span></li>
+        <li class="active"><span>Add Active Substance</span></li>
+    </ol>
+</div>
+<div class="card">
+    <div class="card-body">
+        <div class="card">
+            <div  class="card-header">
+                <h6>Add Active Substance</h6>
+            </div>
+            <div class="card-body">
+                <div class="form-group row">
+                    <label class="col-sm-4"></label>
+                    <div id="activeSubstanceErrorMessages" class="error col-sm-6"></div>
+                </div>
+                <form id="activeSubstanceAddForm" method="post" name="myForm">
+                    <div class="form-group row">
+                        <label class="col-sm-4 col-form-label">Active Substance Name<span class="error ml-1">*</span></label>
+                        <div class="col-sm-6">
+                            <input type="text" class="form-control" <?php if ($activeSubstancesId > 0) { echo 'readonly'; ?> <?php } ?> placeholder="Active Substance" id="active_substaance" name="active_substaance" required>
+                            <div class="error" id="forActiveSubstanceId"></div>
+                        </div>
+                    </div>                    
+                    <div class="form-group row">
+                        <label class="col-sm-4 col-form-label">Product Name<span class="error ml-1">*</span></label>
+                        <div class="col-sm-6">
+                            <select class="selectpicker form-control" multiple data-live-search="true" data-actions-box="true" id="productIds" name="productIds" title="Select Product" data-container="body" required>
+                                <?php
+                                $selected = '';
+                                foreach ($products as $opt => $opt_values) {
+                                    $product_id = $opt_values['product_id'];
+                                    $product_name = $opt_values['product_name'];
+                                    ?>
+                                    <option <?php echo $selected ?> value="<?php echo $this->escapeHtml($product_id); ?>"><?php echo $this->escapeHtml($product_name); ?></option>
+                                    <?php
+                                }
+                                ?>
+                            </select>
+                            <div class="error" id="forProductIds"></div>
+                        </div>
+                    </div>
+                    <div class="form-group row">
+                        <label class="col-sm-4 col-form-label">Reason for change<span class="error ml-1">*</span></label>
+                        <div class="col-sm-6">
+                           <textarea id="reason" class="form-control" placeholder="Reason for change" name="addcomment"></textarea>
+                           <div id="forReason" class="error"></div>
+                        </div>
+                    </div>
+                    <div class="card-footer">
+                        <div class="form-group row">
+                            <?php if ($activeSubstancesId == 0) { ?>
+                            <div class="offset-sm-4">
+                                <button id ="savebtn" type="button" class="btn btn-primary ml-2" onclick="addNewActiveSubstance(<?php echo $trackerId ?>, <?php echo $formId; ?>)">Save</button>
+                                <button onclick="window.location.href='/activesubstance/activesubstance_management/<?php echo $trackerId ?>/<?php echo $formId; ?>'" type="button" class="btn btn-default">Cancel</button>
+                            </div>
+                            <?php } ?>
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+<script> 
+    var trackerName='<?php echo $trackerName ?>';    
+</script>
+<?php $this->inlineScript()->appendFile($this->basePath() . '/js/module/sigtrace/product/addActiveSubstance.js', 'text/javascript');

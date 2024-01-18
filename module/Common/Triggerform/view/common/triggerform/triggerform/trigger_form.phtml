@@ -1,0 +1,112 @@
+<?php
+
+$trackerDetails = $trackerResults['tracker_details'];
+$forms = $trackerResults['forms'];
+$trackerName = $trackerDetails['name'];
+$title = "$trackerName - Trigger Form";
+$this->headTitle($title);
+?>
+
+<div class="pagebar container-fluid col-md-12">
+    <!-- Sidebar Toggle -->
+    <button type="button" class="pagebar-toggle navbar-toggle pull-left">
+      <span class="pagebar-arrow"></span>
+    </button>
+    <ol class="breadcrumb">
+        <li><span>Settings</span></li>
+        <li><span>Tracker Settings</span></li>
+        <li class="active"><span>Trigger Form</span></li>
+    </ol>
+</div>
+<div class="card">
+    <div class="card-body">
+        <div class="card">
+            <div  class="card-header">
+                <h6 class="col-md-6 float-left">List of Trigger Form</h6>
+                <span class="col-md-6">
+                   <button type="button" class="btn btn-primary float-right" onclick="window.location.href='/triggerform/add/<?php echo $trackerId; ?>'">Add New Trigger</button>
+                </span>
+            </div>
+            <div class="card-body">
+                <div class="form-group row">
+                    <label class="col-sm-4"></label>
+                    <div id="triggerErrorMessages" class="error col-sm-6"></div>
+                </div>
+                <?php
+                $flashMessage = $this->flashMessenger()->getMessages();
+                if (count($flashMessage) && isset($flashMessage[0]['success'])) {
+                    echo '<div class="contents boxpadding"><div class="alert alert-dismissable alert-success" id="fashMessage">'.$flashMessage[0]['success'].'<button type="button" class="close" data-dismiss="alert" aria-hidden="true">×</button></div></div>';
+                }
+                ?>
+                <div class="table-responsive">
+                     <table id="list_of_trigger" class="table table-striped">
+                        <thead>
+                            <tr>
+                                <th>Action</th>
+                                <th>Trigger Name</th>
+                                <th>Trigger When</th>
+                                <th>Trigger Then</th>
+                                <!-- <th>Source</th>
+                                <th>Destination</th> -->
+                            </tr>
+                        </thead>
+                        <tbody id="clientbody">
+                            
+                            <?php foreach ($trigger as $key => $values) { ?>
+                                <tr>
+                                    <td>
+                                        <button type="button" onclick="window.location.href='/triggerform/view/<?php echo $trackerId ?>/<?php echo $values['trigger_id']; ?>'" class="btn btn-default" aria-label="Left Align">
+                                            <span class="lnr icon-eye" aria-hidden="true"></span>
+                                        </button>
+                                        <?php if (strtolower($values['trigger_name']) != 'administrator') { ?>
+                                            <button type="button" onclick="window.location.href='/triggerform/edit/<?php echo $trackerId ?>/<?php echo $values['trigger_id']; ?>'" class="btn btn-default" aria-label="Left Align">
+                                                <span class="lnr icon-pencil" aria-hidden="true"></span>
+                                            </button>
+                                            <button type="button" data-toggle="modal" data-target="#deleteRole_<?php echo $values['trigger_id']; ?>" class="btn btn-default" aria-label="Left Align" onclick="reloadPopUp('<?php echo $values['trigger_id']; ?>')">
+                                                <span class="lnr icon-trash2" aria-hidden="true"></span>
+                                            </button>
+                                            <!-- Modal -->
+                                            <div class="modal fade" id="deleteRole_<?php echo $values['trigger_id']; ?>" tabindex="-1" role="dialog" aria-labelledby="deleteRoleModal" aria-hidden="true">
+                                                <div class="modal-dialog modal-dialog-centered" role="document">
+                                                    <div class="modal-content">
+                                                        <div class="modal-header">
+                                                            <h5 class="modal-title" id="exampleModalLongTitle">Delete Confirmation</h5>
+                                                            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                                                <span aria-hidden="true">&times;</span>
+                                                            </button>
+                                                        </div>
+                                                        <div class="modal-body">
+                                                            <!-- <div class="pb-1"><b>While removing this trigger form it will delete from all assigned users also.</b></div> -->
+                                                            <div class="form-group row">
+                                                                <label class="col-sm-4 col-form-label">Reason for change<span class="error ml-1">*</span></label>
+                                                                <div class="col-sm-7">
+                                                                    <textarea id="reason_<?php echo $values['trigger_id']; ?>" class="form-control" placeholder="Reason for change." name="addcomment"></textarea>   
+                                                                    <span id="forReason_<?php echo $values['trigger_id']; ?>" class="error"></span>
+                                                                </div>
+                                                            </div>
+                                                            
+                                                        </div>
+                                                        <div class="modal-footer">
+                                                            <button id="reasonfordelete" onclick="deleteTriggerAction('<?php echo $values['trigger_id']; ?>', '<?php echo $trackerId; ?>')" type="button" class="btn btn-primary">Delete</button>
+                                                            <button class="btn btn-default" type="button" data-dismiss="modal">Close</button>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        <?php } ?>
+                                    </td>
+                                    <td><?php echo $values['trigger_name']; ?></td>
+                                    <td><?php echo $values['trigger_when']; ?></td>
+                                    <td><?php echo $values['trigger_then']; ?></td>
+                                    <!-- <td><?php echo $values['source']; ?></td>
+                                    <td><?php echo $values['destination']; ?></td> -->
+                                </tr>
+                            <?php } ?>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<?php $this->inlineScript()->appendFile($this->basePath() . '/js/module/common/triggerform/trigger_form.js');

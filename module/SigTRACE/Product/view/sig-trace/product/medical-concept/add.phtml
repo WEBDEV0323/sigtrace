@@ -1,0 +1,104 @@
+<?php
+use Session\Container\SessionContainer;
+$session = new SessionContainer();
+$userContainer = $session->getSession('user');
+$forms = isset($trackerResults['forms'])?$trackerResults['forms']:array();
+$trackerDetails = isset($trackerResults['tracker_details'])?$trackerResults['tracker_details']:array();
+$trackerName = isset($trackerDetails['name'])?$trackerDetails['name']."":"";
+$trackerId = isset($forms[0]['tracker_id']) ? (int)$forms[0]['tracker_id'] : 0;
+$formId = isset($forms[0]['form_id']) ? (int)$forms[0]['form_id'] : 0;
+$title = "$trackerName Active Substances";
+$this->headTitle($title);
+?>
+<div class="pagebar container-fluid col-md-12">
+    <!-- Sidebar Toggle -->
+    <button type="button" class="pagebar-toggle navbar-toggle pull-left">
+      <span class="pagebar-arrow"></span>
+    </button>
+    <ol class="breadcrumb">        
+        <li><span><a href="/dashboard/<?php echo $trackerId;?>/<?php echo $formId;?>"><?php echo $trackerName;?></a></span></li>
+        <li><span>Product Settings</span></li>        
+        <li class="active"><span><a href='/activesubstance/activesubstance_management/<?php echo $trackerId ?>'>Active Substance Management</a></span></li>
+        <li class="active"><span><a href='/medicalconcept/medicalconcept_management/<?php echo $trackerId ?>/<?php echo $formId ?>/<?php echo $activeSubstanceId ?>'>(Medical Concept/Preferred Term) Management</a></span></li>
+        <li class="active"><span>Add (Medical Concept/Preferred Term)</span></li>
+    </ol>
+</div>
+<div class="card">
+    <div class="card-body">
+        <div class="card">
+            <div  class="card-header">
+                <h6>Add Medical Concept/Preferred Term</h6>
+            </div>
+            <div class="card-body">
+                <div class="form-group row">
+                    <label class="col-sm-4"></label>
+                    <div id="medicalConceptErrorMessages" class="error col-sm-6"></div>
+                </div>
+                <form id="medicalConceptAddForm" method="post" name="myForm">
+                    <div class="form-group row">
+                        <label class="col-sm-4 col-form-label">Medical Concept/Preferred Term Name<span class="error ml-1">*</span></label>
+                        <div class="col-sm-6">
+                            <input type="text" class="form-control" placeholder="Enter Medical Concept/Preferred Term Name" id="medical_concept" name="medical_concept" required>
+                            <div class="error" id="forMedicalConceptId"></div>
+                        </div>
+                    </div>                    
+                    <div class="form-group row">
+                        <label class="col-sm-4 col-form-label">Preferred Term Type<span class="error ml-1">*</span></label>
+                        <div class="col-sm-6">
+                            <select class="selectpicker form-control" data-live-search="true" data-actions-box="true" id="pt_type" name="pt_type" title="Select Preferred Term Type" data-container="body" required>
+                                <option value="Medical Concept">Medical Concept</option>
+                                <option value="Label Event">Label Event</option>
+                                <option value="Special Situation">Special Situation</option>
+                                <option value="Synonym">Synonym</option>
+                                <option value="DME">DME</option>
+                                <option value="IME">IME</option>
+                            </select>
+                            <div class="error" id="forPreferredTermType"></div>
+                        </div>
+                    </div>
+                    <div class="form-group row" id="pt_id"  style="display: none">
+                        <label class="col-sm-4 col-form-label">
+                            Preferred Terms<!--span class="error ml-1">*</span>-->
+                        </label>
+                        <div class="col-sm-6" id="pt_type">
+                            <select class="selectpicker form-control" multiple data-live-search="true" data-actions-box="true" id="preferredTermIds" name="preferredTermIds" title="Select Preferred Term" data-container="body" required>
+                                <?php
+                                $selected = '';
+                                foreach ($preferredTerm as $opt => $opt_values) {
+                                    $pt_id = $opt_values['pt_id'];
+                                    $pt_name = $opt_values['pt_name'];
+                                    ?>
+                                    <option <?php echo $selected ?> value="<?php echo $this->escapeHtml($pt_id); ?>"><?php echo $this->escapeHtml($pt_name); ?></option>
+                                    <?php
+                                }
+                                ?>
+                            </select>
+                            <div class="error" id="forPreferredTermIds"></div>
+                        </div>
+                    </div>
+                    <div class="form-group row">
+                        <label class="col-sm-4 col-form-label">Reason for change<span class="error ml-1">*</span></label>
+                        <div class="col-sm-6">
+                           <textarea id="reason" class="form-control" placeholder="Reason for change" name="addcomment"></textarea>
+                           <div id="forReason" class="error"></div>
+                        </div>
+                    </div>
+                    <div class="card-footer">
+                        <div class="form-group row">
+                            <?php if ($activeSubstanceId > 0) { ?>
+                            <div class="offset-sm-4">
+                                <button id ="savebtn" type="button" class="btn btn-primary ml-2" onclick="addNewMedicalConcept(<?php echo $trackerId ?>, <?php echo $formId; ?>, <?php echo $activeSubstanceId; ?>)">Save</button>
+                                <button onclick="window.location.href='/medicalconcept/medicalconcept_management/<?php echo $trackerId ?>/<?php echo $formId ?>/<?php echo $activeSubstanceId ?>'" type="button" class="btn btn-default">Cancel</button>
+                            </div>
+                            <?php } ?>
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+<script> 
+    var trackerName='<?php echo $trackerName ?>';    
+</script>
+<?php $this->inlineScript()->appendFile($this->basePath() . '/js/module/sigtrace/product/addMedicalConcept.js', 'text/javascript');

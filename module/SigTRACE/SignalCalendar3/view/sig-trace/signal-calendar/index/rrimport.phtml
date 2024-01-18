@@ -1,0 +1,103 @@
+<?php
+use Session\Container\SessionContainer;
+$session = new SessionContainer();
+
+$configContainer = $session->getSession('config');
+$allowedFileSize=$configContainer->config['importFileSize'];
+?>
+<input type="hidden" id="auditlogmsg" value=""/>
+<div class="pagebar container-fluid col-md-12">
+    <!-- Sidebar Toggle -->
+    <button type="button" class="pagebar-toggle navbar-toggle pull-left">
+      <span class="pagebar-arrow"></span>
+    </button>
+    <ol class="breadcrumb">
+        <li><a href="/dashboard/<?=$trackerId;?>/<?=$formId;?>"><span>Dashboard</span></a></li>
+        <li class="active"><span>Import Regulatory Recommendations</span></li>
+    </ol>
+</div>
+<div class="card">
+    <div class="card-body">
+        <?php
+        $flashMessage = $this->flashMessenger()->getMessages();
+        if (count($flashMessage) && isset($flashMessage[0]['success'])) {
+            echo '<div class="contents boxpadding"><div class="alert alert-dismissable alert-success" id="fashMessage">'.$flashMessage[0]['success'].'<button type="button" class="close" data-dismiss="alert" aria-hidden="true">×</button></div></div>';
+        }
+        ?>        
+        <p class="alert-warning" id="alert"></p>
+        <div class="error" id="errorcsv"></div>
+        <div class="card">
+            <div class="card-header">Import Regulatory Recommendations</div>
+            <div id="part1">
+            <form method='post' action='' enctype="multipart/form-data">
+                <div class="modal-body">
+                      <div class="input-group">
+                        <div class="custom-file">
+                          <input type="file" class="custom-file-input form-control" id="importCsvFile" aria-describedby="addon-wrapping" name="importCsvFile" accept=".csv,.xls,.xlsx">
+                          <label class="custom-file-label" for="importCsvFile">Choose file</label>
+                        </div>
+                      </div>
+                  <div class="error" id="ImportCsvFileMsg">
+                  </div>
+                </div>
+                <div class="modal-footer">
+                  <button type="button" class="btn btn-primary" id="btrrImport">Import</button>
+                </div>
+            </form>
+            </div>
+            <div id="part2">
+                <div style="height: auto; align-items: center ;overflow: auto;" id="actsubdates" class="hot handsontable htRowHeaders htColumnHeaders">
+                    <!--<span id="noRecord" style="align-items: center;color: red;" >No data available in table</span>-->
+                </div>
+                <div style="height: auto; align-items: center ;overflow: auto;" id="example1" style="display:none;" class="hot handsontable htRowHeaders htColumnHeaders">
+                    <!--<span id="noRecord" style="align-items: center;color: red;" >No data available in table</span>-->
+                </div>
+                <span id="noRecord" style="align-items: center;color: red;display:none;">No data available in table</span>                
+            </div>
+            <div class="error" id="ImportCsvFileMsg1"></div>
+            <!-- <div id="displaybuttons" class="pull-right" style="padding:5px;display:none;">
+                <button type="button" class="btn btn-primary" id="btnSave">Save</button>
+                <button type="button" class="btn btn-light" id="btnCancel">Cancel</button>
+            </div>             -->
+        </div>
+    </div>
+</div>
+<div id="validation_load" style="display:none">
+    <p class="loader_img" id="loading_mask_loader">
+    <img src="/assets/spinner.gif" alt="Loading..."  />
+    <br/>
+    <span>Validating File(s)...</span>
+    </p>
+</div>
+<style> 
+    #validation_load {
+        width: 100%;
+        height: 100%;
+        top: 0;
+        position: fixed;
+        opacity: 0.7;
+        background-color: #fff;
+        z-index: 999999;
+        left: 0px;
+    }
+
+#loading-image {
+  position: absolute;
+  top: 300px;
+  /*left: 240px;*/
+  z-index: 100;
+}
+</style>
+<link href="/css/handsontable/handsontable.full.min.css" type="text/css" rel="stylesheet">
+<script type="text/javascript">
+    var trackerId="<?php echo $trackerId ?>";
+    var formId="<?php echo $formId ?>";
+    var allowedFileSize="<?php echo $allowedFileSize ?>";
+</script>
+<?php 
+    $this->inlineScript()
+         // ->appendFile($this->basePath() . '/assets/bootstrap-filestyle/bootstrap-filestyle.min.js', 'text/javascript')
+         ->appendFile($this->basePath() . '/js/module/sigtrace/import/casedata.js', 'text/javascript')
+         ->appendFile($this->basePath() . '/js/handsontable/handsontable.full.min.js', 'text/javascript');
+    
+

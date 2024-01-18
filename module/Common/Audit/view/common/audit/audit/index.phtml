@@ -1,0 +1,43 @@
+<?php
+$title = 'Audit Log';
+$this->headTitle($title); 
+
+?>
+
+<div class="pagebar container-fluid col-md-12">
+    <!-- Sidebar Toggle -->
+    <button type="button" class="pagebar-toggle navbar-toggle pull-left">
+      <span class="pagebar-arrow"></span>
+    </button>
+    <ol class="breadcrumb">
+      <li class="active"><span><?php echo $this->escapeHtml($title); ?></span></li>
+    </ol>
+</div>
+<div class="card">
+    <div  class="card-header">
+        <button type="button" id="kibanalogin" class="btn btn-primary float-right" onclick="kibanapopUp('<?=$kibana_url;?>')">Kibana Login</button>
+    </div>
+    <div class="card-body">
+        <?php //$kibanaUrl = $kibana_url."?embed=true&_g=(refreshInterval%3A(display%3AOff%2Cpause%3A!f%2Cvalue%3A0)%2Ctime%3A(from%3Anow-2y%2Cmode%3Aquick%2Cto%3Anow))";
+       
+        if ($trackerId > 0) {
+        $kibanaUrl = $kibana_url."?embed=true&_g=(refreshInterval%3A(display%3AOff%2Cpause%3A!f%2Cvalue%3A0)%2Ctime%3A(from%3Anow-2y%2Cmode%3Aquick%2Cto%3Anow))&_a=(query:(query_string:(analyze_wildcard:!t,query:'CustomerID:".$clientData."')))";
+        }
+        else {
+        $kibanaUrl = $kibana_url."?embed=true&_g=(refreshInterval%3A(display%3AOff%2Cpause%3A!f%2Cvalue%3A0)%2Ctime%3A(from%3Anow-2y%2Cmode%3Aquick%2Cto%3Anow))";
+        }
+        ?>
+        
+        <iframe id='dashboard' height="600" width="100%"></iframe>
+    </div>
+</div>
+<script>
+var url= '<?php echo $kibana_url?>';
+var dashboardUrl= "<?php echo $kibanaUrl?>";
+var popUpTime = '<?php echo $popUp_time?>';
+</script>
+       
+
+<?php 
+$this->inlineScript()->appendFile($this->basePath() . '/js/module/common/audit/audit.js');
+?>

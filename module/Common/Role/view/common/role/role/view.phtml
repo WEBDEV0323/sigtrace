@@ -1,0 +1,36 @@
+<?php
+$forms = $trackerResults['forms'];
+$trackerDetails = $trackerResults['tracker_details'];
+$trackerName = $trackerDetails['name'];
+$title = "$trackerName - Roles";
+$this->headTitle($title);
+?>
+<div class="pagebar container-fluid col-md-12">
+    <!-- Sidebar Toggle -->
+    <button type="button" class="pagebar-toggle navbar-toggle pull-left">
+      <span class="pagebar-arrow"></span>
+    </button>
+    <ol class="breadcrumb">
+        <li><span>Settings</span></li>
+        <li><span>Tracker Settings</span></li>
+        <li><span><a href="/role/role_management/<?php echo $trackerId;?>">Role Management</a></span></li>
+        <li class="active"><span>View Role</span></li>
+    </ol>
+</div>
+<div class="card">
+    <div class="card-body">
+        <div class="card">
+            <div  class="card-header"><h6>View Role</h6></div>
+            <div class="card-body"> 
+                <?php echo $this->form()->openTag($form); ?>
+                <div class="form-group row">
+                    <label class="col-sm-4 col-form-label" for="c_name"><?php echo $this->formlabel($form->get('c_name')); ?></label>
+                    <div class="col-sm-6">
+                        <?php echo $roleData['role_name']; ?>
+                    </div>
+                </div>
+                <?php echo $this->form()->closeTag($form); ?>
+            </div>
+        </div>
+    </div>
+</div>

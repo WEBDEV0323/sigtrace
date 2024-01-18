@@ -1,0 +1,81 @@
+<?php
+$forms = $trackerResults['forms'];
+$trackerDetails = $trackerResults['tracker_details'];
+$trackerName = $trackerDetails['name'];
+$title = "$trackerName - Trigger Form";
+$this->headTitle($title);
+?>
+<div class="pagebar container-fluid col-md-12">
+    <!-- Sidebar Toggle -->
+    <button type="button" class="pagebar-toggle navbar-toggle pull-left">
+      <span class="pagebar-arrow"></span>
+    </button>
+    <ol class="breadcrumb">
+        <li><span>Settings</span></li>
+        <li><span>Tracker Settings</span></li>
+        <li><span><a href="/triggerform/trigger_form/<?php echo $trackerId;?>">Trigger Form</a></span></li>
+        <li class="active"><span>View Trigger Form</span></li>
+    </ol>
+</div>
+<div class="card">
+    <div class="card-body">
+        <div class="card">
+            <div  class="card-header"><h6>View Trigger Form</h6></div>
+            <div class="card-body"> 
+                <?php echo $this->form()->openTag($form); ?>
+                <div class="form-group row">
+                    <label class="col-sm-4 col-form-label" for="c_name"><?php echo $this->formlabel($form->get('c_name')); ?></label>
+                    <div class="col-sm-6">
+                        <input type="text" name="c_name" class="form-control" id="c_name" readonly value=<?php echo $triggerData['trigger_name']; ?>>
+                    </div>
+                </div>
+
+                <div class="form-group row">
+                    <label class="col-sm-4 col-form-label" for="trigger_when"><?php echo $this->formlabel($form->get('trigger_when')); ?></label>
+                    <div class="col-sm-6">
+                        <input type="text" name="trigger_when" class="form-control" id="trigger_when" readonly value=<?php echo $triggerData['trigger_when']; ?>>
+                    </div>
+                </div>
+
+                <div class="form-group row">
+                    <label class="col-sm-4 col-form-label" for="trigger_then"><?php echo $this->formlabel($form->get('trigger_then')); ?></label>
+                    <div class="col-sm-6">
+                        <input type="text" name="trigger_then" class="form-control" id="trigger_then" readonly value=<?php echo $triggerData['trigger_then']; ?>>
+                    </div>
+                </div>
+
+                <div class="form-group row">
+                    <label class="col-sm-4 col-form-label" for="source"><?php echo $this->formlabel($form->get('source')); ?></label>
+                    <div class="col-sm-6">
+                        <input type="text" name="source" class="form-control" id="source" readonly value=<?php echo $triggerData['source']; ?>>
+                    </div>
+                </div>
+
+                <div class="form-group row">
+                    <label class="col-sm-4 col-form-label" for="destination"><?php echo $this->formlabel($form->get('destination')); ?></label>
+                    <div class="col-sm-6">
+                        <input type="text" name="destination" class="form-control" id="destination" readonly value=<?php echo $triggerData['destination']; ?>>
+                    </div>
+                </div>
+
+                <div class="form-group row">
+                    <label class="col-sm-4 col-form-label" for="when_conditions"><?php echo $this->formlabel($form->get('when_conditions')); ?><span class="error ml-1">*</span></label>
+                    <div class="col-sm-6">
+                        <textarea readonly id="when_conditions" class="form-control" placeholder="Trigger When Condition" name="when_conditions"><?php echo $triggerData['when_conditions']; ?></textarea>
+                        
+                    </div>
+                </div>
+
+                <div class="form-group row">
+                    <label class="col-sm-4 col-form-label" for="fields_to_copy"><?php echo $this->formlabel($form->get('fields_to_copy')); ?><span class="error ml-1">*</span></label>
+                    <div class="col-sm-6">
+                        <textarea readonly id="fields_to_copy" class="form-control" placeholder="Trigger Fields to Copy" name="fields_to_copy"><?php echo $triggerData['fields_to_copy']; ?></textarea>
+                        
+                    </div>
+                </div>
+
+                <?php echo $this->form()->closeTag($form); ?>
+            </div>
+        </div>
+    </div>
+</div>

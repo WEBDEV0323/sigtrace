@@ -1,0 +1,49 @@
+<div class="crumbs">
+    <ul class="breadcrumb" id="breadcrumbs">
+            <li>
+                <i class="icon-home"></i>
+                <a href="/tracker">Dashboard</a>
+            </li>
+            <li class="current">
+                <a href="javascript:void(0)">Fatal Cumulative Analysis</a>
+            </li>
+    </ul>
+</div>
+<div class="page-header"></div>
+<div class="row">
+    <div class="col-md-12">
+        <p class="alert alert-success" id="success_alert" style="display:none;"></p>
+        <div class="widget box">
+            <div class="widget-header">
+                    <h4><i class="icon-reorder"></i> Fatal Cumulative Analysis</h4>
+            </div>
+            <div class="widget-content no-padding">
+                <table class="table table-columnfilter table-highlight-head table-striped table-bordered table-hover table-checkable table-responsive datatable">
+                    <thead>
+                        <tr>
+                            <?php foreach($headers as $head){ ?>
+                            <th><?=$head['label'];?></th> 
+                            <?php } ?>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <?php foreach($lists as $list){ ?>
+                            <tr>
+                                <?php for($i = 1; count($list) > $i ; $i++){ ?>
+                                    <td><?=$list[$i];?></td>
+                                <?php } ?>
+                            </tr>
+                          <?php } ?>
+                    </tbody>
+                    <tfoot>
+                        <tr>
+                            <?php foreach($headers as $h){?>
+                                <th rowspan="1" colspan="1"><span class="filter_column filter_text"><input type="text" placeholder="<?php echo $this->escapeHtml($h['label']); ?>" class="text_filter form-control search_init"></span></th>
+                            <?php } ?>
+                        </tr>
+                    </tfoot>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>

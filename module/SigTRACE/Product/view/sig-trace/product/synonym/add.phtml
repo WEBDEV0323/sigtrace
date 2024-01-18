@@ -1,0 +1,215 @@
+<div class="crumbs">
+    <ul class="breadcrumb" id="breadcrumbs">
+        <li>
+            <i class="icon-home"></i>
+            <a title="" href="/product/<?=$trackerId;?>/<?=$formId;?>">Product</a>
+        </li>
+        <li>
+            <a title="" href="/product/synonym/<?=$trackerId;?>/<?=$formId;?>/<?=$productId;?>">Synonym</a>
+        </li>
+        <li class="current">
+            <a href="javascript:void(0)">Add</a>
+        </li>
+    </ul>
+</div>
+<div class="page-header"></div>
+<div class="row">
+    <div class="col-md-12">
+        <p class="alert" id="msg_alert" style="display:none;"></p>
+        <div class="widget box">
+        <div class="widget-header">
+            <h4><i class="icon-reorder"></i> Add Synonym</h4>   
+        </div>
+        <div class="widget-content">
+            <form method="POST" id="addSyn" enctype='multipart/form-data' class="form-horizontal row-border">
+                    <input type="hidden" id="hiddenProductStatus" value="0"/>
+                    <div class="form-group">
+                            <label class="col-md-3 control-label">Product <span class="required">*</span></label>
+                            <div class="col-md-4 clearfix">
+                                    <select class="col-md-12 select2 full-width-fix required" name="product_id">
+                                            <?php foreach($products as $product){ ?> 
+                                                <?php if($product['product_id'] == $productId){ ?>
+                                                    <option selected value="<?=$product['product_id'];?>"><?=$product['product_name'];?></option>
+                                            <?php } }?>
+                                    </select>
+                            </div>
+                    </div>
+                    <div class="form-group">
+                            <label class="col-md-3 control-label">Type <span class="required">*</span></label>
+                            <div class="col-md-4">
+                                    <label class="radio"><input type="radio" class="required uniform" name="type" value="m" checked> Manual</label>
+                                    <label class="radio"><input type="radio" name="type" value="f" class="uniform"> File</label>
+                                    
+                            </div>
+                    </div>
+                    <div class="form-group" id="manual">
+                        <div id="manualData">
+                            <label class="col-md-3 control-label">Synonym Name<span class="required">*</span></label>
+                            <div class="row">
+                                    <div class="col-md-4">
+                                        <input style=' margin-bottom: 10px;' oninput="nameCheck('syn_0')" type="text" class="form-control required" name="synonym[syn_0]">
+                                    </div>
+                                    <div class="col-md-1">&nbsp;</div>
+                                    
+                            </div>
+                        </div>
+                        <div id="addNewRow">
+                            <label class="col-md-3 control-label">&nbsp;</label>
+                            <div class="row">
+                                <div class="col-md-4">
+                                    <input type="button" align="center" onclick="insSpec(); return false;" 
+                                           style='float: right;'
+                                           class="btn btn-primary" value="Add Row"/>
+                                </div>
+                                <div class="col-md-1">&nbsp;</div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="form-group" id="file" style="display:none;">
+                        <label class="col-md-3 control-label">File <span class="required">*</span></label>
+                        <div class="col-md-4">
+                            <input type="file" id="file1" name="file" class="form-control required" accept=".csv,application/vnd.ms-excel" data-style="fileinput" data-inputsize="medium">
+                            <p class="help-block">csv files only</p>
+                        </div>
+                    </div>
+                    <div class="form-actions">
+                        <a class="btn btn-default pull-right" href="<?=isset($_SERVER['HTTP_REFERER'])? $_SERVER['HTTP_REFERER']:'#';?>">Cancel</a>
+                        <input type="submit" class="btn btn-primary pull-right" value="Save" />
+                    </div>
+            </form>
+        </div>
+        </div>
+    </div>
+</div>
+<script>
+$(document).ready(function(){
+    $("#addSyn").validate();
+});
+    $('input[type="radio"]').on("click", function(){
+        switch($(this).val()){
+            case 'f':
+                $('#file').show();
+                $('#manual').hide();
+                break;
+            case 'm':
+                $('#manual').show();
+                $('#file').hide();
+                break;
+            default:
+                break;
+        }
+    });
+    function random_string(size){
+        var str = "";
+        for (var i = 0; i < size; i++){
+            str += random_character();
+        }
+        return str;
+    }
+    function random_character() {
+        var chars = "lmnopqurstuvwxyzABCDEFGHIJKLMNOPQURSTUVWXYZ";
+        return chars.substr( Math.floor(Math.random() * 62), 1);
+    }
+    function insSpec() {
+        var str = random_string(6);
+        var selid = 'sel'+str;
+        var html = "";
+        html+='<div id="del_'+str+'" style="margin-bottom: 10px;"><label class="col-md-3 control-label">&nbsp;</label>\n\
+                <div class="row">\n\
+                    <div class="col-md-4">\n\
+                        <input type="text" oninput="nameCheck(\'syn_'+str+'\')" class="form-control required" name="synonym[syn_'+str+']">\n\
+                    </div>\n\
+                    <div class="col-md-1">\n\
+                        <i class="icon-remove" style="cursor:pointer;" onClick="delSuspectProduct(this)"></i>\n\
+                    </div>\n\
+                </div></div>';
+        $("#manual #manualData").append(html);
+    }
+    function delSuspectProduct(node) {
+        r = node.parentNode.parentNode.parentNode;
+        r.parentNode.removeChild(r);
+    }
+    
+    $("#addSyn").on('submit',function(){
+       
+        if($('input[type="radio"][name="type"]:checked').val() != 'f'){
+            var sName = new Array();
+            var test = 0;
+            $('#msg_alert').removeClass('alert-danger').hide().html('');
+            $('input[type="text"][name*="synonym"]').each(function(){
+                    if($.trim($(this).val()).length > 0){ 
+                        if(!$(this).val().match(/[a-zA-Z]/i)){
+                            $(this).addClass('red');
+                            test = 1;
+                            //$('#hiddenProductStatus').val(0);
+                        }
+                        sName.push($(this).val()); }    
+            });
+            if(sName.length == 0){
+                $('#hiddenProductStatus').val(0);
+                return false;
+            }else if(test == 1){return false;}
+            else {
+                if(checkIfArrayIsUnique(sName)){
+                    if($('#hiddenProductStatus').val() != 1){
+                        return false;
+                    }
+                }else{
+                    $('#msg_alert').addClass('alert-danger').show().html('Duplicate synonyms.');
+                    $('#hiddenProductStatus').val(0);
+                    return false;
+                }
+            }
+        }
+    });
+    function checkIfArrayIsUnique(myArray) 
+    {
+        for (var i = 0; i < myArray.length; i++) 
+        {
+            if (myArray.indexOf(myArray[i]) !== myArray.lastIndexOf(myArray[i])) { 
+                return false; 
+            } 
+        } 
+        return true;   // this means not unique
+    }
+    function nameCheck(name){
+        var synNameVal = $("input[name='synonym["+name+"]']").val();
+        var productId = $('select[name="product_id"]').val();
+        $('input[name="synonym['+name+']"]').removeClass('green').removeClass('red');
+        if(synNameVal.length === 0)
+        {
+            $('#hiddenProductStatus').val(0);
+        }
+        else if(!synNameVal.match(/[a-zA-Z]/i)){
+            $('input[name="synonym['+name+']"]').addClass('red');
+            $('#hiddenProductStatus').val(0);
+        }
+        else
+        {
+            $.ajax({  
+                type: "POST", 
+                url: "/product/synonym/synonymCheck", 
+                data: "id="+productId+"&label="+synNameVal, 
+                success: function(respJson){
+                    var resp =JSON.parse(respJson);
+                    var responseCode = resp.responseCode;
+                    var errMessage = resp.errMessage;
+                    if(responseCode == 1){
+                            $('input[name="synonym['+name+']"]').addClass('green');
+                            //$(".eRR_"+name).html('<font color="#088A08">'+errMessage+'</font>');
+                            $('#hiddenProductStatus').val(1); 
+                    }
+                    else{
+                        $('input[name="synonym['+name+']"]').addClass('red');
+                        //$(".eRR_"+name).html('<font color="#cc0000">'+errMessage+'</font>');
+                        $('#hiddenProductStatus').val(0);
+                    }
+                }
+            });
+        }
+    }
+</script>
+<style>
+.red{ border-color:#cc0000 !important;}
+.green{ border-color:#088A08 !important;}
+</style>

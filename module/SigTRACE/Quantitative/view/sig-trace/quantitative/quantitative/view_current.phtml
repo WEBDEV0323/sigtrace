@@ -1,0 +1,181 @@
+<div class="pagebar container-fluid col-md-12">
+    <!-- Sidebar Toggle -->
+    <button type="button" class="pagebar-toggle navbar-toggle pull-left">
+      <span class="pagebar-arrow"></span>
+    </button>
+    <ol class="breadcrumb">
+        <li><span><a href="/dashboard/<?=$trackerId;?>/<?=$formId;?>">Dashboard</a></span></li>
+        <li><span><a href="/quantitative/analysis/<?=$trackerId;?>/<?=$formId;?>">Quantitative Analysis</a></span></li>
+        <li><span><a href="<?=$this->url('quantitative', array('action' => 'view','trackerId' => $trackerId,'formId'=>$formId,'productId'=>$productId));?>">View</a></span></li>
+        <li class="active"><span><a href="javascript:void(0)">Current</a></span></li>
+        <li class="active"><span><a href="javascript:void(0)"><?=$mode;?></a></span></li>
+    </ol>
+</div>
+
+<div class="page-header"></div>
+<div class="row">
+    <div class="col-md-12">
+        <p class="alert alert-success" id="success_alert" style="display:none;"></p>
+        <div class="widget box">
+            <div class="widget-header">
+                <h4><i class="icon-reorder"></i> Qualitative Analysis</h4>
+            </div>
+            <div class="widget-content no-padding">
+                <table class="table table-highlight-head table-columnfilter table-striped table-bordered table-hover table-checkable table-responsive table-tabletools datatable"
+		data-columnfilter='{"aoColumns": [ null, {"type": "text"}, 
+                       {"type": "text"}, 
+                       {"type": "text"},
+                       {"type": "text"},
+                       {"type": "text"},
+                       {"type": "text"}, 
+                       {"type": "text"}, 
+                       {"type": "text"},
+                       {"type": "text"},
+                       {"type": "text"},
+                       {"type": "text"},
+                       {"type": "text"},
+                       {"type": "text"},
+                       {"type": "text"},
+                       {"type": "text"},
+		       {"type": "text"},
+                       {"type": "text"},
+                       {"type": "text"},
+                       {"type": "text"},
+                       {"type": "text"},
+		       {"type": "text"},
+                       {"type": "text"},
+                       {"type": "text"},
+                       {"type": "text"},
+                       {"type": "text"},
+                       {"type": "text"},
+                       {"type": "text"},
+		       {"type": "text"},
+                       {"type": "text"},
+                       {"type": "text"},
+                       {"type": "text"},
+                       {"type": "text"},
+		       {"type": "text"},
+                       {"type": "text"},
+                       {"type": "text"},
+                       {"type": "text"},
+                       {"type": "text"},
+                       {"type": "text"},
+                       {"type": "text"},
+		       {"type": "text"},
+                       {"type": "text"},
+                       {"type": "text"},
+                       {"type": "text"},
+                       {"type": "text"},
+		       {"type": "text"},
+                       {"type": "text"},
+                       {"type": "text"},
+                       {"type": "text"},
+                       {"type": "text"},
+                       {"type": "text"},
+                       {"type": "text"},
+		       {"type": "text"},
+                       {"type": "text"},
+                       {"type": "text"},
+                       {"type": "text"},
+                       {"type": "text"},
+		       {"type": "text"},
+                       {"type": "text"},
+                       {"type": "text"},
+                       {"type": "text"},
+                       {"type": "text"},
+                       {"type": "text"},
+                       {"type": "text"},
+		       {"type": "text"},
+                       {"type": "text"},
+                       {"type": "text"},
+                       {"type": "text"},
+                       {"type": "text"},
+		       {"type": "text"},
+                       {"type": "text"},
+                       {"type": "text"},
+                       {"type": "text"},
+                       {"type": "text"},
+                       {"type": "text"},
+                       {"type": "text"},
+		       {"type": "text"},
+                       {"type": "text"},
+                       {"type": "text"},
+                       {"type": "text"},
+                       {"type": "text"},
+		       {"type": "text"},
+                       {"type": "text"},
+                       {"type": "text"},
+                       {"type": "text"},
+                       {"type": "text"},
+                       {"type": "text"},
+                       {"type": "text"},
+		       {"type": "text"},
+                       {"type": "text"},
+                       {"type": "text"},
+                       {"type": "text"},
+                       {"type": "text"},
+		       {"type": "text"},
+                       {"type": "text"},
+                       {"type": "text"},
+                       {"type": "text"},
+                       {"type": "text"},
+                       {"type": "text"},
+                       {"type": "text"},
+		       {"type": "text"},
+                       {"type": "text"},
+                       {"type": "text"},
+                       {"type": "text"},
+                       {"type": "text"}]}'>
+                    <thead>
+                        <tr>
+                            <th>Action</th>
+                            <th>Year</th>
+                            <th>Quarter</th>
+                            <?php foreach($headers as $list){?>
+                                <th><?=$list['label'];?></th>
+                            <?php } ?>
+                        </tr>
+                    </thead>
+		    <tfoot>
+                        <tr>
+                            <th rowspan="1" colspan="1"></th>
+			    <th rowspan="1" colspan="1">
+                                    <span class="filter_column filter_text">
+                                        <input type="text" placeholder="Year" class="text_filter form-control search_init">
+                                    </span>
+                                </th>
+			    <th rowspan="1" colspan="1">
+                                    <span class="filter_column filter_text">
+                                        <input type="text" placeholder="Quarter" class="text_filter form-control search_init">
+                                    </span>
+                                </th>
+                            <?php foreach($headers as $list){?>
+                                <th rowspan="1" colspan="1">
+                                    <span class="filter_column filter_text">
+                                        <input type="text" placeholder="<?=$list['label'];?>" class="text_filter form-control search_init">
+                                    </span>
+                                </th>
+                             <?php } ?>
+                        </tr> 
+                    </tfoot>
+                    <tbody>
+                        <?php foreach($listOfView as $list){?>
+                        <tr>
+                            <td>
+                                <ul class="table-controls">
+                                    <li><a href="javascript:void(0);" onclick="window.location.href='/sWorkflow/signal_detection/<?=$trackerId;?>/<?=$formId;?>/<?=$list[2];?>'" class="bs-tooltip" title="Edit"><i class="lnr icon-pencil"></i></a> </li>
+                                    <li><a href="javascript:void(0);" onclick="window.location.href='/sWorkflow/signal_detection_view/<?=$trackerId;?>/<?=$formId;?>/<?=$list[2];?>'" class="bs-tooltip" title="View"><i class="lnr icon-eye"></i></a> </li>
+                                </ul>
+                            </td>
+                           <?php for($i = 0; count($list) > $i ; $i++){ if($i != 2){?>
+                                <td><?=$list[$i];?></td>
+                           <?php } } ?>
+                            
+                        </tr>
+                    <?php } ?>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>

@@ -1,0 +1,79 @@
+<?php
+use Session\Container\SessionContainer;
+$session = new SessionContainer();
+$msg = $session->getSession('usermanual_settings');
+$messageStatus = $msg->msg;
+$session->clearSession('usermanual_settings');
+$title = 'Upload User Manual';
+?>
+
+<div class="pagebar container-fluid col-md-12">
+    <!-- Sidebar Toggle -->
+    <button type="button" class="pagebar-toggle navbar-toggle pull-left">
+      <span class="pagebar-arrow"></span>
+    </button>
+    <ol class="breadcrumb">
+      <li><span>Settings</span></li>
+      <li class="active"><span><?php echo $this->escapeHtml($title); ?></span></li>
+    </ol>
+</div>
+<?php 
+$this->headTitle($title);
+$form->prepare();
+ 
+?>
+<div class="card">
+    <div class="card-body"> 
+        <div class="card">
+            <div class="card-header">
+                <h6>Upload User Manual</h6>
+            </div>
+            <?php echo $this->form()->openTag($form); ?>
+            <?php $fileElement = $form->get('image-file'); ?>
+            <div class="card-body">
+                <p class="alert alert-success" id="alert" <?php if($messageStatus != 'uploaded'){ ?> style="display:none;" <?php } ?> >
+                    <i class="lnr icon-trash3 close" data-dismiss="alert"></i> User manual uploaded Successfully!!!
+                </p>
+                <div class="form-group row">
+                    <label class="col-sm-4 col-form-label"><?php echo $this->formLabel($fileElement); ?></label>
+                    <div class="col-sm-7">
+                        <div class="input-group">
+                            <div class="custom-file">
+                              <?php echo $this->formFile($fileElement); ?>
+                              <!--<input type="file" class="custom-file-input" id="image-file" name="image-file" aria-describedby="image-file">-->
+                              <label class="custom-file-label" for="image-file">Choose file</label>
+                            </div>
+                            <div style="clear:both;"></div>
+                        </div>
+                        <div style="color: #3a87ad;font-weight: 600;">Kindy upload .pdf, .doc, .docx file only .</div>
+                        <div id="status" class="error"></div> 
+                    </div>
+                </div>
+                <div class="form-group row">
+                    <label class="col-md-2 control-label"></label>
+                    <div class="col-md-10">
+                        <?php echo $this->formElement($form->get('t_hidden')); ?>
+                    </div>
+                </div>
+                <div class="form-group row">
+                    <label class="col-sm-4 col-form-label">Reason for change<span class="error ml-1">*</span></label>
+                    <div class="col-sm-7">
+                       <textarea id="reason" class="form-control" placeholder="Reason for change" name="reason"></textarea>
+                       <div id="forReason" class="error"></div>
+                    </div>
+                </div>           
+            </div>
+            <div class="card-footer text-right">
+                <button id="submitform" class="btn btn-primary">Submit</button>
+                <button type="button" class="btn btn-default" id = 'cancelButton'>Cancel</button>
+            </div>
+            <?php echo $this->form()->closeTag($form); ?>
+        </div>
+    </div>
+</div>
+<script>
+        var cancelPath = "<?php echo $this->escapeJs(filter_input(INPUT_SERVER, 'HTTP_REFERER')); ?>";
+</script>
+<?php $this->inlineScript()
+        ->appendFile($this->basePath() . '/assets/uniform/jquery.uniform.min.js', 'text/javascript')
+        ->appendFile($this->basePath() . '/js/module/common/settings/upload_user_manual.js', 'text/javascript');

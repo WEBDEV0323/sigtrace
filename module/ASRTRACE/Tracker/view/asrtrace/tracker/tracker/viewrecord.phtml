@@ -1,0 +1,163 @@
+<?php
+ $user_details = $_SESSION['user_details'];
+ //echo"<pre>";print_r($form_records);
+?>
+<input type="hidden" id="trackerId" value="<?=$tracker_id?>"/>
+<input type="hidden" id="formId" value="<?=$action_id?>"/>
+<input type="hidden" id="recordId" value="<?=$record_id?>"/>
+<input type="hidden" id="workflowNameId" value="<?=$workflow_id?>"/>
+<input type="hidden" id="workflowName" value=""/>
+<input type="hidden" id="fieldDetails" value=""/>
+<div class="pagebar container-fluid col-md-12">
+    <!-- Sidebar Toggle -->
+    <button type="button" class="pagebar-toggle navbar-toggle pull-left">
+      <span class="pagebar-arrow"></span>
+    </button>
+    <ol class="breadcrumb">
+        <li><?php if ($type != '') { ?><a href="/dashboard/<?=$tracker_id;?>/<?=$action_id;?>"><?php } ?><span>Dashboard</span><?php if ($type != '') { ?></a><?php } ?></li>
+        <?php if ($type != '') { ?>
+            <li><a href="/dashboard/list/<?=$tracker_id;?>/<?=$action_id;?>/<?=$type?>/<?=$filter?>"><?php echo $this->escapeHtml(strtoupper($type)); ?></a></li>
+        <?php } ?>
+        <li class="active"><span>View Record #<?php echo $record_id;?></span></li>
+    </ol>
+</div>
+
+<div class="card">
+  <div class="card-body">
+    <div class="card card-default mb-2">
+        <div class="card-body">
+        <div id="accessHeader"></div>
+        <form id ="workflowForm" enctype='multipart/form-data' class='workflowFormClass' method='post'>
+            <div class="row">
+            
+              <ul class="nav nav-tabs" id="myTab" role="tablist">
+              <?php foreach($workflow as $key => $value) { 
+                $input = strtolower(preg_replace("/[^a-zA-Z]+/", "", $value['workflow_name']));
+                if ($value['can_read']!='No') { ?>
+                
+                <li class="nav-item">
+                  <a class="nav-link" id="<?=$input;?>-tab" data-toggle="tab" href="#workflow<?=$value['workflow_id'];?>" role="tab" wid="<?=$value['workflow_id'];?>" aria-controls="<?=$input;?>" data-name="<?=$value['workflow_name'];?>"><b><?=$value['workflow_name'];?></b></a>
+                </li>
+                <input type="hidden" id="canUpdate" value="<?if($value['can_update']){echo $value['can_update'];}else{"No";};?>"/>
+              <?php 
+              }} ?>
+                              
+              </ul>
+            </div>
+            <div class="tab-content" id="myTabContent">
+            
+            <div id="alertWorkflow"></div>
+            
+            <?php foreach($workflow as $key => $value) { 
+            $input = strtolower(preg_replace("/[^a-zA-Z]+/", "", $value['workflow_name'])); ?>
+              <div class="tab-pane fade" id="workflow<?=$value['workflow_id'];?>" role="tabpanel" aria-labelledby="<?=$input;?>-tab">
+              
+                    <div class="form-group row" id="fieldsDiv<?=$input;?>">
+                    </div>
+
+              </div>
+              <?php }?>
+            </div>
+            </form>
+          </div>
+    </div>
+  </div>
+</div>
+
+<script>
+   $(function () {
+    $('#myTab li:first-child a').tab('show')
+    var workflowNameId=$('#myTab li:first-child a').attr("aria-controls");
+    $('#workflowNameId').val(workflowNameId);
+    var workflowName=$('#myTab li:first-child a').data("name");
+    $('#workflowName').val(workflowName);
+    var fieldDetails = <?php echo json_encode($field_details,JSON_FORCE_OBJECT); ?>;
+    showFieldAndData(fieldDetails,workflowName,workflowNameId);
+
+    $('a[data-toggle="tab"]').on('shown.bs.tab', function (e) {
+        var workflowName = $(e.target).data("name"); // activated tab
+        var workflowNameId = $(e.target).attr("aria-controls"); // activated tab
+        var relatedTarget  = $(e.relatedTarget ).data("name"); // previous active tab
+       
+        $('#workflowName').val(workflowName);
+        $('#workflowName').val(workflowName);
+        showFieldAndData(fieldDetails,workflowName,workflowNameId);
+     }); 
+  });
+
+  function showFieldAndData(response,workflowName,workflowNameId){
+      for(var workflow in response) {
+        if(workflow == workflowName) {
+          for(var fields in response[workflow]) {
+            if (response[workflow]['can_read']=='Yes') {
+              switch (response[workflow][fields]['field_type']) {
+                case 'Text':
+                case 'Integer': 
+                case 'TextArea':
+                case 'Combo Box':
+                case 'User Role':
+                case 'Formula': 
+                case 'Formula Combo Box':
+                case 'Formula Date': 
+                case 'DependentText':
+                case 'ReadOnly': 
+                      var readOnlyField=readOnlyFields(response[workflow][fields]['fieldlabel'],response[workflow][fields]['field_name'],response[workflow][fields]['fieldValue']);
+                      $("#fieldsDiv"+workflowNameId).append(readOnlyField);
+                      break;
+                case 'Heading':
+                      var headingField=headingFields(response[workflow][fields]['fieldlabel']);
+                      $("#fieldsDiv"+workflowNameId).append(headingField);
+                      break;
+                case 'File': 
+                      var fileField=fileFieldsDownload(response[workflow][fields]['fieldlabel'],response[workflow][fields]['field_name'],response[workflow][fields]['fieldValue']);
+                      $("#fieldsDiv"+workflowNameId).append(fileField);
+                      break;
+                case 'Date': 
+                      var dateFormat = response[workflow][fields]['dateFormat'];
+                      var fieldType = response[workflow][fields]['field_type'];
+                      var value = formatDateDDMMMYYYY(response[workflow][fields]['fieldValue']);
+                      if(value == 'Invalid date' || value == '0000-00-00') {value = '';}
+                      var dateField=readOnlyFields(response[workflow][fields]['fieldlabel'],response[workflow][fields]['field_name'],value);
+                      $("#fieldsDiv"+workflowNameId).append(dateField);
+                      break;
+                case 'Date Time': 
+                      var dateTimeFormat=response[workflow][fields]['dateTimeFormat'];  
+                      var fieldType = response[workflow][fields]['field_type'];
+                      var value= moment(response[workflow][fields]['fieldValue'],'YYYY-MM-DD HH:mm:ss').format('DD-MMM-YYYY hh:mm A');
+                      if(value == 'Invalid date') {value = '';}
+                      var dateTimeField=readOnlyFields(response[workflow][fields]['fieldlabel'],response[workflow][fields]['field_name'],value);
+                      $("#fieldsDiv"+workflowNameId).append(dateTimeField);
+                      break;
+                case 'Check Box':
+                      var checkBoxOptions=response[workflow][fields]['options'];
+                      var fieldValue = response[workflow][fields]['fieldValue'];
+                      var commentvalue=response[workflow][fields]['comment'];
+                      var fieldValueArr;
+                      if(fieldValue!=''){
+                          fieldValueArr = fieldValue.split(',');
+                      }
+                      var fieldLabel=response[workflow][fields]['fieldlabel'];
+                      var fieldName=response[workflow][fields]['field_name'];
+                      var fieldValue=response[workflow][fields]['fieldValue'];
+                      var disabled = 'disabled';
+                      var checkBoxField=checkBoxFields(fieldLabel,fieldName,checkBoxOptions,fieldValue,commentvalue,disabled);
+                      $("#fieldsDiv"+workflowNameId).append(checkBoxField);
+                      break;
+                default:
+                    //$("#fieldsDiv"+workflowNameId).append();
+              }
+            } else {
+                $('#accessHeader').html("You dont have access to view this Page");
+                $('#accessHeader').addClass('alert alert-info');
+            }
+          } 
+        } 
+      }
+  }
+</script>
+
+<?php 
+    //$this->inlineScript()->appendFile($this->basePath() . '/js/module/tracker/workflowViewManagement.js', 'text/javascript');
+    $this->inlineScript()->appendFile($this->basePath() . '/js/module/tracker/fieldTypeFunction.js', 'text/javascript');
+    $this->inlineScript()->appendFile($this->basePath() . '/js/module/tracker/formulaFunctions.js', 'text/javascript');
+ ?> 

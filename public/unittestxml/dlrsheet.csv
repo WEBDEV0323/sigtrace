@@ -1,0 +1,117 @@
+1,DLR No: 8077,testgetAuditService
+2,DLR No: 8077,testgetAuthService
+3,DLR No: 8077,testErrorpageAction
+4,DLR No: 8077,testLogoutAction
+5,DLR No: 8077,testAuthenticationCannotBeAccessedWithUserSession
+6,DLR No: 7093,testgetWorkflowModelService
+7,"DLR No: 7154, 8061, 8074",testgetFieldsByWorkflowId
+8,DLR No: 7027,testEditRecordCannotBeAccessedWithoutUserSession
+9,DLR No: 7027,testEditRecordCanBeAccessed
+10,DLR No: 7312,testUpdateAndSaveCannotBeAccessedWithoutUserSession
+11,"DLR No: 8134, 7256",testViewRecordCanBeAccessed
+12,DLR No: 7312,testNewRecordCannotBeAccessedWithoutUserSession
+13,DLR No: 7312,testNewRecordCanBeAccessed
+14,DLR No: 7331,testgetAuditService
+15,DLR No: 7331,testgetBulkActionService
+16,DLR No: 7331,testBulkActionCannotBeAccessedWithoutUserSession
+17,DLR No: 8131,testGetServiceReturnsAnInstanceOfCasedataModel
+18,DLR No: 7366,testGetServiceReturnsAnInstanceOfCasedataService
+19,DLR No: 7363,testGetServiceReturnsAnInstanceOfCasdataeHelper
+20,"DLR No: 7360, 7434",testgetFileFromClientCanBeAccessed
+21,"DLR No: 7415, 7434",testgetFileFromCheckForEmptyPost
+22,"DLR No: 7076, 7434",testgetFileFromCheckForPostData
+23,"DLR No: 8137, 7434",testreadErmrImportFileForEmptyPost
+24,"DLR No: 7537, 7167, 8073",testIndexActionCantBeAccessed
+25,"DLR No: 7537, 7167, 8073",testGetDashboardDataActionCantBeAccessed
+26,"DLR No: 7537, 7167, 8073, 8088, 8033",testGetDashboardDataAction
+27,"DLR No: 7537, 7167, 8073",testListCantBeAccessed
+28,"DLR No: 7537, 7167, 8073, 8088",testFetchAllDataActionCantBeAccessed
+29,DLR No: 7532,testgetFrequencyAnalysisModel
+30,DLR No: 7532,testAnalysisActionCannotBeAccessedWithoutUserSession
+31,DLR No: 7532,testAnalysisActionCanBeAccessedWithUserSession
+32,"DLR No: 8067, 8062, 7259",testgetWorkflowModelService
+33,"DLR No: 8067, 8062, 7259",testIndexCannotBeAccessedWithoutUserSession
+34,"DLR No: 8067, 8062, 7259",testIndexCanBeAccessed
+35,"DLR No: 8067, 8062, 7259",testFilterCannotBeAccessedWithoutUserSession
+36,"DLR No: 8067, 8062, 7259",testFilterCanBeAccessed
+37,"DLR No: 8067, 8062, 7259",testFilterReportDataCannotBeAccessedWithoutUserSession
+38,"DLR No: 8067, 8062, 7259",testFilterReportDataCanBeAccessed
+39,"DLR No: 8067, 8062, 7259",testDownloadaCannotBeAccessedWithoutUserSession
+40,"DLR No: 8067, 8062, 7259",testDownloadCanBeAccessed
+41,DLR No: 7518,testVIndexCannotBeAccessedWithoutUserSession
+42,DLR No: 7518,testVIndexCanBeAccessed
+43,"DLR No: 8084, 8081, 8086",testAddReminderCantBeAccessed
+44,"DLR No: 8084, 8081, 8086",testAddReminderGetData
+45,"DLR No: 7165, 7309, 7163, 7161",testAddSubscriptionCantBeAccessed
+46,"DLR No: 7165, 7309, 7163, 7161",testAddSubscriptionGetData
+47,"DLR No: 8083, 8082, 8085",testAddTemplaterCantBeAccessed
+48,"DLR No: 8083, 8082, 8085",testAddTemplateGetData
+49,"DLR No: 8083, 8082, 8085",testIndexCantBeAccessed
+50,"DLR No: 8083, 8082, 8085",testIndexGetData
+51,"DLR No: 8083, 8082, 8085,7165, 7309, 7163, 7161,8084, 8081, 8086, 6819",testgetWorkflowList
+52,"DLR No: 8083, 8082, 8085,7165, 7309, 7163, 7161,8084, 8081, 8086, 6819",testgetformfieldsList
+53,"DLR No: 8083, 8082, 8085,7165, 7309, 7163, 7161,8084, 8081, 8086, 6819",testgetReportsList
+54,"DLR No: 7165, 7309, 7163, 7161",testsavesubscriptionAction
+55,"DLR No: 8083, 8082, 8085,7165, 7309, 7163, 7161,8084, 8081, 8086, 6819",testsavelog
+56,"DLR No: 8083, 8081, 7163",testdeleteCondition
+57,"DLR No: 8083, 8082, 8085,7165, 7309, 7163, 7161,8084, 8081, 8086, 6819",testpopulatefields
+58,"DLR No: 8083, 8081, 7163",testdeletetemplate
+59,"DLR No: 8083, 8082, 8085,7165, 7309, 7163, 7161,8084, 8081, 8086, 6819",testgetWorkflowandfields
+60,"DLR No: 8083, 8082, 8085,7165, 7309, 7163, 7161,8084, 8081, 8086, 6819",testgetWorkflowFields
+61,DLR No: 7215,testSendMailCronJobActionCantBeAccessed
+62,DLR No: 7215,testSendMailCronJob1ActionCantBeAccessed
+63,DLR No: 7176,testGetServiceReturnsAnInstanceOfActiveSubstanceModel
+64,DLR No: 7176,testgetActivesubstanceManagementCanBeAccessed
+65,DLR No: 7176,testgetAddCanBeAccessed
+66,DLR No: 7176,testgetEditCanBeAccessed
+67,DLR No: 7176,testgetActiveSubstanceCheckCheckForEmptyPost
+68,DLR No: 7176,testgetActiveSubstanceCheckCheckForPostData
+69,DLR No: 7176,testgetSaveEditActiveSubstanceCheckForEmptyPost
+70,DLR No: 7176,testgetSaveEditActiveSubstanceCheckForPostData
+71,DLR No: 7176,testgetDeleteActiveSubstanceCheckForEmptyPost
+72,DLR No: 7176,testgetDeleteActiveSubstanceCheckForPostData
+73,DLR No: 7178,testgetMedicalConceptManagementCanBeAccessed
+74,DLR No: 7178,testgetAddCanBeAccessed
+75,DLR No: 7178,testgetEditCanBeAccessed
+76,DLR No: 7178,testgetMedicalConceptCheckCheckForEmptyPost
+77,DLR No: 7178,testgetMedicalConceptCheckCheckForPostData
+78,DLR No: 7178,testgetSaveEditMedicalConceptCheckForEmptyPost
+79,DLR No: 7178,testgetSaveEditMedicalConceptCheckForPostData
+80,DLR No: 7178,testgetDeleteMedicalConceptCheckForEmptyPost
+81,DLR No: 7178,testgetDeleteMedicalConceptCheckForPostData
+82,DLR No: 7176,testGetServiceReturnsAnInstanceOfActiveSubstanceModel
+83,DLR No: 7176,testgetIndexCanBeAccessed
+84,DLR No: 7176,testgetAddCanBeAccessed
+85,DLR No: 7176,testgetEditCanBeAccessed
+86,DLR No: 7176,testgetSaveProductCheckForEmptyPost
+87,DLR No: 7176,testgetSaveProductCheckForPostData
+88,DLR No: 7176,testgetProductCheckCheckForEmptyPost
+89,DLR No: 7176,testgetProductCheckCheckForPostData
+90,DLR No: 7176,testgetDeleteProductCheckForEmptyPost
+91,DLR No: 7176,testgetDeleteProductkCheckForPostData
+92,"DLR No: 7194, 7521",testGetServiceReturnsAnInstanceOfQuantitativeModel
+93,"DLR No: 7194, 7521",testgetViewCannotBeAccessed
+94,"DLR No: 7194, 7521",testgetViewCanBeAccessed
+95,"DLR No: 7194, 7521",testgetDateCannotBeAccessed
+96,"DLR No: 7194, 7521",testgetDateCanBeAccessed
+97,"DLR No: 7194, 7521",testUpdateMedicalEvaluationCannotBeAccessed
+98,"DLR No: 7194, 7521",testUpdateMedicalEvaluationCanBeAccessedWithoutPostData
+99,"DLR No: 7194, 7521",testUpdateMedicalEvaluationCanBeAccessedWithPostData
+100,DLR No: 8075,testgetgetAuditService
+101,DLR No: 8075,testgetTriggerService
+102,DLR No: 8075,testTriggerCannotBeAccessedWithoutUserSession
+103,DLR No: 8079,testgetAuditService
+104,DLR No: 8079,testgetModelService
+105,DLR No: 8079,testWorkflowRuleSettingsCannotBeAccessedWithOutUserSession
+106,DLR No: 8079,testdeleteRuleNoPostData
+107,DLR No: 8079,testdeleteRuleNoUserData
+108,DLR No: 8079,testdeleteRule
+109,DLR No: 8079,testgetWorkflowsAndFieldsNoUserData
+110,DLR No: 8079,testgetWorkflowsAndFieldsNoPostData
+111,DLR No: 8079,testgetWorkflowsAndFields
+112,DLR No: 8079,testsaveRuleNoUserData
+113,DLR No: 8079,testsaveRuleNoPostData
+114,DLR No: 8079,testsaveRule
+115,DLR No: 8079,testgetRuleInfo
+116,DLR No: 8079,testgetRuleInfoNoUserData
+117,DLR No: 8079,testgetRuleInfoNoPostData

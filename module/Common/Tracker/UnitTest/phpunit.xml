@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<phpunit bootstrap="Bootstrap.php" colors="true" stderr="true">
+    <testsuites>
+        <testsuite name="ASRTrace">
+            <directory>./TrackerTest</directory>
+            <file>./TrackerTest/Controller/AccessControllerTest.php</file>
+            <file>./TrackerTest/Controller/AwsControllerTest.php</file>
+            <file>./TrackerTest/Controller/CodelistControllerTest.php</file>
+            <file>./TrackerTest/Controller/FieldControllerTest.php</file>
+            <file>./TrackerTest/Controller/FormControllerTest.php</file>
+            <file>./TrackerTest/Controller/TrackerControllerForViewDataTest.php</file>
+            <file>./TrackerTest/Controller/TrackerControllerTest.php</file>
+            <file>./TrackerTest/Controller/WorkflowControllerTest.php</file>
+             <!--<file>./TrackerTest/Controller/WorkflowMgmControllerTest.php</file>-->
+            <!-- <exclude>./TrackerTest/Controller/TrackerControllerTest.php</exclude> -->
+           <!--  <exclude>./TrackerTest/Controller/AwsControllerTest.php</exclude> -->
+        </testsuite>
+    </testsuites>
+    <filter>
+        <whitelist>    
+            <directory suffix=".php">../src/Common/Tracker/Model</directory>
+            <directory suffix=".php">../src/Common/Tracker/Controller</directory>
+        </whitelist>
+        
+    </filter>
+    
+    <logging>
+        <log type="coverage-html" target="../../../../test/unittest/code_coverage/Tracker" lowUpperBound="40" highLowerBound="80" />
+    </logging>
+</phpunit>

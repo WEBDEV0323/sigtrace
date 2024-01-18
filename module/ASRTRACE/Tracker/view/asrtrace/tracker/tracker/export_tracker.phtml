@@ -1,0 +1,152 @@
+<?php
+use Zend\Session\Container;
+$tracker_details = $trackerRsults['tracker_details'];
+$forms = $trackerRsults['forms'];
+$tracker_name = $tracker_details['name'];
+$title = "$tracker_name-Export Tracker";
+$this->headTitle($title);
+$container = new Container('successmsg_export');
+$suc_msg=$container->message;
+$container->getManager()->getStorage()->clear('successmsg_export');
+//echo $container->message;die;
+?>
+<div class="pagebar container-fluid col-md-12">
+    <!-- Sidebar Toggle -->
+    <button type="button" class="pagebar-toggle navbar-toggle pull-left">
+      <span class="pagebar-arrow"></span>
+    </button>
+    <ol class="breadcrumb">
+      <li class="active"><span><?php echo $this->escapeHtml($title); ?></span></li>
+    </ol>
+</div>
+<div class="card">
+    <div class="card-body">
+        <?php if ($container->message == 'exported') { ?>
+            <span style="color:green;float: left">
+                Tracker Exported.
+                <?php $container->getManager()->getStorage()->clear('msg'); ?>
+            </span>
+        <?php } else if ($suc_msg == 'duplicate') { ?>
+            <span style="color:red;float: left">
+                Tracker with the same name already exist.
+            </span>
+        <?php } ?>
+        <div class="card card-default mb-2">
+            <div class="card-body">
+                <div class="btn-group" role="group" aria-label="...">
+                    <a href="<?php echo $this->url('tracker', array('action' => 'view', 'tracker_id' => $tracker_id)) ?>">
+                        <button type="button" class="btn btn-default"><span class="lnr icon-home" aria-hidden="true"></span><br/>Home</button>
+                    </a>
+                </div>
+                <div class="btn-group" role="group" aria-label="...">
+                    <a href="<?php echo $this->url('tracker', array('action' => 'settings', 'tracker_id' => $tracker_id)) ?>">
+                        <button type="button" class="btn btn-primary"><span class="lnr icon-settings" aria-hidden="true"></span><br/>Settings</button>
+                    </a>
+                </div>
+                <?php
+                foreach ($forms as $key => $value) {
+                    $form_name = $value['form_name'];
+                    $form_id = $value['form_id'];
+                    ?>
+
+                    <div class="btn-group" role="group" aria-label="...">
+                        <a href="<?php echo $this->url('tracker', array('action' => 'form', 'tracker_id' => $tracker_id, 'action_id' => $form_id)) ?>">
+                            <button type="button" class="btn btn-default"><span class="lnr icon-list" aria-hidden="true"></span><br/><?= $form_name; ?></button>
+                        </a>
+                    </div>
+                    <?php
+                    }
+                    ?>
+                    <div class="btn-group" style="float:right" role="group" aria-label="...">
+                        <a href="<?php echo $this->url('tracker', array('action' => 'newform', 'tracker_id' => $tracker_id)) ?>">
+                            <button type="button" class="btn btn-default"><span class="lnr icon-add" aria-hidden="true"></span><br/>New Form</button>
+                        </a>
+                    </div>
+
+                </div>
+            </div>
+            <div class="card card-default">
+                <div class="card-body">
+                    <div  class="clearfix"><h6>Export Tracker</h6></div>
+                    <hr/>
+
+                    <form id="exporttrcaker" method="post" action="/tracker/export_tracker/<?php echo $tracker_id ?>" name="myForm">
+                        <div class="form-group">
+                            <label class="col-sm-3 control-label" style="padding-left: 0px;">Tracker Name</label>
+                            <div class="col-sm-6">
+                                <input type="text" class="form-control"  required placeholder="Copy of <?php echo $tracker_name ?>" id="t_name" name="t_name" required>
+                            <span id="tracker-error" style="color: rgb(169, 68, 66);"></span>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label class="col-sm-3" style="padding-left: 0px;">Data</label>
+                        <div class="col-sm-6">
+                            <div class="custom-control custom-radio">
+                                <input type="radio" name="datacopy" id="withdata" value="withdata" checked class="custom-control-input"> 
+                                <label class="custom-control-label" for="withdata">Copy tracker with data</label>
+                            </div>
+                            <div class="custom-control custom-radio">
+                                <input type="radio" name="datacopy" id="withoutdata" value="withoutdata" class="custom-control-input"> 
+                                <label class="custom-control-label" for="withoutdata">Copy Tracker without data</label>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label class="col-sm-3" style="padding-left: 0px;">Users and Roles</label>
+                        <div class="col-sm-6">
+                            <div class="custom-control custom-radio">
+                                <input type="radio" name="userrole" id="withuserrole" value="withuserrole" checked class="custom-control-input"> 
+                                <label class="custom-control-label" for="withuserrole">Copy Users in their roles</label>
+                            </div>
+                            <div class="custom-control custom-radio">
+                                <input type="radio" name="userrole" id="withouruserrole" value="withouruserrole" class="custom-control-input"> 
+                                <label class="custom-control-label" for="withouruserrole">Copy users and roles separately(don't assign roles)</label>
+                            </div>
+                        </div>
+                    </div>
+
+
+                    <div class="modal-footer" style="padding-bottom:0px">
+                        <button  type="submit" class="btn btn-primary">Export</button>
+                    </div>
+                </form>
+
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    
+$(document).ready(function() {
+    var status = true;
+    $("#t_name").blur(function() {     
+      if($("#t_name").val() != "") {
+        var testTrackerName = /^[A-Za-z]/;
+        if(!testTrackerName.test(this.value)) { 
+            status = false;
+            $("#tracker-error").html("<b>Tracker name should start with character!</b>");
+        }else{
+            var TrackerName = /^[a-z0-9 ]*$/i;
+            if(!TrackerName.test(this.value)) {
+                status = false;
+                $("#tracker-error").html("<b>Only a-z,A-Z and 0-9 is allowed in tracker name.</b>");
+            }else{
+                if(this.value.length < 5){
+                    status = false;
+                   $("#tracker-error").html("<b>Tracker Name length should be more than 5 characters!</b>");
+                }
+                 else {
+                   status = true;
+                   $("#tracker-error").html("");
+                 }
+
+            }
+        }
+      }
+    });
+    $("#exporttrcaker").submit(function(){
+			return status;			
+    });
+});
+</script>

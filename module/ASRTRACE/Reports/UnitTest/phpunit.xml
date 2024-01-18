@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<phpunit bootstrap="Bootstrap.php" colors="true" stderr="true">
+    <testsuites>
+        <testsuite name="ASRTrace">
+            <directory>./ReportTest</directory>
+        </testsuite>
+    </testsuites>
+    <filter>
+        <whitelist>    
+            <directory suffix=".php">../src/Reports/Model</directory>
+            <directory suffix=".php">../src/Reports/Controller</directory>
+        </whitelist>
+    </filter>
+    
+    <logging>
+        <log type="coverage-html" target="../../../../test/unittest/code_coverage/Reports" lowUpperBound="40" highLowerBound="80" />
+    </logging>
+</phpunit>

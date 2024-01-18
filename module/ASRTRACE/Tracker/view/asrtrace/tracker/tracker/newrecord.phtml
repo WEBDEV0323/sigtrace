@@ -1,0 +1,814 @@
+<?php
+$tracker_details = $trackerRsults['tracker_details'];
+$forms = $trackerRsults['forms'];
+//$table_details = $trackerRsults['form_details'];
+$form_name = $form_details['form_name'];
+$record = $form_details['record_name'];
+$tracker_name = $tracker_details['name'];
+$title = "$tracker_name Tracker - $form_name";
+$this->headTitle($title);
+$user_details = $_SESSION['user_details'];
+$role_id = $user_details['group_id'];
+$tracker_user_groups = @$_SESSION['tracker_user_groups'];
+$session_group = @$tracker_user_groups[$tracker_id]['session_group'];
+?>
+
+<div class="pagebar container-fluid col-md-12">
+    <!-- Sidebar Toggle -->
+    <button type="button" class="pagebar-toggle navbar-toggle pull-left">
+      <span class="pagebar-arrow"></span>
+    </button>
+    <ol class="breadcrumb">
+      <li class="active"><span><?php echo $this->escapeHtml($title); ?></span></li>
+    </ol>
+</div>
+<div class="card">
+    <div class="card-body">
+        <div class="card card-default mb-2">
+            <div class="card-body">
+                <div class="btn-group" role="group" aria-label="...">
+                    <a href="<?php echo $this->url('tracker', array('action' => 'view', 'tracker_id' => $tracker_id)) ?>">
+                        <button type="button" class="btn btn-default"><span class="lnr icon-home" aria-hidden="true"></span><br/>Home</button>
+                    </a>
+                </div>
+                <?php
+                if ($role_id == 1 || $session_group == "Administrator") {
+                ?>
+                <div class="btn-group" role="group" aria-label="...">
+                    <a href="<?php echo $this->url('tracker', array('action' => 'settings', 'tracker_id' => $tracker_id)) ?>">
+                        <button type="button" class="btn btn-default"><span class="lnr icon-settings" aria-hidden="true"></span><br/>Settings</button>
+                    </a>
+                </div>
+                <?php } ?>
+                <?php
+                foreach ($forms as $key => $value) {
+                    $form_name = $value['form_name'];
+                    $form_id = $value['form_id'];
+                    ?>
+
+                    <div class="btn-group" role="group" aria-label="...">
+                        <a href="<?php echo $this->url('tracker', array('action' => 'form', 'tracker_id' => $tracker_id, 'action_id' => $form_id)) ?>">
+                            <button type="button" class="btn btn-<?php
+                            if ($action_id == $form_id) {
+                                echo 'primary';
+                            } else {
+                                echo 'default';
+                            }
+                            ?>"><span class="lnr icon-list" aria-hidden="true"></span><br/><?= $form_name; ?></button>
+                        </a>
+                    </div>
+                    <?php
+                    }
+                    ?>
+                    <?php
+                    if ($role_id == 1 || $session_group == "Administrator") {
+                    ?>
+                    <div class="btn-group" style="float:right" role="group" aria-label="...">
+                        <a href="<?php echo $this->url('tracker', array('action' => 'newform', 'tracker_id' => $tracker_id)) ?>">
+                            <button type="button" class="btn btn-default"><span class="lnr icon-add" aria-hidden="true"></span><br/>New Form</button>
+                        </a>
+                    </div>
+                    <?php } ?>
+
+                </div>
+            </div>
+        
+        <div class="card card-default">
+            <div class="card-body">
+                <div  class="clearfix">
+                    <?php $form_name = $form_details['form_name']; ?>
+                    <h6>New Record - <?=$form_name;?></h6>
+                </div>
+                <hr/>
+                <?php
+                $workflows = $fields_array_val['workflows'];
+                $fields = $fields_array_val['fields'];
+                $roles = @$fields_array_val['roles'];
+                $formula_dependent_array = array();
+                $formula_value_data_array = array();
+                $formula_combo_dependent_array = array();
+                $formula_combo_value_data_array = array();
+                if (array_key_exists(0, $workflows)) {
+                    $ival = 0;
+                    $id = 1;
+                    ?>
+                    <form 
+                        id="commentForm" 
+                        method="post" 
+                        action="<?php echo $this->url('tracker', array('action' => 'saverecord', 'tracker_id' => $tracker_id, 'action_id' => $action_id)) ?>" 
+                        name="newRecordForm" 
+                        enctype="multipart/form-data" >
+                        
+                        <input type ="hidden" name ="pregmatch_date_time" value='<?= $date_time_formats['pregmatch_date_time'] ?>' />
+                        <input type ="hidden" name ="pregmatch_date" value='<?= $date_time_formats['pregmatch_date'] ?>' />
+                        <?php
+                        foreach ($workflows as $wfk => $wf_values) {
+
+                        $workflow_name = $wf_values;
+                        $fields_array = $fields[$workflow_name];
+                        ?>
+
+                        <div class="card card-default mb-2">
+                            <div class="card-header" id="workflow_div_<?=$id;?>">
+                                <h5><i class="lnr icon-remove" id="icon_data_<?=$id;?>"></i><?=" ".$workflow_name;?></h5>
+                            </div>
+                            <div class="card-body" id="workflow_content_<?=$id;?>">
+                                <div class="row">
+                                <?php
+                                    while (list($field, $f_values) = each($fields_array)) {
+
+                                    $f_id = 'f_' . $f_values['field_id'];
+                                    $label = $f_values['label'];
+                                    $field_name = $f_values['field_name'];
+                                    $field_type = $f_values['field_type'];
+                                    $options_id = $f_values['code_list_id'];
+                                    $formula_dependent = $f_values['formula_dependent'];
+                                    $formula_value = $f_values['formula'];
+
+
+                                    $user_details = $_SESSION['user_details'];
+                                    $tracker_user_groups = @$_SESSION['tracker_user_groups'];
+                                    $session_group = @$tracker_user_groups[$tracker_id]['session_group'];
+                                    $session_group_id = @$tracker_user_groups[$tracker_id]['session_group_id'];
+                                    if ($role_id == 1 || $session_group == "Administrator") {
+                                    $can_insert = "Yes";
+                                    } else {
+                                    $can_insert = (($f_values['can_update'] == "Yes") || ($f_values['can_update'] == "Self")) ? "Yes" : "No";
+                                    }
+                                    if ($field_type == 'Heading') {
+                                    ?>
+                                    <br>
+                                    <div class="col-md-12">
+                                        <h4><?php echo $this->escapeHtml($label); ?></h4>
+                                    </div>
+                                    <?php
+                                    }
+                                    else {
+                                    ?>
+                                    <div class="col-md-6">
+                                        <div class="form-group">
+                                            <label class="col-md-4 control-label"><?php echo $this->escapeHtml($label); ?></label>
+
+                                            <div class="col-md-8">
+
+                                                <?php switch ($field_type) {
+                                                case 'Integer': ?>
+                                                <input type="number" class="form-control"
+                                                       placeholder=""
+                                                       id="<?php echo $this->escapeHtml($field_name); ?>"
+                                                       name="<?php echo $this->escapeHtml($field_name); ?>" 
+                                                       <?php if ($can_insert != "Yes") {
+                                                       echo "readonly";
+                                                       } ?>>
+                                                       <?php  break;
+
+                                                       case 'TextArea': ?>
+                                                       <textarea class="form-control" placeholder=""
+                                                       id="<?php echo $this->escapeHtml($field_name); ?>"
+                                                       name="<?php echo $this->escapeHtml($field_name); ?>" 
+                                                       <?php if ($can_insert != "Yes") {
+                                                       echo "readonly";
+                                                       } ?>></textarea>
+                                                <?php  break;
+                                                case 'Formula Combo Box':
+                                                $formula_combo_dependent_array[$field_name] = $formula_dependent;
+                                                $formula_combo_value_data_array[$field_name] = $formula_value;
+                                                $options = "";
+                                                if (array_key_exists($options_id, $group_code_list)) {
+                                                $options_exist = $group_code_list[$options_id];
+                                                $options = $options_exist['option_values'];
+                                                }
+                                                $optionsArr = explode('@', $options);
+                                                ?>
+                                                <select class="form-control comboclass"  placeholder=""
+                                                        id="<?php echo $this->escapeHtml($field_name); ?>"
+                                                        name="<?php echo $this->escapeHtml($field_name); ?>"  <?php if ($can_update != "Yes") {
+                                                        echo "disabled=disabled";
+                                                        } ?>>
+                                                        <option value="">Please Select</option>
+                                                    <?php
+                                                    foreach ($optionsArr as $opt => $opt_values) {
+                                                    if ($opt_values == $record_value) {
+                                                    $selected = 'selected';
+                                                    } else {
+                                                    $selected = '';
+                                                    }
+
+                                                    ?>
+                                                    <option
+                                                        value="<?php echo $this->escapeHtml($opt_values); ?>"
+                                                        <?php echo $selected; ?>><?php echo $this->escapeHtml($opt_values); ?></option>
+                                                    <?php
+                                                    }
+
+                                                    ?>
+                                                    <input type="hidden" class="form-control" placeholder=""
+                                                           id="hidden_formula_combo_<?php echo $this->escapeHtml($field_name); ?>"
+                                                           value='<?= $formula_value; ?>'>
+                                                    <input type="hidden" class="form-control" placeholder=""
+                                                           id="hidden_dependent_combo_<?php echo $this->escapeHtml($field_name); ?>"
+                                                           value='<?= $formula_dependent; ?>'>
+                                                </select>
+                                                <?php  break;
+
+                                                case 'Combo Box':
+                                                $options = "";
+                                                if (array_key_exists($options_id, $group_code_list)) {
+                                                $options_exist = $group_code_list[$options_id];
+                                                $options = $options_exist['option_values'];
+                                                //                                                                                  $kpi_values = $options_exist['kpi_values'];
+                                                }
+                                                $optionsArr = explode('@', $options);
+                                                ?>
+                                                <select class="form-control formulacombo" placeholder=""
+                                                        id="<?php echo $this->escapeHtml($field_name); ?>"
+                                                        name="<?php echo $this->escapeHtml($field_name); ?>" 
+                                                        <?php if ($can_insert != "Yes") {
+                                                        echo "disabled=disabled";
+                                                        } ?>>
+                                                        <option value="">Please Select</option>
+                                                    <?php
+                                                    foreach ($optionsArr as $opt => $opt_values) {
+                                                    ?>
+                                                    <option
+                                                        value="<?php echo $this->escapeHtml($opt_values); ?>"><?php echo $this->escapeHtml($opt_values); ?></option>
+                                                    <?php
+                                                    }
+                                                    ?>
+                                                </select>
+                                                <?php  break;
+                                                case 'Check Box':
+                                                $options = "";
+                                                if (array_key_exists($options_id, $group_code_list)) {
+                                                $options_exist = $group_code_list[$options_id];
+                                                // print_r($options_exist);die;
+                                                $options = $options_exist['option_values'];
+                                                $kpi_values = $options_exist['kpi_values'];
+                                                }
+                                                $optionsArr = explode('@', $options);
+                                                $kpiArr = explode('@', $kpi_values);
+
+                                                foreach ($optionsArr as $opt => $opt_values) {
+                                                $kpi_value = $kpiArr[$opt];
+                                                $option_set_arr['option'] = $opt_values;
+                                                $option_set_arr['kpi'] = $kpi_value;
+                                                $option_set = json_encode($option_set_arr);
+                                                ?>
+                                                <div class="custom-control custom-checkbox">
+                                                    <input type="checkbox" class="custom-control-input" id="<?php echo $this->escapeHtml($opt_values); ?>"
+                                                               name="<?php echo $this->escapeHtml($field_name); ?>[]"
+                                                               value="<?php echo $this->escapeHtml($option_set); ?>"
+                                                               onchange="check_box_text_area_show('<?php echo $this->escapeHtml($field_name); ?>')" <?php if ($can_insert != "Yes") {
+                                                               echo "disabled=disabled";
+                                                               } ?>>
+                                                    <label class="custom-control-label" for="<?php echo $this->escapeHtml($opt_values); ?>"><?= $opt_values; ?></label>
+                                                </div>
+                                                <?php
+                                                } ?>
+                                                <input type='hidden' value="" id="data_<?php echo $this->escapeHtml($field_name); ?>" name="data_<?php echo $this->escapeHtml($field_name); ?>" />
+                                                <input type="hidden" placeholder=""
+                                                       id="critical_checkbox_<?php echo $this->escapeHtml($field_name); ?>"
+                                                       name="critical_checkbox_<?php echo $this->escapeHtml($field_name); ?>"
+                                                       value="0"/>
+                                                <input type="hidden" placeholder=""
+                                                       id="major_checkbox_<?php echo $this->escapeHtml($field_name); ?>"
+                                                       name="major_checkbox_<?php echo $this->escapeHtml($field_name); ?>"
+                                                       value="0"/>
+                                                <input type="hidden" placeholder=""
+                                                       id="minor_checkbox_<?php echo $this->escapeHtml($field_name); ?>"
+                                                       name="minor_checkbox_<?php echo $this->escapeHtml($field_name); ?>"
+                                                       value="0"/>
+                                                <div
+                                                    id="comment_checkbox_div_<?php echo $this->escapeHtml($field_name); ?>"
+                                                    style="display:none">
+                                                    <label>Comment</label>
+                                                    <textarea class="form-control" placeholder=""
+                                                              id="comment_checkbox_<?php echo $this->escapeHtml($field_name); ?>"
+                                                              name="comment_checkbox_<?php echo $this->escapeHtml($field_name); ?>"></textarea>
+                                                </div>
+
+                                                <?php  break;
+                                                case 'Date': ?>
+                                                <div class="input-group" data-date="" data-date-format="dd MM yyyy">
+                                                    <input type="text" readonly class="form-control form_date"
+                                                           placeholder=""
+                                                           id="<?php echo $this->escapeHtml($field_name); ?>"
+                                                           name="<?php echo $this->escapeHtml($field_name); ?>" 
+                                                           <?php if ($can_insert != "Yes") { echo "disabled=disabled"; } ?>
+                                                           >
+                                                           <span class="input-group-addon"><i class="lnr icon-cancel"></i></span>
+                                                           <span class="input-group-addon"><i class="lnr icon-calendar-full"></i></span>
+                                                </div>
+                                                <div for="<?php echo $this->escapeHtml($field_name); ?>" class="error"></div>
+
+                                                <?php  break;
+
+                                                case 'Date Time': ?>
+                                                <div class="input-group date form_datetime" data-date="" >
+                                                    <input type="text" readonly class="form-control"
+                                                           placeholder=""
+                                                           id="<?php echo $this->escapeHtml($field_name); ?>"
+                                                           name="<?php echo $this->escapeHtml($field_name); ?>" <? if ($can_insert != "Yes") {
+                                                           echo "disabled=disabled";
+                                                           } ?>>
+                                                           <span class="input-group-addon"><i class="lnr icon-cancel"></i></span>
+                                                           <span class="input-group-addon"><i class="lnr icon-calender-full"></i></span>
+                                                </div>
+                                                <div for="<?php echo $this->escapeHtml($field_name); ?>" class="error"></div>
+                                                <br/>
+
+                                                <?php  break;
+                                                case 'Formula':
+
+                                                $formula_dependent_array[$field_name] = $formula_dependent;
+                                                // echo($formula_dependent);die;
+                                                $formula_value_data_array[$field_name] = $formula_value;
+                                                ?>
+                                                <input type="text" class="form-control"
+                                                       placeholder=""
+                                                       id="<?php echo $this->escapeHtml($field_name); ?>"
+                                                       name="<?php echo $this->escapeHtml($field_name); ?>"  readonly value="">
+                                                <input type="hidden" class="form-control"
+                                                       placeholder=""
+                                                       id="hidden_formula_<?php echo $this->escapeHtml($field_name); ?>"
+                                                       value='<?= $formula_value; ?>'>
+                                                <input type="hidden" class="form-control"
+                                                       placeholder=""
+                                                       id="hidden_dependent_<?php echo $this->escapeHtml($field_name); ?>"
+                                                       value='<?= $formula_dependent; ?>'>
+
+                                                <?php  break;
+
+                                                case 'User': ?>
+                                                <?php if ($formula_value == 'CurrentUser' && $can_insert == "Yes") {
+                                                    ?>
+                                                    <?php ?>
+                                                    <input type="text" class="form-control" placeholder=""
+                                                           id="<?php echo $this->escapeHtml($field_name); ?>"
+                                                           name="<?php echo $this->escapeHtml($field_name); ?>" 
+                                                           value="<?= $user_details['u_name']; ?>"
+                                                           readonly
+                                                           />
+                                                       <?php } else { ?>
+                                                    <select class="form-control" placeholder=""
+                                                            id="<?php echo $this->escapeHtml($field_name); ?>"
+                                                            name="<?php echo $this->escapeHtml($field_name); ?>" 
+                                                            <?php if ($can_insert != "Yes") {
+                                                            echo "disabled=disabled";
+                                                            } ?>>
+                                                            <option value="">Please Select</option>
+
+
+                                                        <?php
+                                                        foreach ($roles as $role) {
+                                                            $selected = '';
+                                                            if ($f_values['field_id'] == $role['field_id']) {
+                                                                if ($f_values['label'] == $role['label']) {
+                                                                    // $selected='selected';
+                                                                } else {
+                                                                    //  $selected='';
+                                                                }
+                                                                ?>
+                                                                <option <?php echo $selected; ?>
+                                                                    value="<?php echo $this->escapeHtml($role['u_name']); ?>"><?php echo $this->escapeHtml($role['u_name']); ?></option>
+                                                                <?php
+                                                                }
+                                                                }
+
+                                                                ?>
+                                                            </select>
+
+                                                            <?php } break;
+                                                            case 'DependentText':
+                                                            ?>
+                                                            <input type="text" class="form-control" placeholder=""
+                                                                   id="<?php echo $this->escapeHtml($field_name); ?>"
+                                                                   name="<?php echo $this->escapeHtml($field_name); ?>" 
+                                                                   <?php if ($can_insert != "Yes") {
+                                                                   echo "readonly";
+                                                                   } ?>   onchange='populatefields(<?= $formula_value; ?>,this.value)'>
+
+
+                                                                   <?php  break;
+                                                                   case 'Formula Date':
+                                                                   $formula_dependent_array[$field_name] = $formula_dependent;
+                                                                   // echo($formula_dependent);die;
+                                                                   $formula_value_data_array[$field_name] = $formula_value;
+                                                                   ?>
+                                                                   <div class="input-group date form_date " data-date="" data-date-format="dd MM yyyy">
+                                                                <input readonly type="text" class="form-control" placeholder=""
+                                                                       id="<?php echo $this->escapeHtml($field_name); ?>"
+                                                                       name="<?php echo $this->escapeHtml($field_name); ?>" 
+                                                                       <?php if ($can_insert != "Yes") {
+                                                                       //echo "disabled=disabled";
+                                                                       echo "readonly";
+                                                                       } ?> disabled >
+                                                                       <span class="input-group-addon"><span class="lnr icon-remove"></span></span>
+                                                                <span class="input-group-addon"><span class="lnr icon-calendar"></span></span>
+                                                            </div>
+                                                            <div for="<?php echo $this->escapeHtml($field_name); ?>" class="error"></div>
+
+                                                            <input type="hidden" class="form-control"
+                                                                   placeholder=""
+                                                                   id="hidden_formula_<?php echo $this->escapeHtml($field_name); ?>"
+                                                                   value='<?= $formula_value; ?>'>
+                                                            <input type="hidden" class="form-control"
+                                                                   placeholder=""
+                                                                   id="hidden_dependent_<?php echo $this->escapeHtml($field_name); ?>"
+                                                                   value='<?= $formula_dependent; ?>'>
+                                                            <?php  break;
+                                                            case 'File': ?>
+                                                            <input type="file" class="form-control" accept=".doc,.docx,.pdf,.txt,.dotx,.dotm,.dot,.html,.htm,.rtf,.xml,.odt"
+                                                                   placeholder="" style="padding-top: 0px;padding-left: 0px;"
+                                                                   id="<?php echo $this->escapeHtml($field_name); ?>"
+                                                                   name="<?php echo $this->escapeHtml($field_name); ?>" 
+                                                                   <?php if ($can_insert != "Yes") {
+                                                                   echo "disabled=disabled";
+                                                                   } ?>>
+                                                                   <span class="file_error_1 error" style="color: maroon; cursor: pointer;display:none;margin-top: 18px;" id="file_error_1<?php echo $this->escapeHtml($field_name); ?>">Please upload file less than 5MB</span>
+                                                            <span class="error" style="color: red; cursor: pointer;display:none;margin-top: 18px;" id="file_error_2<?php echo $this->escapeHtml($field_name); ?>">The file is too large.Please upload file less than 5MB</span>
+
+                                                            <?php  break;
+
+                                                            default:?>
+                                                            <input type="text" class="form-control"
+                                                                   placeholder=""
+                                                                   id="<?php echo $this->escapeHtml($field_name); ?>"
+                                                                   name="<?php echo $this->escapeHtml($field_name); ?>" 
+                                                                   <?php if ($can_insert != "Yes") {
+                                                                   echo "readonly";
+                                                                   } ?>>
+
+
+
+
+                                                                   <?php }
+                                                                   ?>
+
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                                <?php
+                                            }
+                                        }
+                                ?>
+                                </div>
+                            </div>
+                            </div>
+                            <?php
+                            $id++;
+                            }
+                            ?>
+                            <span id="status"></span>
+                            <div class="modal-footer" style="padding-bottom:0px">
+                                <button type="submit" class="btn btn-primary">Save</button>
+                                <a href="<?php echo $this->url('tracker', array('action' => 'form', 'tracker_id' => $tracker_id, 'action_id' => $action_id)) ?>">
+                                    <button type="button" class="btn btn-default" data-dismiss="modal">Cancel</button>
+                                </a>
+                            </div>
+                        </form>
+                        <?php
+                        } else {
+                        echo "Fields not exist.";
+                        }
+                        ?>
+                    </div>
+                </div>
+    </div>
+</div>
+
+<?php
+$array_form_f = array();
+foreach ($formula_dependent_array as $key => $value) {
+    $formula_f_values_array = array_unique(explode(',', $value));
+    foreach ($formula_f_values_array as $key_f_v => $value_f_v) {
+        $array_form_f[$value_f_v][$key] = $value;
+    }
+}
+
+
+$array_form_formula_combo = array();
+foreach ($formula_combo_dependent_array as $key => $value) {
+    $formula_f_values_array = array_unique(explode(',', $value));
+    foreach ($formula_f_values_array as $key_f_v => $value_f_v) {
+        $array_form_formula_combo[$value_f_v][$key] = $value;
+    }
+}
+?>
+
+<input type="hidden" id="inputFieldsFormiula" value="">
+
+<script>
+$('[id^="workflow_div_"]').on('click',function () {
+        var id=this.id;
+        var splite=id.split('_');
+        var last_id=splite[2];
+        if ($('#workflow_content_'+last_id).is(":hidden")) {
+            $('#workflow_content_'+last_id).slideDown('slow');
+            $('#icon_data_'+last_id).removeClass('icon-add').addClass('icon-remove');
+        } else {
+            $('#workflow_content_'+last_id).slideUp('slow');
+            $('#icon_data_'+last_id).removeClass('icon-remove').addClass('icon-add');
+        }
+});
+$(document).ready(function() {
+//$('.form_datetime').daterangepicker({
+//        weekStart: 1,
+//        todayBtn:  1,
+//        format: '<?//= $date_time_formats['date_time_format'] ?>',
+//        autoclose: 1,
+//        todayHighlight: 1,
+//        startView: 2,
+//        forceParse: 0,
+//       // showMeridian: 1,
+//    });
+//
+//    $('.form_date').daterangepicker({
+//        weekStart: 1,
+//        format: '<?//= $date_time_formats['date_format'] ?>',
+//        todayBtn:  1,
+//        autoclose: 1,
+//        todayHighlight: 1,
+//        startView: 2,
+//        minView: 2,
+//        forceParse: 0,
+//    });
+    $('.form_datetime').daterangepicker({
+        format: '<?= $date_time_formats['date_time_format'] ?>',
+        singleDatePicker: true,
+        startDate: moment(),
+    });
+
+    $('.form_date').daterangepicker({
+        format: '<?= $date_time_formats['date_format'] ?>',
+        singleDatePicker: true,
+        startDate: moment()
+    });
+});
+
+
+    /* format date in yyyy-mm-dd hh:ii:ss */
+                function toformatdatetime(date,formattype) {
+                    var formattedDate = new Date(date);
+                    var d = formattedDate.getDate(date);
+                    d = d < 10 ? '0' + d : d;
+                    var m =  formattedDate.getMonth();
+                    m += 1;  // JavaScript months are 0-11
+                    m = m < 10 ? '0' + m : m;
+                    var y = formattedDate.getFullYear();
+                    var h = formattedDate.getHours();
+                    h = h < 10 ? '0' + h : h;
+                    var i = formattedDate.getMinutes();
+                    i = i < 10 ? '0' + i : i;
+                    var s = formattedDate.getSeconds();
+                    s = s < 10 ? '0' + s : s;
+                    if(formattype=='datetime'){
+                    var format = y+"-"+m+"-"+d+" "+h+":"+i+":"+s;
+                    }
+                    else{
+                        var format = y+"-"+m+"-"+d;
+                    }
+                    return format;
+		}
+
+    function populatefields(val,value){
+        var item = val[0]['Item'][0];
+        var ob;
+        var arrval = [];
+        var arrkey = [];
+        for (ob in item) {
+            arrkey.push(ob);
+            $("#"+item[ob]).val('');
+        }
+        var form = val[0]['Form'];
+        var id=val[0]['onchangeof'];
+        var data = {
+            form : form,
+            id:id,
+            val:value,
+            originfields : arrkey,
+        }
+        var url = "<?php echo $this->url('tracker', array('action' => 'getvaluefromotherform')); ?>";
+        $.post(url, data,function(respJson){
+            if(respJson!='') {
+                var resp = JSON.parse(respJson);
+                var ob;
+                for (ob in resp[0]) {
+                    $("#" + item[ob]).val(resp[0][ob]);
+                }
+            }
+
+        });
+        return false;
+
+    }
+    //$(document).ready(function() {
+        <?php echo html_entity_decode($validation_script);?>
+		var uploadField = $('input[type="file"]');
+                    $(".file_error_1").show();
+                    uploadField.on('change', function(){
+                    var id= $(this).attr('id');
+                    if(this.files[0].size > 5242880 ){
+                        this.value = "";
+                        $("#file_error_1" + id).hide();
+                        $("#file_error_2" + id).show();
+                        }
+                    else {$("#file_error_1"+id).hide();
+                     $("#file_error_2" + id).hide();}
+                                    }
+                    );
+		function toDateTime(date) {
+			var str = '';
+			var year, month, day, hour, min;
+			year = date.getUTCFullYear();
+			month = date.getUTCMonth() + 1;
+			month = month < 10 ? '0' + month : month;
+			day = date.getUTCDate();
+			day = day < 10 ? '0' + day : day;
+			hour = date.getUTCHours();
+			hour = hour < 10 ? '0' + hour : hour;
+			min = date.getUTCMinutes();
+			min = min < 10 ? '0' + min : min;
+
+			str += year + '-' + month + '-' + day;
+			str += ' ' + hour + ':' + min;
+			return str;
+		}
+		function toDate(date) {
+				var str = '';
+				var year, month, day, hour, min;
+				year = date.getUTCFullYear();
+				month = date.getUTCMonth() + 1;
+				month = month < 10 ? '0' + month : month;
+				day = date.getUTCDate();
+				day = day < 10 ? '0' + day : day;
+				str += day + '-' + month + '-' + year;
+				return str;
+		}
+
+        var jsonData = <?php echo json_encode($array_form_f); ?>;
+        var jsonString = JSON.stringify(jsonData);
+        $('#inputFieldsFormiula').val(jsonString);
+
+        $('.control-label').css('margin-top','10px');
+        $('.col-md-6').css('margin-top','10px');
+        $('.col-md-4').css('margin-top','10px');
+        $('.col-md-8').css('margin-top','10px');
+
+        var respCheckListJson = $('#inputFieldsFormiula').val();
+        var formula_fields =JSON.parse(respCheckListJson);
+        <?php
+        $script = "";
+        foreach ($array_form_f as $key => $val) {
+
+            $script.="$('#$key').bind('change',function(){";
+
+            foreach ($val as $key_form => $val_form) {
+                $formula_fields_id = $key_form;
+                $formula_fields_name = $key_form;
+                $formula_value_field_name = "hidden_formula_" . $formula_fields_name;
+                $hidden_dependent_formula_name_string = "hidden_dependent_" . $formula_fields_name;
+
+                $depe_arra = array_unique(explode(',', $val_form));
+                $formula_value = $formula_value_data_array[$formula_fields_id];
+                $script.="var chage_str = '$formula_value';";
+                foreach ($depe_arra as $key_dep => $val_dep) {
+                    $field_concat_val = "{{" . $val_dep . "}}";
+                   $script.= "var getProp=false; if($('#$val_dep').readOnly) { $('#$val_dep').removeAttribute('readonly'); var getProp=true; } var chage_str = chage_str.replace(/$field_concat_val/g,$('#$val_dep').val()); if(getProp){ $('#$val_dep').setAttribute('readonly', true);}";
+                }
+                $script.= "$('#$formula_fields_id').val(eval(chage_str));";
+            }
+            $script.="});";
+        }
+        echo $script;
+        ?>
+
+        <?php
+$script_formula_combo = "";
+foreach ($array_form_formula_combo as $key => $val) {
+
+$script_formula_combo.="$('#$key').change(function(){";
+foreach ($val as $key_form => $val_form) {
+$formula_fields_id = $key_form;
+$formula_fields_name = $key_form;
+$formula_value_field_name = "hidden_formula_combo_" . $formula_fields_name;
+$hidden_dependent_formula_name_string = "hidden_dependent_combo_" . $formula_fields_name;
+$depe_arra = array_unique(explode(',', $val_form));
+$formula_value = $formula_combo_value_data_array[$formula_fields_id];
+$script_formula_combo.="var chage_str = '$formula_value';";
+foreach ($depe_arra as $key_dep => $val_dep) {
+$field_concat_val = "{{" . $val_dep . "}}";
+$script_formula_combo.= "var chage_str = chage_str.replace(/$field_concat_val/g,$('#$val_dep').val());";
+}
+
+$script_formula_combo.= "$('#$formula_fields_id').val(eval(chage_str));";
+}
+$script_formula_combo.="});";
+}
+echo $script_formula_combo;
+?>
+    
+//});
+    
+    function getDuration(date1,date2)
+    {
+        return (date2-date1)/(1000*60*60*24);
+    }
+    function comboselected(element,value){
+        $("#"+element).prop("disabled",false);
+        return value;
+    }
+    function combonotselected(element){
+        $("#"+element).prop("disabled","disabled");
+        return "";
+    }
+    function CheckTAT(StartDate,EndDate)
+    {
+        StartDate = toformatdatetime(new Date(StartDate),"date");
+        EndDate = toformatdatetime(new Date(EndDate),"date");
+        StartDate= Date.parse(StartDate)/1000;    //change date time to unix time stamp
+        EndDate= Date.parse(EndDate)/1000;
+        if (StartDate >= EndDate) {
+            return "PASS";
+        }
+        else {
+            return "FAIL";
+        }	
+    }
+    function getPresentDateTime(div_id){
+        var d = new Date();
+        $("#"+div_id+" option:not(:selected)").attr('disabled', true);
+        return moment(d).format('<?= $date_time_formats['jquery_date_time_format'] ?>')
+    }
+    Number.prototype.mod = function(n) {
+        return ((this%n)+n)%n;
+    }
+    function addBusDays(date1,days)
+    {
+		return moment(date1).businessAdd(days).format('<?= $date_time_formats['jquery_date_format'] ?>');
+    }
+    function addCalDays(date1,days)
+    {
+		return moment(date1).add(days, "day").format('<?= $date_time_formats['jquery_date_format'] ?>')
+    }
+    function substractCalDays(date1,days)
+    {
+		return moment(date1).subtract(days, "day").format('<?= $date_time_formats['jquery_date_format'] ?>')		
+    }
+    function getPresentDate(){
+        var d = new Date();
+        return moment(d).format('<?=($date_time_formats['jquery_date_format'] !== '')?$date_time_formats['jquery_date_format']:'mm/dd/yyyy' ?>')
+    }
+    function check_box_text_area_show(id){
+        var checkedNum = $('input[name="'+id+'[]"]:checked').length;
+        if(checkedNum > 0){
+            $("#comment_checkbox_div_"+id).show();
+        }else{
+            $("#comment_checkbox_div_"+id).hide();
+        }
+        var cboxes = document.getElementsByName(id+'[]');
+        var len = cboxes.length;
+        var critical = 0;
+        var major = 0;
+        var minor = 0;
+
+        var checkbox_name = [];
+
+        $("input[name='"+id+"[]']:checked").each(function() {
+            var value=$(this).val();
+            var value=$.parseJSON(value);
+            checkbox_name.push(value.option);
+            var kpi = value.kpi;
+            if(kpi == 1){
+                critical = critical+1;
+            }else if(kpi == 2){
+                major = major+1;
+            }else if(kpi == 3){
+                minor = minor+1;
+            }
+        });
+
+        var checkbox_names=checkbox_name.join(',');
+        $("#data_"+id).attr('value', checkbox_names);
+        $("#data_"+id).trigger('change');
+        $("#critical_checkbox_"+id).val(critical);
+        $("#major_checkbox_"+id).val(major);
+        $("#minor_checkbox_"+id).val(minor);
+
+        $("#critical_checkbox_"+id).trigger('change');
+        $("#major_checkbox_"+id).trigger('change');
+        $("#minor_checkbox_"+id).trigger('change');
+    }
+
+    
+    function dateDiffInDays(a1, b1) {
+        var _MS_PER_DAY = 1000 * 60 * 60 * 24;
+        var a = new Date(a1);
+        var b = new Date(b1);
+         //Discard the time and time-zone information.
+        var utc1 = Date.UTC(a.getFullYear(), a.getMonth(), a.getDate());
+        var utc2 = Date.UTC(b.getFullYear(), b.getMonth(), b.getDate());
+        var diffDays = Math.floor((utc1 - utc2) / _MS_PER_DAY);
+        return  diffDays;
+    }
+</script>

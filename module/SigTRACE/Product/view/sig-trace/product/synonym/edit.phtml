@@ -1,0 +1,106 @@
+<div class="crumbs">
+    <ul class="breadcrumb" id="breadcrumbs">
+        <li>
+            <i class="icon-home"></i>
+            <a title="" href="/product/<?=$trackerId;?>/<?=$formId;?>">Product</a>
+        </li>
+        <li>
+            <a title="" href="/product/synonym/<?=$trackerId;?>/<?=$formId;?>/<?=$productId;?>">Synonym</a>
+        </li>
+        <li class="current">
+            <a title="" href="javascript:void(0)">Edit</a>
+        </li>
+    </ul>
+</div>
+<div class="page-header"></div>
+
+<div class="row">
+    <div class="col-md-12">
+        <p class="alert" id="msg_alert" style="display:none;"></p>
+        <div class="widget box">
+        <div class="widget-header">
+            <h4><i class="icon-reorder"></i> Edit Synonym</h4>
+        </div>
+        <div class="widget-content">
+            <form method="POST" id="editSyn" enctype='multipart/form-data' class="form-horizontal row-border">
+                    <input type="hidden" id="hiddenProductStatus" value="0"/>
+                    <input type="hidden" id="synId" name="synId" value="<?=$id;?>" />
+                    <div class="form-group">
+                            <label class="col-md-3 control-label">Product <span class="required">*</span></label>
+                            <div class="col-md-4 clearfix">
+                                <select class="col-md-12 select2 full-width-fix required" name="productId" id="productId">
+                                    <option selected value="<?=$productId;?>"><?=$productName;?></option>
+                                </select>
+                            </div>
+                    </div>
+                    <div class="form-group">
+                        <label class="col-md-3 control-label">Synonym Name<span class="required">*</span></label>
+                        <div class="col-md-4">
+                            <input value="<?=$name;?>" type="hidden"  name="oldSyn">
+                            <input oninput="nameCheck(this.value,'input')" value="<?=$name;?>" style='margin-bottom: 10px;' type="text" class="form-control required" id="syn" name="syn">
+                            <div class='syn-block'></div>
+                        </div>
+                    </div>
+                    <div class="form-actions">
+                        <a class="btn btn-default pull-right" href="<?=isset($_SERVER['HTTP_REFERER'])? $_SERVER['HTTP_REFERER']:'#';?>">Cancel</a>
+                        <input type="submit" class="btn btn-primary pull-right" value="Edit" />
+                    </div>
+            </form>
+        </div>
+        </div>
+    </div>
+</div>
+<script>
+    $('#editSyn').validate();
+    $("#editSyn").on('submit',function()
+    {
+        nameCheck($.trim($("#syn").val()),'submit');
+        if($('#hiddenProductStatus').val() == 0)
+        {
+            return false;
+        }
+    });
+    function nameCheck(name, type){
+        var productId =  $("#productId").val();
+        var synId =  <?=$id;?>;//$("#SynId").val();
+        $(".syn-block").html('');
+        if(name.length === 0)
+        {
+            //$(".help-block").html('<font color="#cc0000">Product name can not be blank</font>');
+            $('#hiddenProductStatus').val(0);
+            $("#syn").addClass('red');
+        }
+        else if(!name.match(/[a-zA-Z]/i)){
+            $("#syn").addClass('red');
+            $('#hiddenProductStatus').val(0);
+        }
+        else
+        {
+            $.ajax({  
+                type: "POST", 
+                url: "/product/synonym/synonymCheck", 
+                data: "id="+productId+"&label="+name+"&synId="+synId, 
+                success: function(respJson){
+                    //alert(respJson); return false;
+                    var resp =JSON.parse(respJson);
+                    var responseCode = resp.responseCode;
+                    var errMessage = resp.errMessage;
+                    if(responseCode == 1){
+                        $('#hiddenProductStatus').val(1);
+                        $(".syn-block").html('<font color="#088A08">'+errMessage+'</font>');
+                        $("#syn").addClass('green');
+                    }
+                    else{
+                        $(".syn-block").html('<font color="#cc0000">'+errMessage+'</font>');
+                        $("#syn").addClass('red');
+                        $('#hiddenProductStatus').val(0);
+                    }
+                }
+            });
+        }
+    }
+</script>
+<style>
+    .red{ border-color:#cc0000 !important;}
+    .green{ border-color:#088A08 !important;}
+</style>

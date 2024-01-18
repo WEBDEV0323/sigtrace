@@ -1,0 +1,267 @@
+<?php
+use Zend\Session\Container;
+$title = 'Email Template';
+$this->headTitle($title);
+$container = new Container('msg');
+$selected_option=0;
+$forms = array();
+if(!empty($trackerRsults)){
+  $tracker_details = $trackerRsults['tracker_details'];
+  $forms = $trackerRsults['forms'];
+  $tracker_name = $tracker_details['name'];
+  $sActionType = $template_id > 0 ? 'Edit Notification' : 'Create Notification';
+}
+
+?>
+<div class="pagebar container-fluid col-md-12">
+    <!-- Sidebar Toggle -->
+    <button type="button" class="pagebar-toggle navbar-toggle pull-left">
+        <span class="pagebar-arrow"></span>
+    </button>
+    <ol class="breadcrumb">
+       <li><span><a href="/dashboard/<?php echo isset($forms[0]['tracker_id'])?$forms[0]['tracker_id']:0;?>/<?php echo isset($forms[0]['form_id'])?$forms[0]['form_id']:0;?>"><?php echo $tracker_name;?></a></span></li>
+        <!-- <li><span><a href="/tracker/settings/<?php echo $tracker_id;?>">Tracker Settings</a></span></li> -->
+        <li><span><a href="/email/index/<?php echo $tracker_id;?>">Email List</a></span></li>
+        <li class="active"><span><?php echo $sActionType;?></span></li>
+    </ol>
+</div>
+
+
+<div class="card">
+    <div class="card-body">    
+        <div class="card">
+            <div  class="card-header"><h6><?php echo $sActionType;?></h6></div>
+            <div class="card-body">         
+                <div class="form-group row">
+                    <div class="error" id="eventErrorMessages"></div>
+                    <div id="roleErrorMessages" class="error col-sm-6"></div>
+                </div>
+                <span style="display:none;color:red" id="checkduplicate">Notification with the same name already exist.</span>
+                <!-- <div id="status_final" class="alert" aria-hidden="true"></div> -->
+                    <?php echo $this->form()->openTag($form); ?>
+                    <?php echo $this->formElement($form->get('c_hidden')); ?>
+                    <?php echo $this->formElement($form->get('c_hidden_fields')); ?>
+                    <?php echo $this->formElement($form->get('c_flag')); ?>
+                            <!--   <form id="clientform" method="post" action="" name="clientform" class="form-horizontal">-->
+                            <div class="form-group row">
+                                <label class="control-label col-md-4" style="padding-left: 0px;">
+                                    <?php echo $this->formlabel($form->get('n_name')); ?><span class="error ml-1">*</span>
+                                </label>
+                                <!--                                <label class="control-label col-md-4" style="padding-left: 0px;">Client Name</label>-->
+                                <div class="controls col-md-8">
+                                    <?php echo $this->formElement($form->get('n_name')); ?>
+                                    <span class="error" id="n_name_first"></span>
+                                    <label class="error" style="display:none" for="c_name">Client with the same name already exists</label>
+
+                                </div>
+                            </div>
+                            <div class="form-group row">
+                                <label class="control-label col-md-4" style="padding-left: 0px;">
+                                    <?php echo $this->formlabel($form->get('n_form')); ?><span class="error ml-1">*</span>
+                                </label>
+                                <div class="controls col-md-8">
+                                    <?php echo $this->formElement($form->get('n_form')); ?>
+                                    <label class="error" id="n_form_first"></label>
+                                </div>
+                            </div>
+                            <div class="form-group row">
+                                <label class="control-label col-md-4" style="padding-left: 0px;">Notify Whom<span class="error ml-1">*</span></label>
+                                <div class="controls col-md-8">
+
+                                    <select data-placeholder="Send To" class="form-control selectpicker" data-live-search="true" data-actions-box="true" data-container="body"  id="field_id" multiple tabindex="4" >
+                                        <?php
+                                        $selected = '';
+                                        if (!empty($fields)) { 
+                                            
+                                            foreach ($fields as $opt => $opt_values) {
+                                            $selected = '';
+                                            $field_id = $opt_values['field_id'];
+                                            foreach ($result as $res) {
+                                                if ($template_id > 0 && strpos($res['notification_template_to'], $field_id) !== false) {
+                                                    $selected = 'selected';
+                                                    $selected_option=$res['notification_template_to'];
+                                                    break;
+                                                }
+                                            }
+                                                $field_name = $opt_values['label'];
+                                                ?>
+                                                <option <?php echo $selected ?> value="<?php echo $this->escapeHtml($field_id); ?>"><?php echo $this->escapeHtml($field_name); ?></option>
+                                    <?php
+                                            }
+                                        }
+                                        ?>
+                                    </select>
+                                    <label class="error" id="sendTo_status"></label>
+                                </div>
+                            </div>
+                            <div class="form-group row">
+                                <label class="control-label col-md-4" style="padding-left: 0px;">
+                                    <?php echo $this->formlabel($form->get('n_cc')); ?>
+                                </label>
+                                <div class="controls col-md-8">
+                                    <?php echo $this->formElement($form->get('n_cc')); ?>
+                                    <label id="cc_status" class= "error"></label>
+                                </div>
+                            </div>
+                            <div class="form-group row">
+                                <label class="control-label col-md-4" style="padding-left: 0px;">
+                                    <?php echo $this->formlabel($form->get('n_condition')); ?><span class="error ml-1">*</span>
+                                </label>
+                                <div class="controls col-md-8">
+                                    <?php echo $this->formElement($form->get('n_condition')); ?>
+                                    <label class="error" id="notify_when_error"></label>
+                                </div>
+                            </div>
+                            <div class="form-group row" id="conditionparent">
+                                <label for="fields" class="control-label col-md-4"> </label>
+                                    <div class="controls col-md-3" style="width:35%">
+
+                                        <select id="n_condtionfield" class="demo-default form-control n_condtionfield fields selectpicker" data-live-search="true" data-actions-box="true" data-container="body" placeholder="Select Field" name="fields[]">                                           
+                                            <option value="">--Select Fields--</option>
+                                        </select>
+                                        <label class="error" id="n_condition_first"></label>
+
+                                    </div>
+                                    <div class="controls col-md-2" style="width:20%">
+                                        <select id="n_condition_operand" class="form-control demo-default n_condition_operand"  placeholder="Select Condition">
+                                            
+                                            <option value="">Select Condition</option>
+                                            <option value="==">=</option>
+                                            <option value="!=">!=</option>
+                                            <option value=">">&gt</option>
+                                            <option value="<">&lt</option>
+                                            <option value="Changes To">Changes To</option>
+                                        </select>
+                                        <label class="error" id="n_condition_operand_first"></label>
+                                    </div>
+                                    <div class="controls col-md-2" style="width:20%">
+                                        <?php echo $this->formElement($form->get('n_value')); ?>
+                                        <label class="error" id="n_value_first"></label>
+                                    </div>
+                                    
+                                    <div class="controls col-md-1" style="padding-top: 8px !important;">
+                                        <i class="lnr icon-plus-circle" id="addCondition" value="0"  style="font-size: 16px; color: green;" aria-hidden="true"></i>
+                                    </div>
+                            </div>
+                            <div class="form-group" id="conditionGroup">
+
+                            </div>
+                            <div class="form-group row">
+                                <label class="control-label col-md-4" style="padding-left: 0px;">
+                                    <?php echo $this->formlabel($form->get('n_subject')); ?><span class="error ml-1">*</span>
+                                </label>
+                                <div class="controls col-md-8">
+                                    <?php echo $this->formElement($form->get('n_subject')); ?>
+                                </div>
+                            </div>
+                            <div class="form-group row">
+                                <label for="textfield" class="control-label col-md-4"></label>
+                                <div class="controls col-md-4">
+                                    <select class="form-control selectpicker" data-live-search="true" data-actions-box="true" data-container="body" id="workflowFields" name="workflowFields">
+                                        <option value="">--Select Workflow--</option>
+                                    </select>
+                                </div>
+                                <div class="controls col-md-4">
+                                    <select class="form-control selectpicker" data-live-search="true" data-actions-box="true" data-container="body" id="fieldsForWorkflow" name="fieldsForWorkflow">
+                                        <option value="">Select Fields</option>
+                                    </select>
+                                </div>
+                            </div>
+                            <div class="form-group row">
+                        <label for="textfield" class="control-label col-md-4">Email Body</label>
+                        <div class="controls col-md-8">
+                            <textarea id="summernote" name="editordata"><?php if (isset($result[0])) {
+                                echo html_entity_decode($result[0]['notification_template_msg']);
+                            } ?></textarea>
+                        </div>
+                    </div>
+                            <input type="hidden" name="conditionID" id="conditionID">
+                            <input type="hidden" name="notifyID" id="notifyID">
+                            <?php if ($template_id > 0) { ?>
+                                <div class="form-group row">
+                                    <label class="control-label col-md-4" style="padding-left: 0px;">
+                                        <?php echo $this->formlabel($form->get('reason_for_change')); ?><span class="error ml-1">*</span>
+                                    </label>
+                                    <div class="controls col-md-8">
+                                        <?php echo $this->formElement($form->get('reason_for_change')); ?>
+                                        <div class="col-md-12" id="reason_for_change_error"></div>
+                                    </div>
+                                </div>
+
+                            <?php } ?>
+                            <div class="modal-footer" style="padding-bottom:0px">
+
+                                <button onclick="addNewTemplate(<?php echo $tracker_id ?>,'<?php echo $template_id ?>')" type="button" class="btn btn-primary">Save</button>
+
+                                <a href="<?php echo $this->url('email', array('action' => 'index', 'trackerId' => $tracker_id)) ?>">
+                                    <button class="btn btn-default" type="button" data-dismiss="modal">Cancel</button>
+                                </a>
+                            </div>
+        <?php echo $this->form()->closeTag($form); ?>
+    </div>
+</div>
+</div>
+</div>
+
+<!-- Modal -->
+<div class="modal fade" id="myNotificationModal" tabindex="0" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+  <div class="modal-dialog" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h4 class="modal-title" id="myModalLabel">Delete Notification Condition</h4>
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+      </div>
+      <div class="modal-body">
+        Do you really want to delete this notification condition?
+      </div>
+      <div class="modal-footer">
+        <input type="hidden" id="requiredRemovedDivId">
+        <button type="button" id="btnYes" class="btn btn-primary">Delete</button>
+        <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+      </div>
+    </div>
+  </div>
+</div>
+<script>
+    <?php
+        if(isset($result[0])) {
+            $to_array=explode(",", $result[0]['notification_template_to']);
+        }
+    ?>
+    usersField = '<?php if(isset($to_array)) { echo json_encode($to_array);} ?>';
+    notificationCondition = '<?php if(isset($result)) { echo json_encode($result);} ?>'; //console.log(notificationCondition);
+    link= '<?php echo $this->basePath();?>';
+    selected_option="<?php echo $selected_option; ?>";            
+    tracker_id='<?php echo $tracker_id?>';
+    template_id='<?php echo $template_id ?>';
+    options = '';
+</script>
+
+<?php 
+$this->inlineScript()->appendFile($this->basePath() . '/js/module/common/notification/js_notification.js');
+$this->inlineScript()
+            ->prependFile($this->basePath() . '/assets/summernote/summernote-bs4.min.js', 'text/javascript');
+
+
+?>
+
+
+<style type="text/css" media="all">
+    /* fix rtl for demo */
+    .chosen-rtl .chosen-drop { left: -9000px; }
+</style>
+
+<style>
+    .btn-group .selectize-control .selectize-input{
+        width: 150px;
+        align:left
+    }
+
+    .btn-group{
+        align:left
+    }
+    .dropdown-select {
+        border: 1px solid #ddd;
+        color: #353535 !important;
+    }
+</style>

@@ -1,0 +1,47 @@
+<?php 
+use Session\Container\SessionContainer;
+$session = new SessionContainer();
+$msg = $session->getSession("signalAssessmentEdit");
+$title = "Frequency Analysis";
+?>
+<div class="pagebar container-fluid col-md-12">
+    <!-- Sidebar Toggle -->
+    <button type="button" class="pagebar-toggle navbar-toggle pull-left">
+      <span class="pagebar-arrow"></span>
+    </button>
+    <ol class="breadcrumb">
+      <li class="active"><span><?php echo $this->escapeHtml($title);?></span></li>
+    </ol>
+</div>
+<div class="card">
+    <div class="card-body">
+        <div class="card">
+            <div class="card-header"><h6><?php echo $this->escapeHtml($title);?></h6></div>
+            <div id="alertError"></div> 
+            <div class="card-body">
+                <div class="row">
+                    <div class="col-md-0">Page Size:</div>
+                    <div class="ml-3" style="width:80px;">
+                        <select onchange="onPageSizeChanged()" id="page-size" class="form-control">
+                            <option value="5" selected>5</option>
+                            <option value="10">10</option>
+                            <option value="25">25</option>
+                            <option value="50">50</option>
+                            <option value="100">100</option>
+                            <option value="500">500</option>
+                            <option value="1000">1000</option>
+                        </select>
+                    </div>
+                </div>
+                <div id="myGrid" class="ag-theme-material w-100"></div>  
+            </div>
+        </div>
+        
+    </div>
+</div>
+<script>    
+    var trackerId="<?php echo $trackerId;?>";
+    var formId="<?php echo $formId;?>"; 
+</script>
+<?php 
+    $this->inlineScript()->appendFile($this->basePath() . '/js/module/common/FrequencyAnalysis/FrequencyAnalysis.js', 'text/javascript');

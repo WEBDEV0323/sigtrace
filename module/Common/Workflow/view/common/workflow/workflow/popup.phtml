@@ -1,0 +1,56 @@
+<!DOCTYPE HTML>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="Content-Type: text/html; charset=utf-8" content="text/html; charset=utf-8" />
+	<meta http-equiv="X-UA-Compatible" content="IE=edge"/>
+	<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+	<!-- Apple devices fullscreen -->
+	<meta name="apple-mobile-web-app-capable" content="yes" />
+	<!-- Apple devices fullscreen -->
+	<meta names="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+	<?php echo $this->headMeta()->appendName('viewport', 'width=device-width, initial-scale=1.0')->appendHttpEquiv('X-UA-Compatible', 'IE=edge')?>
+
+	<!-- Le styles -->
+	<?php echo $this->headLink(array('rel' => 'shortcut icon', 'type' => 'image/vnd.microsoft.icon', 'href' => $this->basePath() . '/assets/favicon.ico'))
+                ->appendStylesheet($this->basePath() . '/assets/custom/css/style.css');
+        ?>
+</head>
+<body>
+<input type="hidden" id="trackerId" value="<?php echo $tracker_id?>"/>
+<input type="hidden" id="recordId" value="<?php echo $recordId?>"/>
+<div class="pagebar container-fluid col-md-12">
+    <!-- Sidebar Toggle -->
+    <button type="button" class="pagebar-toggle navbar-toggle pull-left">
+      <span class="pagebar-arrow"></span>
+    </button>
+    <ol class="breadcrumb">        
+        <li class="active"><span>View <?php echo $fieldLabel;?> Data</span></li>
+    </ol>
+</div>
+
+<div class="card">
+  <div class="card-body">
+    <div class="card mb-2">
+        <div class="card-body">
+            <div class="row">                         
+                <div class="col-sm-4"><?php echo $fieldLabel;?></div>
+                <div class="col-sm-7">
+                    <p class="text-justify"><?php echo $value;?></p>
+                </div>
+            </div>
+          </div>
+    </div>
+  </div>
+</div>
+<style>
+    .pagebar {
+
+     position: static; 
+     top: 0px; 
+     z-index: 777; 
+     margin-left: 0px; 
+    }
+</style>
+</body>
+</html>

@@ -1,0 +1,223 @@
+<?php
+$trackerDetails = $trackerResults['tracker_details'];
+$trackerName = $trackerDetails['name'];
+$forms = isset($trackerResults['forms']) ? $trackerResults['forms'] : array();
+$iAccessFormId = count($forms) > 0 ? $forms[0]['form_id'] : 0;
+$title = "$trackerName - Calendar";
+$this->headTitle($title);
+$trackerId = isset($trackerId) ? $this->escapeUrl($trackerId) : $this->escapeUrl(0);
+$formId = isset($formId) ? $this->escapeUrl($formId) : $this->escapeUrl(0);
+$trackerUrl = "/tracker/form/" . $trackerId  . "/" . $formId;
+$calendarAdd = "/calendar/add/" . $trackerId  . "/" . $formId;
+?>
+
+<div class="pagebar container-fluid col-md-12">
+    <!-- Sidebar Toggle -->
+    <button type="button" class="pagebar-toggle navbar-toggle pull-left">
+        <span class="pagebar-arrow"></span>
+    </button>
+    <ol class="breadcrumb">
+        <li><span><a href='<?php echo $trackerUrl;?>'><?php echo $this->escapeHtml($formName);?></a></span></li>        
+        <li class="active"><span>View Calendar</span></li>
+    </ol>
+</div>
+<div class="card">
+    <div class="card-header m-0 p-2">                        
+        <nav aria-label="breadcrumb">
+            <button type="button" class="btn btn-primary " onclick="window.location.href = '<?php echo $this->url('calendar', array('action' => 'events_list', 'trackerId' => $trackerId, 'form_id' => $formId)) ?>'" >Events List</button>
+            <button type="button" class="btn btn-primary " onclick="window.location.href = '<?php echo $calendarAdd;?>'">Add New Event</button>                
+            <input type="hidden" id="tid" value="<?php echo $this->escapeHtml($trackerId); ?>"/>
+            <input type="hidden" id="fid" value="<?php echo $this->escapeHtml($formId); ?>"/>
+            <button type="button" class="btn btn-sm btn-outline-secondary float-right" data-toggle="popover" data-html="true" data-content='<?php echo $legend; ?>' title="Legends" style="position: sticky; left: 10; margin-left: 10px;">
+                <i class="fas fa-palette"></i>
+            </button>                            
+        </nav>
+    </div>
+    <div class="card-body m-0 p-0" id="monthTable">
+        <?php echo $calendar ?>
+    </div>
+</div>
+<?php
+$this->headLink()->appendStylesheet($this->basePath() . '/assets/fontawesome/css/all.css');
+$this->headLink()->appendStylesheet($this->basePath() . '/assets/calendar js/calendar-alt.css');
+$this->inlineScript()->appendFile($this->basePath() . '/assets/fontawesome/js/fontawesome.js');
+$this->inlineScript()->appendFile($this->basePath() . '/js/module/calendar/calendar.js');
+?>
+<script>
+    var usedHeight = 230;
+
+    $(function () {
+        $('[data-toggle="popover"]').popover();
+        $('[data-toggle="tooltip"]').tooltip();
+    });
+
+    $(document).ready(function () {
+        setGridContainersHeight();
+        resetCalendarDetailRowHeight();
+        var reportsCount = 0;
+        var usersCount = 0;
+    });
+
+    $(document).resize(function () {
+        resetCalendarDetailRowHeight();
+    });
+
+    $(window).resize(function () {
+        resetCalendarDetailRowHeight();
+    });
+
+    $('#tblReportsCategories > tbody > tr').mouseenter(function (e) {
+        var rowIndex = $(this).index();
+        var rowElem = $('#tblReportsDetail > tbody > tr').eq(rowIndex);
+        rowElem.toggleClass('calendarBodyItemHovered');
+    });
+
+    $('#tblReportsCategories > tbody > tr').mouseleave(function (e) {
+        var rowIndex = $(this).index();
+        var rowElem = $('#tblReportsDetail > tbody > tr').eq(rowIndex);
+        rowElem.toggleClass('calendarBodyItemHovered');
+    });
+
+    $('#tblReportsDetail > tbody > tr').mouseenter(function (e) {
+        var rowIndex = $(this).index();
+        var rowElem = $('#tblReportsCategories > tbody > tr').eq(rowIndex);
+        rowElem.toggleClass('calendarBodyItemHovered');
+    });
+
+    $('#tblReportsDetail > tbody > tr').mouseleave(function (e) {
+        var rowIndex = $(this).index();
+        var rowElem = $('#tblReportsCategories > tbody > tr').eq(rowIndex);
+        rowElem.toggleClass('calendarBodyItemHovered');
+    });
+
+    $('#tblUsersCategories > tbody > tr').mouseenter(function (e) {
+        var rowIndex = $(this).index();
+        var rowElem = $('#tblUsersDetail > tbody > tr').eq(rowIndex);
+        rowElem.toggleClass('calendarBodyItemHovered');
+    });
+
+    $('#tblUsersCategories > tbody > tr').mouseleave(function (e) {
+        var rowIndex = $(this).index();
+        var rowElem = $('#tblUsersDetail > tbody > tr').eq(rowIndex);
+        rowElem.toggleClass('calendarBodyItemHovered');
+    });
+
+    $('#tblUsersDetail > tbody > tr').mouseenter(function (e) {
+        var rowIndex = $(this).index();
+        var rowElem = $('#tblUsersCategories > tbody > tr').eq(rowIndex);
+        rowElem.toggleClass('calendarBodyItemHovered');
+    });
+
+    $('#tblUsersDetail > tbody > tr').mouseleave(function (e) {
+        var rowIndex = $(this).index();
+        var rowElem = $('#tblUsersCategories > tbody > tr').eq(rowIndex);
+        rowElem.toggleClass('calendarBodyItemHovered');
+    });
+
+    function resetCalendarDetailRowHeight() {
+        $('#tblReportsCategories > tbody > tr').each(function (i, el) {
+            var categoryRow = $('#tblReportsCategories > tbody > tr').eq(i);
+            var detailRow = $('#tblReportsDetail > tbody > tr').eq(i);
+
+            if (categoryRow.height() > detailRow.height()) {
+                detailRow.height(categoryRow.height());
+            } else {
+                categoryRow.height(detailRow.height());
+            }
+        });
+
+        $('#tblUsersCategories > tbody > tr').each(function (i, el) {
+            var categoryRow = $('#tblUsersCategories > tbody > tr').eq(i);
+            var detailRow = $('#tblUsersDetail > tbody > tr').eq(i);
+
+            if (categoryRow.height() > detailRow.height()) {
+                detailRow.height(categoryRow.height());
+            } else {
+                categoryRow.height(detailRow.height());
+            }
+        });
+    }
+
+    function setRowHeight(target, rowIndex, rowHeight) {
+        $(target + ' > tbody > tr')
+                .eq(rowIndex)
+                .height(rowHeight);
+    }
+
+    function setGridContainersHeight() {
+        var containerHeight = (window.innerHeight - usedHeight);
+        var minimumRowCountThreshold = 8;
+        var minimumRowHeight = 45;
+        reportsCount = <?= $reportCount; ?>;
+        usersCount = <?= $usersCount; ?>;
+        setSectionHeight('U', minimumRowHeight);
+
+        if (reportsCount > minimumRowCountThreshold) {
+            setSectionHeight('R', containerHeight - minimumRowHeight);
+        } else {
+            setSectionHeight('R', reportsCount * minimumRowHeight);
+        }
+    }
+
+    function setSectionHeight(sectionName, height) {
+        if (sectionName == 'R') {
+            $('#tblReportsCategoriesContainer').css(
+                    'max-height',
+                    height + 'px'
+                    );
+            $('#tblReportsCategoriesContainer').height(height);
+            $('#tblReportsDetailContainer').css(
+                    'max-height',
+                    height + 'px'
+                    );
+            $('#tblReportsDetailContainer').height(height);
+        } else {
+            $('#tblUsersCategoriesContainer').css(
+                    'max-height',
+                    height + 'px'
+                    );
+            $('#tblUsersCategoriesContainer').height(height);
+            $('#tblUsersDetailContainer').css('max-height', height + 'px');
+            $('#tblUsersDetailContainer').height(height);
+        }
+    }
+
+    function syncScrollbars(container1, container2) {
+        var $div1 = $(container1);
+        var $div2 = $(container2);
+
+        var userScroll1 = true;
+        var userScroll2 = true;
+        var timer;
+
+        //if you want to see the difference the
+        //timers make when scrolling with a mouse
+        //wheel, remove lines with comment
+
+        $div1.scroll(function () {
+            if (userScroll2) {
+                //
+                userScroll1 = false; //
+                clearTimeout(timer); //
+                $div2.scrollTop($div1.scrollTop());
+                timer = setTimeout(function () {
+                    //
+                    userScroll1 = true; //
+                }, 100); //
+            } //
+        });
+
+        // $div2.scroll(function() {
+        //   if (userScroll1) {
+        //     //
+        //     userScroll2 = false; //
+        //     clearTimeout(timer); //
+        //     $div1.scrollTop($div2.scrollTop());
+        //     timer = setTimeout(function() {
+        //       //
+        //       userScroll2 = true; //
+        //     }, 100); //
+        //   } //
+        // });
+    }
+</script>

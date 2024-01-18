@@ -1,0 +1,745 @@
+<?php
+$tracker_details = $trackerRsults['tracker_details'];
+$forms = $trackerRsults['forms'];
+$tracker_name = $tracker_details['name'];
+$title = "$tracker_name - Code Lists";
+$this->headTitle($title);
+?>
+
+<div class="pagebar container-fluid col-md-12">
+    <!-- Sidebar Toggle -->
+    <button type="button" class="pagebar-toggle navbar-toggle pull-left">
+      <span class="pagebar-arrow"></span>
+    </button>
+    <ol class="breadcrumb">
+      <li class="active"><span><?php echo $this->escapeHtml($title); ?></span></li>
+    </ol>
+</div>
+<div class="card">
+    <div class="card-body">
+        <div class="card card-default mb-2">
+            <div class="card-body">
+                <div class="btn-group" role="group" aria-label="...">
+                    <a href="<?php echo $this->url('tracker', array('action' => 'view', 'tracker_id' => $tracker_id)) ?>">
+                        <button type="button" class="btn btn-default"><span class="lnr icon-home" aria-hidden="true"></span><br/>Home</button>
+                    </a>
+                </div>
+                <div class="btn-group" role="group" aria-label="...">
+                    <a href="<?php echo $this->url('tracker', array('action' => 'settings', 'tracker_id' => $tracker_id)) ?>">
+                        <button type="button" class="btn btn-primary"><span class="lnr icon-settings" aria-hidden="true"></span><br/>Settings</button>
+                    </a>
+                </div>
+                <?php
+                foreach ($forms as $key => $value) {
+                    $form_name = $value['form_name'];
+                    $form_id = $value['form_id'];
+                    ?>
+
+                    <div class="btn-group" role="group" aria-label="...">
+                        <a href="<?php echo $this->url('tracker', array('action' => 'form', 'tracker_id' => $tracker_id, 'action_id' => $form_id)) ?>">
+                            <button type="button" class="btn btn-default"><span class="lnr icon-list" aria-hidden="true"></span><br/><?= $form_name; ?></button>
+                        </a>
+                    </div>
+                    <?php
+                    }
+                    ?>
+                    <div class="btn-group" style="float:right" role="group" aria-label="...">
+                        <a href="<?php echo $this->url('tracker', array('action' => 'newform', 'tracker_id' => $tracker_id)) ?>">
+                            <button type="button" class="btn btn-default"><span class="lnr icon-add" aria-hidden="true"></span><br/>New Form</button>
+                        </a>
+                    </div>
+
+                </div>
+            </div>
+            <div class="card card-default">
+                <div class="card-body">
+                    <div  class="clearfix">
+                        <b>Code Lists</b>
+                        <div  class="pull-right">
+                            <div class="btn-group" role="group" aria-label="...">
+                                <a href="#" data-toggle="modal" id="codeList_add_new" class="audModelAdd" data-target="#addNewCodeListwithoprions">
+                                    <button type="button" class="btn btn-default"><span class="lnr icon-plus" aria-hidden="true"></span>Add New Code List</button>
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                    <hr/>
+                    <?php
+                    if (array_key_exists(0, $code_lists)) {
+                        ?>
+                        <table class="table table-striped">
+                            <tr>
+                                <th>Sl No</th>
+                                <th>Code List Name</th>
+                                <th>Action</th>
+                                <th>Code List Options</th>
+                            </tr>
+                            <?php
+                            $ival = 0;
+                            foreach ($code_lists as $field => $f_values) {
+                                $code_list_id = $f_values['code_list_id'];
+                                $code_list_name = $f_values['code_list_name'];
+                                $tracker_id_cl = $f_values['tracker_id'];
+                                ?>
+                                <tr>
+                                    <td><?php $ival++;
+                    echo $this->escapeHtml($ival);
+                                ?></td>
+                                    <td><?php echo $this->escapeHtml($code_list_name); ?></td>
+                                    <td>
+                                        <?php if ($tracker_id_cl != 0) {
+                                        ?>
+                                        <a href="#" data-toggle="modal" onclick="edit_codeList_name('<?= $code_list_id; ?>','<?= $code_list_name; ?>')" id="wf_edit_<?= $code_list_id; ?>" class="audModelAdd" data-target="#editNewCodeListwithoprions">
+                                            <button type="button" class="btn btn-default"><span class="lnr icon-pencil" aria-hidden="true"></span></button>
+                                        </a>
+                                        <?php
+                                        } else {
+                                        echo "--";
+                                        }
+                                        ?>
+                                    </td>
+                                    <td>
+                                        <a href="#" data-toggle="modal" onClick="viewOptionsModel('<?= $code_list_id; ?>','<?= $tracker_id_cl; ?>')" id="viewid.<?= $code_list_id; ?>" class="viewCodeListModel" data-target="#viewOptionsCode">
+                                            <button type="button" class="btn btn-default"><span class="lnr icon-eye" aria-hidden="true"></span></button>
+                                        </a>
+                                        <?php if ($tracker_id_cl != 0) { ?>
+                                        <a href="#" data-toggle="modal" id="<?= $code_list_id; ?>" class="addOptionsCode" data-target="#addOptionsCode">
+                                            <button type="button" class="btn btn-default"><span class="lnr icon-plus" aria-hidden="true"></span></button>
+                                        </a>
+                                        <a href="#" data-toggle="modal" onClick="editOptionsModel('<?= $code_list_id; ?>')"   id="edit_id<?= $code_list_id; ?>" class="editModelField" data-target="#editOptionsCode">
+                                            <button type="button" class="btn btn-default"><span class="lnr icon-pencil" aria-hidden="true"></span></button>
+                                        </a>
+                                        <?php
+                                        }
+                                        ?>
+                                    </td>
+                                </tr>
+
+                                <?php
+                            }
+                            ?>
+                        </table>
+                        <?php
+                        } else {
+                        echo "Fields not exist.";
+                        }
+                        ?>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+
+<div class="modal fade" id="viewOptionsCode" data-backdrop="static" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+    <div>
+        <br />
+        <br />
+    </div>    <div class="modal-dialog"  style="margin-bottom:0px;" >
+        <div class="modal-content" id="modelContentAdd">
+
+            <div class="panel panel-primary" style="margin:0px">
+                <div class="panel-heading">View CodeList Options<button aria-hidden="true" data-dismiss="modal" class="close" type="button">×</button></div>
+                <div style=" padding-left: 10px;" id="optionsView">
+
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="modal fade" id="editOptionsCode" data-backdrop="static" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+    <div>
+        <br />
+        <br />
+    </div> <div class="modal-dialog"  style="margin-bottom:0px;" >
+        <div class="modal-content" id="modelContentAdd">
+
+            <div class="panel panel-primary" style="margin:0px">
+                <div class="panel-heading">Edit CodeList Options<button aria-hidden="true" data-dismiss="modal" class="close" type="button">×</button></div>
+                <div style=" padding-left: 10px;">
+                    <form data-toggle="validator" id="commentForm_editOptions" method="get" action="" name="myForm" class="form-horizontal">
+
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="modal fade" id="addOptionsCode" data-backdrop="static" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+    <div>
+        <br />
+        <br />
+    </div><div class="modal-dialog"  style="margin-bottom:0px;" >
+        <div class="modal-content" id="modelContentAdd">
+
+            <div class="panel panel-primary" style="margin:0px">
+                <div class="panel-heading">New CodeList Options<button aria-hidden="true" data-dismiss="modal" class="close" type="button">×</button></div>
+                <div style=" padding-left: 10px;">
+                    <form data-toggle="validator" id="commentForm_newOptions" method="get" action="" name="myForm" class="form-horizontal">
+
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="modal fade" id="addNewCodeListwithoprions" data-backdrop="static" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+   <div>
+        <br />
+        <br />
+    </div>  <div class="modal-dialog"  style="margin-bottom:0px;" >
+        <div class="modal-content" id="modelContentAdd">
+
+            <div class="panel panel-primary" style="margin:0px">
+                <div class="panel-heading">New CodeList<button aria-hidden="true" data-dismiss="modal" class="close" type="button">×</button></div>
+                <div style=" padding-left: 10px;">
+                    <form data-toggle="validator" id="commentForm_newDodeList" method="get" action="" name="myForm" class="form-horizontal">
+
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="modal fade" id="editNewCodeListwithoprions" data-backdrop="static" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+    <div class="icons">
+        <br />
+        <br />
+    </div>
+    <div class="modal-dialog"  style="margin-bottom:0px;" >
+        <div class="modal-content" id="modelContentAdd">
+
+            <div class="panel panel-primary" style="margin:0px">
+                <div class="panel-heading">Edit CodeList<button aria-hidden="true" data-dismiss="modal" class="close" type="button">×</button></div>
+                <div style=" padding-left: 10px;">
+                    <form data-toggle="validator" id="commentForm_editCodeList" method="get" action="" name="myForm" class="form-horizontal">
+                        <div class="modal-body">
+                            <div class="form-group">
+                                <label class="col-sm-2" style="padding-left: 10px;">Code List Name</label>
+                                <div class="col-sm-6">
+                                    <input type="text" class="form-control"  placeholder="Code List Name" id="edit_code_list" name="edit_code_list" required value="">
+                                    <input type="text" class="form-control"  placeholder="edit_code_list_id" id="edit_code_list_id" name="edit_code_list_id" required value="" style="display:none">
+                                </div>
+                            </div>
+							<div class="form-group">
+                                <label class="col-sm-2" style="padding-left: 10px;">Comment</label>
+                                <div class="col-sm-6">
+                                    <textarea id="addcomment" class="form-control" placeholder="Add Comment" name="addcomment" required ></textarea>
+                                                    <span id="commenterror" style="display:none; color: red;">Please add reason for change</span>
+                                                    <span id="status_for_reason"></span>
+                                </div>
+							</div>
+                        </div>
+                        <span id="status_edit"></span>
+                        <div class="modal-footer">'
+                            <button onclick="editCodeList()" type="button" class="btn btn-primary">Save</button>
+                            <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="modal fade" id="deletecommentasreason" data-backdrop="static" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+    <div>
+        <br />
+        <br />
+    </div>
+    <div class="modal-dialog"  style="margin-bottom:0px;" >
+        <div class="modal-content" id="modelContentdelete">
+            <div class="panel-primary" style="margin:0px">
+                <div class="panel-heading">Comments<button aria-hidden="true" data-dismiss="modal" class="close" type="button">×</button></div>
+    <!--                                                <div class="form-group" style=" padding-left: 10px;" id="optionsView">
+                    <textarea id="addcomment" required="required"  placeholder="Add Comment" name="addcomment"></textarea>
+                </div>-->
+                <div class="modal-body">
+                    <div class="form-group">
+                        <textarea id="addcommentfordelete" class="form-control" placeholder="Add reason for deletion." name="addcomment"></textarea>
+                        <span id="commenterrorfordelete" style="display:none;color: red;">Please add reason for change</span>
+                    </div>
+                </div>
+            </div>
+            <div style="clear:both"></div>
+
+            <div class="modal-footer">
+                <button id="reasonfordelete"  type="button" class="btn btn-primary">OK</button>
+                <button class="btn btn-default" type="button" data-dismiss="modal">Close</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    $(document).ready(function() {
+
+
+        $(".addOptionsCode").click(function()
+        {
+            var code_list_id = this.id;
+            $('#commentForm_newOptions').html("");
+            var str = random_string(6);
+            var selid = 'questionID' + str;
+            var html = '';
+            html += '<div class="modal-body">';
+            html += '<table class="table table-striped">';
+            html += '<tr>';
+            html += '<th>Add Option</th>';
+            html += '<th>KPI</th>';
+            html += '<th></th>';
+            html += '</tr>';
+            html += '<tbody id="tabledivbody_code_list_add">';
+            html += '<tr class="sectionsid">';
+            html += '<td>';
+            html += '<div class="form-group">';
+            html += '<input type="text" class="form-control quesiionIDs"  placeholder="Option" id="' + selid + '" name="questionID_' + selid + '" required>';
+            html += '</div>';
+            html += '</td>';
+            html += '<td>';
+            html += '<div class="form-group">';
+            html += '<select type="text" class="form-control quesiionKpi" placeholder="Question Kpi" id="kpiType_'+str+'" name="kpiType_'+str+'" required>';
+            html += '<option value="0">None</option>';
+            html += '<option value="1">Critical</option>';
+            html += '<option value="2">Major</option>';
+            html += '<option value="3">Important</option>';
+            html += '</select>';
+            html += '</div>';
+            html += '</td>';
+            html += '<td>';
+            html += '</td>';
+            html += '</tr>';
+            html += '</tbody>';
+            html += '</table>';
+            html += '<span id="status_add_cl_option"></span><br/>';
+            html += '<button style="float:right" type="button"id="add_img" class="btn btn-primary" onClick="insSpec_new_code_list(); return false;" align="center">New Option</button>';
+            html += '<div style="clear:both"></div>';
+            html += '<div class="modal-footer">';
+            html += '<button onclick="addCodeListOptions(\'' + code_list_id + '\')" type="button" class="btn btn-primary">Save</button>';
+            html += '<button type="button" class="btn btn-default" data-dismiss="modal">Close</button>';
+            html += '</div>';
+            $('#commentForm_newOptions').html(html);
+
+
+        });
+        $("#codeList_add_new").click(function()
+        {
+            $('#commentForm_newDodeList').html("");
+            var str = random_string(6);
+            var selid = 'questionID' + str;
+            var tracker_id =<?= $tracker_id ?>;
+            var html = '';
+            html += '<div class="modal-body">';
+            html += '<div class="form-group">';
+            html += '<label class="col-sm-3" style="padding-left: 10px;">Code List Name</label>';
+            html += '<div class="col-sm-6">';
+            html += '<input type="text" class="form-control"  placeholder="Code List Name" id="new_code_list" name="new_code_list" required value="">';
+            html += '</div>';
+            html += '</div>';
+            html += '<span id="status_add_cl"></span><br/>';
+            html += '<div style="clear:both"></div>';
+            html += '<div class="modal-footer">';
+            html += '<button onclick="addCodeListNew(\'' + tracker_id + '\')" type="button" class="btn btn-primary">Save</button>';
+            html += '<button type="button" class="btn btn-default" data-dismiss="modal">Close</button>';
+            html += '</div>';
+            $('#commentForm_newDodeList').html(html);
+        });
+    });
+
+    function insSpec_new_code_list()
+    {
+        var str = random_string(6);
+        var selid = 'questionID' + str;
+        var html = "";
+        html += '<tr class="sectionsid">';
+        html += '<td>';
+        html += '<div class="form-group">';
+        html += '<input type="text" class="form-control quesiionIDs"  placeholder="Option" id="' + selid + '" name="questionID_' + selid + '" required>';
+        html += '<input type="text" class="form-control expected1" style="display:none" id="questionType_' + selid + '_expected">';
+        html += '</div></td><td>';
+        html += '<div class="form-group">';
+        html += '<select type="text" class="form-control quesiionKpi" placeholder="Question Kpi" id="kpiType_'+str+'" name="kpiType_'+str+'" required>';
+        html += '<option value="0">None</option>';
+        html += '<option value="1">Critical</option>';
+        html += '<option value="2">Major</option>';
+        html += '<option value="3">Important</option>';
+        html += '</select></td></div><td>';
+        html += '<i class="icon-remove" style="color: red; cursor: pointer;" onClick="delSuspectProduct(this)"></i>';
+        html += '</td>';
+        html += '</tr>';
+        $("#tabledivbody_code_list_add").append(html);
+    }
+
+    function addCodeListNew(tracker_id){
+        var $valid = $("#commentForm_newDodeList").valid();
+        var new_code_list = $("#new_code_list").val();
+        if(!$valid) {
+            return false;
+        }else{
+            $("#status_add_cl").html('processing...');
+            var tracker_id = tracker_id;
+            var data = {
+                new_code_list : new_code_list,
+                tracker_id : tracker_id
+            };
+            var url = "<?php echo $this->url('tracker', array('action' => 'addnewcodelist')); ?>";
+            $.post(url, data,function(respJson){
+                var resp =JSON.parse(respJson);
+                var responseCode = resp.responseCode;
+                var errMessage = resp.errMessage;
+                console.log(resp);
+                if(responseCode == 1){
+                    $("#status_add_cl").html('<font color="#088A08">'+errMessage+'</font>');
+                    window.setTimeout('window.location.replace("<?php echo $this->url('tracker', array('action' => 'codelist', 'tracker_id' => $tracker_id)) ?>")', 1000);
+                }
+                else{
+                    $("#status_add_cl").html('<font color="#cc0000">'+errMessage+'</font>');
+                }
+            });
+        }
+    }
+    function editCodeList(){
+        var $valid = $("#commentForm_editCodeList").valid();
+        var edit_code_list_id = $("#edit_code_list_id").val();
+        var edit_code_list = $("#edit_code_list").val();
+        if(!$valid) {
+            return false;
+        }else{
+
+            $("#status_edit").html('processing...');
+            var tracker_id = tracker_id;
+            var data = {
+                edit_code_list : edit_code_list,
+                tracker_id : <?= $tracker_id; ?>,
+                edit_code_list_id : edit_code_list_id,
+		        comment:$('#addcomment').val()
+            };
+            var url = "<?php echo $this->url('tracker', array('action' => 'editcodelist')); ?>";
+            $.post(url, data,function(respJson){
+                var resp =JSON.parse(respJson);
+                var responseCode = resp.responseCode;
+                var errMessage = resp.errMessage;
+                if(responseCode == 1){
+                    $("#status_edit").html('<font color="#088A08">'+errMessage+'</font>');
+                    window.setTimeout('window.location.replace("<?php echo $this->url('tracker', array('action' => 'codelist', 'tracker_id' => $tracker_id)) ?>")', 1000);
+                }
+                else{
+                    $("#status_edit").html('<font color="#cc0000">'+errMessage+'</font>');
+                }
+            });
+        }
+    }
+
+    function addCodeListOptions(code_list_id){
+        var $valid = $("#commentForm_newOptions").valid();
+        if(!$valid) {
+            return false;
+        }else{
+            $("#status_add_cl_option").html('processing...');
+            var elem = document.getElementsByClassName("quesiionIDs");
+            var names = [];
+            for (var i = 0; i < elem.length; ++i) {
+                if (typeof elem[i].value !== "undefined") {
+                    var option= elem[i].value.trim();
+                    if (names.indexOf(option) == -1) {
+                        names.push(option);
+                    }else{
+                        $("#status_add_cl_option").html('<font color="#cc0000">Duplicate Options</font>');
+                        return false;
+                    }
+                }
+            }
+            var elem = document.getElementsByClassName("quesiionKpi");
+            var kpivalues = [];
+            for (var i = 0; i < elem.length; ++i) {
+                if (typeof elem[i].value !== "undefined") {
+                    kpivalues.push(elem[i].value);
+                }
+            }
+            var data = {
+                kpi : kpivalues,
+                names : names,
+                tracker_id : <?= $tracker_id; ?>,
+                code_list_id : code_list_id
+            };
+            var url = "<?php echo $this->url('tracker', array('action' => 'addoptionscodes')); ?>";
+            $.post(url, data,function(respJson){
+                var resp =JSON.parse(respJson);
+                var responseCode = resp.responseCode;
+                var errMessage = resp.errMessage;
+                if(responseCode == 1){
+                    $("#status_add_cl_option").html('<font color="#088A08">'+errMessage+'</font>');
+                }
+                else{
+                    $("#status_add_cl_option").html('<font color="#cc0000">'+errMessage+'</font>');
+                }
+            });
+        }
+    }
+
+    function edit_codeList_name(code_list_id, code_list_name){
+        $("#edit_code_list").val(code_list_name);
+        $("#edit_code_list_id").val(code_list_id);
+    }
+    function viewOptionsModel(code_list_id, tracker_id){
+        var data = {
+            code_list_id : code_list_id
+        };
+        var url = "<?php echo $this->url('tracker', array('action' => 'getoptionsbycodelist')); ?>";
+        $.post(url, data,function(respJson){
+            var resp =JSON.parse(respJson);
+            var responseCode = resp.responseCode;
+            var results = resp.results;
+            var html = '';
+            html += '<div class="modal-body"><table class="table table-striped"><tr><th>Option</th><th>KPI</th><th></th></tr>';
+            html += '<tbody id="tabledivbody_code_list_option_view">';
+            var resCount = results.length;
+            if(resCount > 0){
+                for(var i = 0; i<resCount; i++){
+                    var option_id = results[i].option_id;
+                    html += '<tr class="sectionsid">';
+                    html += '<td>';
+                    html += '<div class="form-group">';
+                    html += results[i].label;
+                    html += '</div></td><td>';
+                    html += '<div class="form-group">';
+                    var kpi = results[i].kpi;
+                    switch (kpi) {
+                        case '1':
+                            html += 'Critical';
+                            break;
+                        case '2':
+                            html += 'Major';
+                            break;
+                        case '3':
+                            html += 'Important';
+                            break;
+                        default :
+                            html += 'None';
+                            break;
+                    }
+                    html += '</div>';
+                    html += '</td>';
+                    html += '<td>';
+                    if(tracker_id != 0){
+                        html += '<button type="button" onclick="deletecodeListOption(\''+option_id+'\')" class="btn btn-default" aria-label="Left Align">';
+                        html += '<span class="lnr icon-trash" aria-hidden="true"></span>';
+                        html += '</button>';
+                    }
+                    html += '</td>';
+                    html += '</tr>';
+                }
+            }else{
+                html += "<tr><td>No results found</td><td></td><td></td></tr>";
+            }
+            html += '</tbody>';
+            html += '</table>';
+            html += '</div>';
+            html += '<span id="status_option_edit"></span><br/>';
+            html += '<div style="clear:both"></div>';
+            html += '<div class="modal-footer">';
+            html += '<button type="button" class="btn btn-default" data-dismiss="modal">Close</button>';
+            html += '</div>';
+            $("#optionsView").html(html);
+        });
+    }
+
+    function editOptionsModel(code_list_id){
+        var data = {
+            code_list_id : code_list_id
+        };
+        var url = "<?php echo $this->url('tracker', array('action' => 'getoptionsbycodelist')); ?>";
+        $.post(url, data,function(respJson){
+            var resp =JSON.parse(respJson);
+            var responseCode = resp.responseCode;
+            var results = resp.results;
+            var html = '';
+            html += '<div class="modal-body">';
+            html += '<table class="table table-striped">';
+            html += '<tr>';
+            html += '<th>Option</th>';
+            html += '<th>KPI</th>';
+            html += '<th></th>';
+            html += '</tr>';
+            html += '<tbody id="tabledivbody_code_list_option_view">';
+
+            var resCount = results.length;
+            if(resCount > 0){
+
+                for(var i = 0; i<resCount; i++){
+                    var option_id = results[i].option_id;
+                    var label = results[i].label;
+                    var kpi = results[i].kpi;
+                    html += '<tr class="sectionsid">';
+                    html += '<td>';
+                    html += '<div class="form-group">';
+                    html += '<input type="text" class="form-control quesiionIDs_option_edit"  placeholder="Option" id="op_edit' + option_id + '" name="op_edit' + option_id + '" required value="' + (label) + '">';
+                    html += '<input type="text" class="form-control option_ids_edit" style="display:none" id="option_ids' + option_id + '" value="' + option_id + '">';
+                    html += '</div>';
+                    html += '</td>';
+                    html += '<td>';
+                    html += '<div class="form-group">';
+                    html += '<select type="text" class="form-control quesiionKpi_option_edit" placeholder="Question Kpi" id="edit_kpiType_'+option_id+'" name="edit_kpiType_'+option_id+'" required>';
+                    html += '<option value="0"';
+                        if(kpi == "0"){html+='selected'}
+                        html += '>None</option>';
+                        html += '<option value="1"';
+                        if(kpi == "1"){html+='selected'}
+                        html += '>Critical</option>';
+                        html += '<option value="2"';
+                        if(kpi == "2"){html+='selected'}
+                        html += '>Major</option>';
+                        html += '<option value="3"';
+                        if(kpi == "3"){html+='selected'}
+                        html += '>Important</option>';
+                    html += '</select>';
+                    html += '</div>';
+                    html += '</td>';
+                    html += '<td>';
+                    //html += '<!--<i class="icon-arrow-up"></i><i class="icon-arrow-down"></i>--><i class="icon-remove" style="color: red; cursor: pointer;" onClick="delSuspectProduct(this)">X</i>';
+                    html += '<!--<i class="icon-arrow-up"></i><i class="icon-arrow-down"></i>--><i class="icon-remove" style="color: red; cursor: pointer;" onClick="deletecodeListOption(\''+option_id+'\')"></i>';
+                    html += '</td>';
+                    html += '</tr>';
+                }
+            }else{
+                html += "<tr>";
+                html += '<td>';
+                html += "No results found";
+                html += '</td>';
+                html += '<td>';
+                html += '</td>';
+                html += '<td>';
+                html += '</td>';
+                html += "</tr>";
+            }
+            html += '</tbody>';
+            html += '</table>';
+			html += '<label for="add_comment">Comment</label>';
+            html += '<textarea id="add_comment" class="form-control" placeholder="Add_Comment" name="add_comment"></textarea>';
+            html += '<span id="comment_error" style="color: red; display: none;">Please add reason for change</span>';
+            html += '</div>';
+            html += '<span id="status_option_edit"></span><br/>';
+            html += '<div style="clear:both"></div>';
+            html += '<div class="modal-footer">';
+            html += '<button onclick="editCodeListOptions(\'' + code_list_id + '\')" type="button" class="btn btn-primary">Save</button>';
+            html += '<button type="button" class="btn btn-default" data-dismiss="modal">Close</button>';
+            html += '</div>';
+            $("#commentForm_editOptions").html(html);
+
+        });
+    }
+
+
+
+    function editCodeListOptions(code_list_id){
+		var tracker_id=<?= $tracker_id?>;
+        var $valid = $("#commentForm_newOptions").valid();
+		 var cmt=$('#add_comment').val();
+        if(!$valid) {
+            return false;
+        }
+		 if($('#add_comment').val() == '' ){
+            $('#comment_error').show();
+            return false;
+            }
+		else{
+            $("#status_option_edit").html('processing...');
+            var elem = document.getElementsByClassName("quesiionIDs_option_edit");
+            var names = [];
+            for (var i = 0; i < elem.length; ++i) {
+                if (typeof elem[i].value !== "undefined") {
+                    names.push(elem[i].value);
+                }
+            }
+            var elem = document.getElementsByClassName("option_ids_edit");
+            var option_ids = [];
+            for (var i = 0; i < elem.length; ++i) {
+                if (typeof elem[i].value !== "undefined") {
+                    option_ids.push(elem[i].value);
+                }
+            }
+            var elem = document.getElementsByClassName("quesiionKpi_option_edit");
+            var kpivalues = [];
+            for (var i = 0; i < elem.length; ++i) {
+                if (typeof elem[i].value !== "undefined") {
+                    kpivalues.push(elem[i].value);
+                }
+            }
+            var data = {
+                kpi : kpivalues,
+                names : names,
+                option_ids : option_ids,
+                code_list_id : code_list_id,
+		        tracker_id: tracker_id,
+                comment:$('#add_comment').val()
+            };
+
+
+            var url = "<?php echo $this->url('tracker', array('action' => 'editoptionscodes')); ?>";
+            $.post(url, data,function(respJson){
+                var resp =JSON.parse(respJson);
+                var responseCode = resp.responseCode;
+                var errMessage = resp.errMessage;
+                if(responseCode == 1){
+                    $("#status_option_edit").html('<font color="#088A08">'+errMessage+'</font>');
+                }
+                else{
+                    $("#status_option_edit").html('<font color="#cc0000">'+errMessage+'</font>');
+                }
+            });
+        }
+    }
+   function random_string(size){
+        var str = "";
+        for (var i = 0; i < size; i++){
+            str += random_character();
+        }
+        return str;
+    }
+
+    function random_character() {
+        var chars = "lmnopqurstuvwxyzABCDEFGHIJKLMNOPQURSTUVWXYZ";
+        return chars.substr( Math.floor(Math.random() * 62), 1);
+    }
+    function delSuspectProduct(node)
+    {
+        r = node.parentNode.parentNode;
+        r.parentNode.removeChild(r);
+        sendOrderToServer();
+    }
+
+    function deletecodeListOption(option_id)
+    {
+        $('#deletecommentasreason').modal('show');
+        $("#reasonfordelete").click(function(){
+            $('#commenterrorfordelete').hide();
+            if ($('#addcommentfordelete').val() == ''){
+                $('#commenterrorfordelete').show();
+                return false;
+            }
+            else{
+                var id=$(this).closest('tr').attr("id");
+                var tracker_id = '<?= $tracker_id; ?>';
+                var action_id = '<?= $action_id; ?>';
+                $.ajax({
+                    url: "/tracker/deletecodelistoption",
+                    type:'post',
+                    dataType:'json',
+                    data:{option_id:option_id, tracker_id:tracker_id,comment:$('#addcommentfordelete').val()},
+                    success:function(data) {
+                        if(data=='Deleted')
+                        {
+                            $("#status_option_edit").html('<font color="#cc0000">Option deleted</font>');
+                             window.location.reload();
+                        }
+                    }
+                });
+
+            return false;
+            }
+        });
+    }
+</script>

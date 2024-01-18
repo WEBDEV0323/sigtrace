@@ -1,0 +1,84 @@
+<?php
+$reportName = isset($reportDetails['report_name'])?$reportDetails['report_name']:"";
+$title = "Custom Report".$reportName;
+$this->headTitle($title);
+?>
+
+<div class="pagebar container-fluid col-md-12">
+    <!-- Sidebar Toggle -->
+    <button type="button" class="pagebar-toggle navbar-toggle pull-left">
+      <span class="pagebar-arrow"></span>
+    </button>
+    <ol class="breadcrumb">
+        <li><span>Reports</span></li>
+        <?php if ($reportName != "") { ?>
+            <li class="active"><span><?php echo $this->escapeHtml($title); ?></span></li>
+        <?php } ?>
+    </ol>
+</div>
+<div class="card">
+    <div class="card-body">
+        <form id="customReportform" method="post" action="" name="filterForm" class="form-horizontal"> 
+           
+            <div class="card">
+            <?php foreach ($field_names as $workflow_name => $fields) {?>
+                <div  class="card-header"><b>Workflow Name:- <?=$workflow_name;?></b></div>
+
+                    <div class="card-body"> 
+
+                        <div class="form-group row">
+                            <label class="col-lg-3 col-form-label" >
+                                <?php echo "Select Fields Names:"; ?>
+                            </label>
+                            <div class="col-lg-7">
+                                <select class="form-control" id="fieldNames" name="select_field_names[]"  multiple="multiple">
+                                <?php foreach ($fields as $key =>$value) {?>
+                                    <option value='<?=$key."$".$value;?>'><?=$value;?></option>
+                                <?}?>
+                                </select>
+                            </div>
+                        </div>
+
+                        <div class="form-group row col-lg-12">
+                            <label class="col-lg-3 col-form-label">
+                                <?php echo "Select Condition:"; ?>
+                            </label>
+                            <?php $workflow_id = str_replace(" ", "-", $workflow_name);?>
+                            <div class="col-lg-7">
+                                <select class="form-control col-lg-12 where-field" id="<?=$workflow_id?>" name="where_field_names[]" multiple="multiple">
+                                <?php foreach ($fields as $key =>$value) {?>
+                                    <option value='<?=$key;?>'><?=$value;?></option>
+                                <?}?>
+                                </select>
+                            </div>
+                        </div>
+
+                        <div class="form-group row col-lg-12">
+                            <label class="col-lg-3 col-form-label"></label>
+                            <div class="col-lg-7 <?=$workflow_id?>">
+                            </div>
+                        </div>
+                    </div>
+                <?}?>
+                <div class="col-lg-12" id="other-details"> </div>
+                <input type="hidden" name ="page_no" id ="page_no" value="1"/>
+                <!-- <input type="hidden" name="tracker_id" value="<?= $trackerId ?>" />
+                <input type="hidden" name="form_id" value="<?= $formId ?>" />
+                <input type="hidden" name="report_id" value="<?= $reportId ?>" /> -->
+
+                <div class="col-lg-12" id="alert_custom"> </div>
+                </div>
+                              
+            </div>
+           
+        </form>
+    <!-- </div>
+</div> -->
+<script> 
+    var trackerId="<?php echo $trackerId;?>";
+    var formId="<?php echo $formId;?>";
+    var reportId="<?php echo $reportId;?>";
+</script>
+<?php
+    $this->inlineScript()
+            ->appendFile($this->basePath() . '/js/module/common/report/custom.js', 'text/javascript');

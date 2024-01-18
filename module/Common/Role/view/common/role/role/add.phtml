@@ -1,0 +1,63 @@
+<?php 
+$forms = $trackerResults['forms'];
+$trackerDetails = $trackerResults['tracker_details'];
+$trackerName = $trackerDetails['name'];
+$title = "$trackerName - Roles";
+$this->headTitle($title);
+?>
+
+<div class="pagebar container-fluid col-md-12">
+    <!-- Sidebar Toggle -->
+    <button type="button" class="pagebar-toggle navbar-toggle pull-left">
+      <span class="pagebar-arrow"></span>
+    </button>
+    <ol class="breadcrumb">
+        <li><span>Settings</span></li>
+        <li><span>Tracker Settings</span></li>
+        <li><span><a href="/role/role_management/<?php echo $trackerId;?>">Role Management</a></span></li>
+        <li class="active"><span>Add Role</span></li>
+    </ol>
+</div>
+<div class="card">
+    <div class="card-body">
+        <div class="card">
+            <div  class="card-header"><h6>Add Role</h6></div>
+            <div class="card-body"> 
+                <div class="form-group row">
+                    <label class="col-sm-4"></label>
+                    <div id="roleErrorMessages" class="error col-sm-6"></div>
+                </div>
+                <?php echo $this->form()->openTag($form); ?>
+                <?php echo $this->formElement($form->get('c_hidden')); ?>
+                <?php echo $this->formElement($form->get('c_flag')); ?>
+               
+                <div class="form-group row">
+                    <label class="col-sm-4 col-form-label" for="c_name"><?php echo $this->formlabel($form->get('c_name')); ?><span class="error ml-1">*</span></label>
+                    <div class="col-sm-6">
+                        <?php echo $this->formElement($form->get('c_name')); ?>
+                        <div class="error" id="forRoleName"></div>
+                    </div>
+                </div>
+                <div class="form-group row">
+                    <label class="col-sm-4 col-form-label">Reason for change<span class="error ml-1">*</span></label>
+                    <div class="col-sm-6">
+                       <textarea id="reason" class="form-control" placeholder="Reason for change" name="addcomment"></textarea>
+                       <div id="forReason" class="error"></div>
+                    </div>
+                </div>
+                <div class="card-footer">
+                    <div class="form-group row">
+                        <?php if ($roleId == 0) { ?>
+                        <div class="offset-sm-4">
+                            <button id ="savebtn" type="button" class="btn btn-primary ml-2" onclick="addEditRole('<?php echo $roleId; ?>', '<?php echo $trackerId; ?>')">Save</button>
+                            <button onclick="window.location.href='/role/role_management/<?php echo $trackerId ?>'" type="button" class="btn btn-default">Cancel</button>
+                        </div>
+                        <?php } ?>
+                    </div>
+                </div>
+                <?php echo $this->form()->closeTag($form); ?>
+            </div>
+        </div>
+    </div>
+</div>
+<?php $this->inlineScript()->appendFile($this->basePath() . '/js/module/common/role/role_management.js');

@@ -1,0 +1,194 @@
+<?php
+ $user_details = $_SESSION['user_details'];
+ //echo"<pre>";print_r($form_records);
+?>
+<input type="hidden" id="trackerId" value="<?=$tracker_id?>"/>
+<input type="hidden" id="formId" value="<?=$action_id?>"/>
+<input type="hidden" id="recordId" value="<?=$record_id?>"/>
+<input type="hidden" id="workflowNameId" value="<?=$workflow_id?>"/>
+<input type="hidden" id="filter" value="<?=$filter?>"/>
+<input type="hidden" id="dashboardId" value="<?=$dashboardId?>"/>
+<input type="hidden" id="workflowName" value=""/>
+<input type="hidden" id="fieldDetails" value=""/>
+<div class="pagebar container-fluid col-md-12">
+    <!-- Sidebar Toggle -->
+    <button type="button" class="pagebar-toggle navbar-toggle pull-left">
+      <span class="pagebar-arrow"></span>
+    </button>
+    <ol class="breadcrumb">
+        <li><a href="/dashboard/<?=$tracker_id;?>/<?=$action_id;?>"><span>Dashboard</span></a></li>
+        <?php if($dashboardId == 0) { ?>
+        <li><a href="/<?=$controllerName;?>/<?=$tracker_id;?>/<?=$action_id;?>/<?=$asId?>?filter=<?=$filter?>&&cond=<?=$cond?>">All Records</a></li>
+        <?php } else { ?>
+        <li><a href="/<?=$controllerName;?>/<?=$tracker_id;?>/<?=$action_id;?>/<?=$dashboardId?>/<?=$asId?>?filter=<?=$filter?>&&listfilter=<?=$listfilter?>&&cond=<?=$cond?>">All Records</a></li>
+        <?php } ?>
+        <li class="active"><span>View Record #<?php echo $record_id;?></span></li>
+    </ol>
+</div>
+
+<div class="card">
+  <div class="card-body">
+    <div class="card card-default mb-2">
+        <div class="card-body">
+        <div id="accessHeader"></div>
+        <form id ="workflowForm" enctype='multipart/form-data' class='workflowFormClass' method='post'>
+            <div class="row">
+            
+              <ul class="nav nav-tabs" id="myTab" role="tablist">
+              <?php foreach($workflow as $key => $value) { 
+                $input = strtolower(preg_replace("/[^a-zA-Z]+/", "", $value['workflow_name']));
+                if ($value['can_read']!='No') { ?>
+                
+                <li class="nav-item">
+                  <a class="nav-link" id="<?=$input;?>-tab" data-toggle="tab" href="#workflow<?=$value['workflow_id'];?>" role="tab" wid="<?=$value['workflow_id'];?>" aria-controls="<?=$input;?>" data-name="<?=$value['workflow_name'];?>"><b><?=$value['workflow_name'];?></b></a>
+                </li>
+                <input type="hidden" id="canUpdate" value="<?php if($value['can_update']){echo $value['can_update'];}else{"No";};?>"/>
+              <?php 
+              }} ?>
+                              
+              </ul>
+            </div>
+            <div class="tab-content" id="myTabContent">
+            
+            <div id="alertWorkflow"></div>
+            
+            <?php foreach($workflow as $key => $value) { 
+            $input = strtolower(preg_replace("/[^a-zA-Z]+/", "", $value['workflow_name'])); ?>
+              <div class="tab-pane fade" id="workflow<?=$value['workflow_id'];?>" role="tabpanel" aria-labelledby="<?=$input;?>-tab">
+              
+                    <div class="form-group row" id="fieldsDiv<?=$input;?>">
+                    </div>
+
+              </div>
+              <?php }?>
+            </div>
+            </form>
+          </div>
+    </div>
+  </div>
+</div>
+
+<script>
+    var tracker_id="<?php echo $this->escapeJs($tracker_id);?>";
+  var form_id="<?php echo $this->escapeJs($action_id);?>";
+ var record_id="<?php echo $this->escapeJs($record_id);?>";
+  
+   $(function () {
+    $('#myTab li:first-child a').tab('show')
+    var workflowNameId=$('#myTab li:first-child a').attr("aria-controls");
+    $('#workflowNameId').val(workflowNameId);
+    var workflowName=$('#myTab li:first-child a').data("name");
+    $('#workflowName').val(workflowName);
+    var fieldDetails = <?php echo json_encode($field_details,JSON_FORCE_OBJECT); ?>;
+    showFieldAndData(fieldDetails,workflowName,workflowNameId);
+
+    $('a[data-toggle="tab"]').on('shown.bs.tab', function (e) {
+        var workflowName = $(e.target).data("name"); // activated tab
+        var workflowNameId = $(e.target).attr("aria-controls"); // activated tab
+        var relatedTarget  = $(e.relatedTarget ).data("name"); // previous active tab
+        var relatedTargetId = $(e.relatedTarget).attr("aria-controls"); // activated tab
+        $('#workflowName').val(workflowName);
+        $('#workflowName').val(workflowName);
+        showFieldAndData(fieldDetails,workflowName,workflowNameId);
+        $("#fieldsDiv"+relatedTargetId).html('');
+     }); 
+  });
+function openValue (tracker_id,form_id,fieldName,fieldLabel,recordId){
+        url = '/wp/popup?tracker_id='+tracker_id+'&form_id='+form_id+'&fieldName='+fieldName+'&fieldLabel='+fieldLabel+'&recordId='+recordId;
+        popupWindow =  window.open(url,'popupWindow','height=300,width=700,left=50,top=50,resizable=yes,scrollbars=yes,toolbar=yes,menubar=no,location=no,directories=no, status=yes');       
+    }
+  function showFieldAndData(response,workflowName,workflowNameId){console.log(response);
+      for(var workflow in response) {
+        if(workflow == workflowName) {
+          for(var fields in response[workflow]) {
+            if (response[workflow]['can_read']=='Yes') { 
+              switch (response[workflow][fields]['field_type']) {
+                case 'Text':
+                case 'Integer': 
+                case 'Text Area':
+                case 'Combo Box':
+                case 'User Role':
+                case 'Formula': 
+                case 'Formula Combo Box':
+                case 'Formula Date': 
+                case 'DependentText':
+                case 'ReadOnly Integer':
+                case 'ReadOnly Date':
+                case 'ReadOnly Date Time':
+                case 'ReadOnly Text Area':                              
+                case 'ReadOnly':
+                      var readOnlyField=readOnlyFields(response[workflow][fields]['fieldlabel'],response[workflow][fields]['field_name'],response[workflow][fields]['fieldValue'],'undefined',record_id);
+                      $("#fieldsDiv"+workflowNameId).append(readOnlyField);
+                      break;
+                case 'Heading':
+                      var headingField=headingFields(response[workflow][fields]['fieldlabel']);
+                      $("#fieldsDiv"+workflowNameId).append(headingField);
+                      break;
+                case 'File': 
+                      var fileField=fileFieldsDownload(response[workflow][fields]['fieldlabel'],response[workflow][fields]['field_name'],response[workflow][fields]['fieldValue']);
+                      $("#fieldsDiv"+workflowNameId).append(fileField);
+                      break;
+                case 'Date': 
+                      var dateFormat = response[workflow][fields]['dateFormat'];
+                      var fieldType = response[workflow][fields]['field_type'];
+                      var value = formatDateDDMMMYYYY(response[workflow][fields]['fieldValue']);
+                      if(value == 'Invalid date' || value == '0000-00-00') {value = '';}
+                      var dateField=readOnlyFields(response[workflow][fields]['fieldlabel'],response[workflow][fields]['field_name'],value,'undefined',record_id);
+                      $("#fieldsDiv"+workflowNameId).append(dateField);
+                      break;
+                case 'Date Time': 
+                      var dateTimeFormat=response[workflow][fields]['dateTimeFormat'];  
+                      var fieldType = response[workflow][fields]['field_type'];
+                      var value= moment(response[workflow][fields]['fieldValue'],'YYYY-MM-DD HH:mm:ss').format('DD-MMM-YYYY hh:mm A');
+                      if(value == 'Invalid date') {value = '';}
+                      var dateTimeField=readOnlyFields(response[workflow][fields]['fieldlabel'],response[workflow][fields]['field_name'],value,'undefined',record_id);
+                      $("#fieldsDiv"+workflowNameId).append(dateTimeField);
+                      break;
+                case 'Check Box':
+                      var checkBoxOptions=response[workflow][fields]['options'];
+                      var fieldValue = response[workflow][fields]['fieldValue'];
+                      var commentvalue=response[workflow][fields]['comment'];
+                      var fieldValueArr;
+                      if(fieldValue!=''){
+                          fieldValueArr = fieldValue.split(',');
+                      }
+                      var fieldLabel=response[workflow][fields]['fieldlabel'];
+                      var fieldName=response[workflow][fields]['field_name'];
+                      var fieldValue=response[workflow][fields]['fieldValue'];
+                      var disabled = 'disabled';
+                      var checkBoxField=checkBoxFields(fieldLabel,fieldName,checkBoxOptions,fieldValue,commentvalue,disabled);
+                      $("#fieldsDiv"+workflowNameId).append(checkBoxField);
+                      break;
+                case 'Multivalue':
+                        var value= moment(response[workflow][fields]['fieldValue'],'YYYY-MM-DD',true);
+                        var fieldLabel=response[workflow][fields]['fieldlabel'];
+                        var fieldName=response[workflow][fields]['field_name'];
+                        var fieldValue=response[workflow][fields]['fieldValue'];
+                        var isValid=value.isValid();
+                         if(isValid) {
+                             value=moment(value).format('DD-MMM-YYYY');
+                             var readOnlyField=MultivalueFields(response[workflow][fields]['fieldlabel'],response[workflow][fields]['field_name'],value,response[workflow][fields]['hide_field'], response[fieldName]['multiple_values'],record_id);
+                             $("#fieldsDiv"+workflowId).append(readOnlyField);
+                         } else {
+                             var readOnlyField=MultivalueFields(response[workflow][fields]['fieldlabel'],response[workflow][fields]['field_name'],response[workflow][fields]['fieldValue'],response[workflow][fields]['hide_field'], response[fieldName]['multiple_values'],record_id);
+                             $("#fieldsDiv"+workflowNameId).append(readOnlyField);                   
+                         }
+                        break; 
+                default:
+                    //$("#fieldsDiv"+workflowNameId).append();
+              }
+            } else {
+                $('#accessHeader').html("You dont have access to view this Page");
+                $('#accessHeader').addClass('alert alert-info');
+            }
+          } 
+        } 
+      }
+  }
+</script>
+
+<?php 
+   // $this->inlineScript()->appendFile($this->basePath() . '/js/module/asrtrace/workflow/workflowManagement.js', 'text/javascript');
+    $this->inlineScript()->appendFile($this->basePath() . '/js/module/asrtrace/workflow/fieldTypeFunction.js', 'text/javascript');
+    $this->inlineScript()->appendFile($this->basePath() . '/js/module/asrtrace/workflow/formulaFunctions.js', 'text/javascript');
+ ?> 

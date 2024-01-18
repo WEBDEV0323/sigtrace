@@ -1,0 +1,215 @@
+.calendarNav {
+  border: none !important;
+  border-bottom: 2px solid rgba(0, 0, 0, 0.25) !important;
+  height: 53px;
+  min-height: 53px;
+  max-height: 53px;
+  text-align: center;
+  font-weight: bold;
+}
+
+.calendarSection {
+  height: 40px;
+  min-height: 40px;
+  max-height: 40px;
+  font-weight: bold;
+}
+
+.calenderTable {
+    font-family: apple-system,BlinkMacSystemFont,
+        "Segoe UI",
+        Roboto,
+        "Helvetica Neue",
+        Arial,
+        "Noto Sans",
+        sans-serif,
+        "Apple Color Emoji",
+        "Segoe UI Emoji",
+        "Segoe UI Symbol",
+        "Noto Color Emoji" !important;
+}
+
+table.calenderCategories > tbody > tr,
+table.calenderCategories > tbody > tr > td {
+  min-height: 48px;
+}
+
+table.calenderCategories > tbody > tr:not(:last-child) {
+  border: none;
+  border-bottom: 1px solid rgba(0, 0, 0, 0.125);
+}
+
+table.calenderCategories > tbody > tr:hover {
+  color: #18638e;
+  border-bottom: #18638e solid 2px;
+  background-color: rgba(128, 208, 255, 0.1);
+  cursor: pointer;
+}
+
+table.calenderCategories > tbody > tr:hover > td,
+.calendarBodyItemHovered > td {
+
+}
+
+table.calenderCategories > tbody > tr > td {
+  border: none;
+  font-size: 0.7rem;
+  font-weight: 400;
+  padding: 8px;
+  margin: 0px;
+  vertical-align: middle;
+}
+
+table.calenderHeader > thead > tr {
+  border: none;
+  border-bottom: 2px solid rgba(0, 0, 0, 0.25);
+  height: 53px;
+  min-height: 53px;
+  max-height: 53px;
+  text-align: center;
+  vertical-align: middle;
+}
+
+table.calenderHeader > thead > tr > th {
+  border: none;
+  border-left: 1px solid rgba(0, 0, 0, 0.125);
+  font-size: 0.7rem;
+  font-weight: 500;
+  min-width: 50px;
+  width: 50px;
+  max-width: 50px;
+  padding: 0px 0px;
+  margin: 0px;
+  text-align: center;
+  vertical-align: middle;
+}
+
+table.calenderBody > tbody > tr:not(:last-child) {
+  border: none;
+  border-bottom: 1px solid rgba(0, 0, 0, 0.125);
+}
+
+table.calenderBody > tbody > tr:hover,
+.calendarBodyItemHovered {
+  border-bottom: #18638e solid 2px !important;
+  background-color: rgba(128, 208, 255, 0.1) !important;
+  cursor: pointer !important;
+}
+
+table.calenderBody > tbody > tr > td {
+  border: none;
+  border-left: 1px solid rgba(0, 0, 0, 0.125);
+  font-size: 0.7rem;
+  font-weight: normal;
+  min-width: 50px;
+  width: 50px;
+  max-width: 50px;
+  padding: 8px 0px;
+  margin: 0px;
+  text-align: center;
+  vertical-align: middle;
+}
+
+th.weekendCell,
+td.weekendCell {
+  background-color: rgba(255, 255, 255, 1) !important;
+  background-image: repeating-linear-gradient(
+    45deg,
+    transparent,
+    transparent 1px,
+    rgba(0, 0, 0, 0.125) 2px,
+    rgba(0, 0, 0, 0.125) 6px
+  )!important;
+}
+
+th.todayHeaderCell {
+  background-color: rgba(128, 208, 255, 0.2) !important;
+  /* border-top: #18638e solid 2px !important; */
+  border-left: #18638e solid 1px !important;
+  border-right: #18638e solid 1px !important;
+  color: #18638e !important;
+  font-weight: bold !important;
+}
+
+td.todayCell {
+  background-color: rgba(128, 208, 255, 0.2) !important;
+  border-left: #18638e solid 1px !important;
+  border-right: #18638e solid 1px !important;
+}
+
+.calenderHeader tr th:nth-child(31) ~ th {
+  display: none;
+}
+
+.calenderBody tr td:nth-child(31) ~ td {
+  display: none;
+}
+
+.red-tooltip .tooltip-inner {
+  background-color: #f00;
+}
+
+.red-tooltip.bs-tooltip-right .arrow:before {
+  border-right-color: #f00 !important;
+}
+.red-tooltip.bs-tooltip-left .arrow:before {
+  border-left-color: #f00 !important;
+}
+.red-tooltip.bs-tooltip-bottom .arrow:before {
+  border-bottom-color: #f00 !important;
+}
+.red-tooltip.bs-tooltip-top .arrow:before {
+  border-top-color: #f00 !important;
+}
+
+.legend1-tooltip .tooltip-inner {
+  background-color: #ff8c00;
+}
+
+.legend1-tooltip.bs-tooltip-right .arrow:before {
+  border-right-color: #ff8c00 !important;
+}
+.legend1-tooltip.bs-tooltip-left .arrow:before {
+  border-left-color: #ff8c00 !important;
+}
+.legend1-tooltip.bs-tooltip-bottom .arrow:before {
+  border-bottom-color: #ff8c00 !important;
+}
+.legend1-tooltip.bs-tooltip-top .arrow:before {
+  border-top-color: #ff8c00 !important;
+}
+
+.act-legend {
+  display: inline-block;
+  height: 16px;
+  width: 16px;
+  margin-right: 6px;
+}
+
+.act {
+  display: inline-block;
+  height: 22px;
+  width: 22px;
+}
+
+.act1 {
+  background-color: #ff8c00;
+}
+
+.act2 {
+  background-color: #8a2be2;
+}
+
+.act3 {
+  background-color: #00ff00;
+}
+
+ul.legend-list > li {
+  padding: 0px;
+  padding: 6px 4px;
+  display: inline-block;
+}
+
+.type-split {
+  background-color: #18638e !important;
+}

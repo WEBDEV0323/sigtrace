@@ -1,0 +1,83 @@
+<?php 
+$forms = $trackerResults['forms'];
+$trackerDetails = $trackerResults['tracker_details'];
+$trackerName = $trackerDetails['name'];
+$title = $this->escapeHtml("$trackerName - Calendar");
+$this->headTitle($title);
+$trackerId  = isset($trackerId) ? $this->escapeUrl($trackerId) : $this->escapeUrl(0);
+$formId     = isset($forms[0]['form_id']) ? $this->escapeUrl($forms[0]['form_id']) : $this->escapeUrl(0);
+$fTrackerId = isset($forms[0]['tracker_id'])? $this->escapeUrl($forms[0]['tracker_id']) : $this->escapeUrl(0);
+?>
+
+<div class="pagebar container-fluid col-md-12">
+    <!-- Sidebar Toggle -->
+    <button type="button" class="pagebar-toggle navbar-toggle pull-left">
+      <span class="pagebar-arrow"></span>
+    </button>
+    <ol class="breadcrumb">
+        <li><span><a href="/tracker/form/<?php echo $fTrackerId;?>/<?php echo $formId;?>"><?php echo $this->escapeHtml($trackerName);?></a></span></li>
+        <li><span><a href="/calendar/view/<?php echo $trackerId;?>/<?php echo $formId;?>">View Calendar</a></span></li>
+        <li class="active"><span><a href="/calendar/events_list/<?php echo $trackerId;?>/<?php echo $formId;?>">Events List</a></span></li>
+        <li class="active"><span>Add Event</span></li>
+    </ol>
+</div>
+<div class="card">
+    <div class="card-body">    
+        <div class="card">
+            <div  class="card-header"><h6>Add Event</h6></div>
+            <div class="card-body">         
+                <div class="error" id="eventErrorMessages"></div>
+                <div class="form-group row">
+                    <label class="col-sm-4"></label>
+                    <div id="roleErrorMessages" class="error col-sm-6"></div>
+                </div>
+                <form id="eventAddForm" method="post" name="myForm" autocomplete="off">
+                    <div class="form-group row">
+                        <label class="col-sm-4 col-form-label">Event Name<span class="error ml-1">*</span></label>
+                        <div class="col-sm-6">
+                            <select type="text" class="form-control" placeholder="Select Event Name" id="e_name" name="e_name" required="true">
+                                <option></option>
+                                <?php foreach($events as $name) {?> 
+                                <option value="<?php echo $this->escapeHtml($name['id']) ?>"><?php echo $this->escapeHtml($name['event_name']) ?></option>
+                                <?php }?>
+                            </select>
+                            <div class="error" id="forEventName"></div>
+                        </div>
+                    </div>
+                    <div class="form-group row">
+                     <label class="col-sm-4 col-form-label">Description<span class="error ml-1">*</span></label>
+                     <div class="col-sm-6">
+                        <input type="text" id="eventData" class="form-control" placeholder="Description" name="eventData">
+                        <div id="forEventData" class="error"></div>
+                     </div>
+                    </div>
+                    <div class="form-group row">
+                        <label class="col-sm-4 col-form-label">Select Start Date and End Date<span class="error ml-1">*</span></label>
+                        <div class="col-sm-6">
+                            <div class="input-group date" data-provide="datepicker">
+                                <input id="dateRange" name="daterange" type="text" placeholder="Select Date Range" class="form-control " >                                
+                            </div>
+                            <div class="error" id="forDateRange"></div>
+                        </div>
+                    </div> 
+                    <div class="form-group row">
+                     <label class="col-sm-4 col-form-label">Reason for change<span class="error ml-1">*</span></label>
+                     <div class="col-sm-6">
+                        <textarea id="reason" class="form-control" placeholder="Reason for change" name="addcomment"></textarea>
+                        <div id="forReason" class="error"></div>
+                     </div>
+                    </div>
+                    <div class="card-footer">
+                        <div class="form-group row">
+                            <div class="offset-sm-4">
+                                <button id ="savebtn" type="button" class="btn btn-primary ml-2" onclick="addNewEvent(<?php echo $trackerId ?>,<?php echo $formId?>)">Save</button>
+                                <button onclick="window.location.href='/calendar/events_list/<?php echo $trackerId ?>/<?php echo $formId;?>'" type="button" class="btn btn-default">Cancel</button>
+                            </div>
+                        </div>
+                    </div>                    
+                </form>                 
+            </div>
+        </div>
+    </div>
+</div>
+<?php $this->inlineScript()->appendFile($this->basePath() . '/js/module/common/calendar/addEvent.js');

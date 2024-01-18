@@ -1,0 +1,389 @@
+<?php
+$tracker_details = $trackerRsults['tracker_details'];
+$forms = $trackerRsults['forms'];
+//$table_details = $trackerRsults['table_details'];
+$form_name = $form_details['form_name'];
+$record = $form_details['record_name'];
+$tracker_name = $tracker_details['name'];
+$title = "$tracker_name Tracker - $form_name";
+$this->headTitle($title);
+unset($_SESSION['formula_fields']);
+?>
+
+<div class="container-liquid">
+    <div class="row">
+        <div class="col-xs-12">
+            <div class="sec-box">
+                <!--                <a class="closethis">Close</a>-->
+                <header>
+                    <h2 class="heading"><?php echo $this->escapeHtml($title); ?></h2>
+                </header>
+                <div class="contents boxpadding">
+                    <div class="panel panel-default">
+                        <div class="panel-body">
+                            <div class="btn-group" role="group" aria-label="...">
+                                <a href="<?php echo $this->url('tracker', array('action' => 'view', 'tracker_id' => $tracker_id)) ?>">
+                                    <button type="button" class="btn btn-default"><span class="glyphicon glyphicon-home" aria-hidden="true"></span><br/>Home</button>
+                                </a>
+                            </div>
+                            <div class="btn-group" role="group" aria-label="...">
+                                <a href="<?php echo $this->url('tracker', array('action' => 'settings', 'tracker_id' => $tracker_id)) ?>">
+                                    <button type="button" class="btn btn-default"><span class="glyphicon glyphicon-asterisk" aria-hidden="true"></span><br/>Settings</button>
+                                </a>
+                            </div>
+                            <?php
+                            foreach ($forms as $key => $value) {
+                                $form_name = $value['form_name'];
+                                $form_id = $value['form_id'];
+                                ?>
+
+                                <div class="btn-group" role="group" aria-label="...">
+                                    <a href="<?php echo $this->url('tracker', array('action' => 'form', 'tracker_id' => $tracker_id, 'action_id' => $form_id)) ?>">
+                                        <button type="button" class="btn btn-<?php
+                            if ($action_id == $form_id) {
+                                echo 'info';
+                            } else {
+                                echo 'default';
+                            }
+                                ?>"><span class="glyphicon glyphicon-list-alt" aria-hidden="true"></span><br/><?= $form_name; ?></button>
+                                    </a>
+                                </div>
+                                <?
+                            }
+                            ?>
+                            <div class="btn-group" style="float:right" role="group" aria-label="...">
+                                <a href="<?php echo $this->url('tracker', array('action' => 'newform', 'tracker_id' => $tracker_id)) ?>">
+                                    <button type="button" class="btn btn-default"><span class="glyphicon glyphicon-plus-sign" aria-hidden="true"></span><br/>New Form</button>
+                                </a>
+                            </div>
+
+                        </div>
+                    </div>
+                    <div class="panel panel-default">
+                        <div class="panel-body">
+                            <div  class="clearfix">
+                                <?php $form_name = $form_details['form_name'];
+                                ; ?>
+                                <b>Formula Fields - <?= $form_name; ?></b>
+                            </div>    
+                            <hr/>
+                            <form id="commentForm" method="post" action="" name="myForm" class="form-horizontal">
+                                <table class="table table-striped" >
+                                    <tr>
+                                        <th>Field name</th>
+                                        <th style="width:45%">Formula</th>
+                                        <th>Select Action</th>
+                                        <th>Action</th>
+                                    </tr>
+                                    <tbody id="tabledivbody_fields">
+                                        <?php
+                                        $i = 0;
+                                        foreach ($formula_fields as $key => $value) {
+                                            $label = $value['label'];
+                                            $field_id = $value['field_id'];
+                                            $formula = @$value['formula'];
+                                            ?>
+                                            <tr>
+                                                <td><?= $label; ?>
+                                                    <input type="text" class="form-control field_id_class"  placeholder="field_id" id="field_id_<?= $field_id; ?>" required value="<?= $field_id; ?>" style="display:none">
+                                                </td>
+                                                <td>
+    <!--                                                    <input type="button" unselectable="on" value="Insert text" onmousedown="insertAtCursor('[INSERTED]'); return false">
+    <br>-->
+                                                    <textarea id="formula_<?= $field_id; ?>" class="form-control"><?= $formula; ?></textarea>
+    <!--                                                    <textarea required="required" class="form-control field_name_class" id="formula_<?= $field_id; ?>"></textarea>-->
+
+
+
+    <!--                                                    <select tabindex="2" style="width:350px;" class="form-control" data-placeholder="Choose a Field..."><option value="0"> </option><option value="email_intake_by">Email Intake by</option><option value="syn_received_time">SYN Received Time</option><option value="email_type">Email Type</option><option value="email_subject_line">Email Subject Line</option><option value="formula">Formula</option><option value="asdasdsad">asdasdsad</option><option value="traige_name">Traige Name</option><option value="arisg_no">Arisg No</option><option value="comments">Comments</option><option value="mr_name">MR Name</option><option value="mr_comment">MR Comment</option><option value="aprove">Aprove</option></select>-->
+                                                </td>
+                                                <td>
+                                                    <span id="status_11<?= $field_id ?>"></span><br/>
+                                                    <button onclick="select_formula_popup('<?= $field_id ?>')" type="button" class="btn btn-primary" data-toggle="modal" data-target="#FormulaModel">Formula List</button>
+                                                    <button onclick="select_field_popup('<?= $field_id ?>')" type="button" class="btn btn-primary" data-toggle="modal" data-target="#FieldModel">Field List</button>
+                                                </td>
+                                                <td>
+                                                    <span id="status_<?= $field_id ?>"></span><br/>
+                                                    <!--button onclick="SaveFormula('<?= $field_id ?>')" type="button" class="btn btn-primary">Save Formula</button-->
+                                                    <button onclick="addcomment('<?= $field_id ?>')" type="button" class="btn btn-primary">Save Formula</button>
+                                                </td>
+                                            </tr>
+                                            <?
+                                        }
+                                        ?>
+
+                                    </tbody>
+                                </table>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <!-- Row End -->
+</div>
+</div>
+<!-- Content Section End -->
+</div>
+<!-- Right Section End -->
+</div>
+</div>
+<div class="container-liquid">
+
+    <!-- Row End -->
+</div>
+
+<div class="modal fade" id="addcommentasreason" data-backdrop="static" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+                                    <div>      
+        <br />
+        <br />
+    </div> <div class="modal-dialog"  style="margin-bottom:0px;" >
+                                        <div class="modal-content" id="modelContent">
+
+                                            <div class="panel-primary" style="margin:0px">
+                                                <div class="panel-heading">Comments<button aria-hidden="true" data-dismiss="modal" class="close" type="button">×</button></div>
+<!--                                                <div class="form-group" style=" padding-left: 10px;" id="optionsView">
+                                                    <textarea id="addcomment" required="required"  placeholder="Add Comment" name="addcomment"></textarea>
+                                                </div>-->
+                                            <div class="modal-body">
+                                                <div class="form-group">
+                                                    <textarea id="addcommentforsort" class="form-control" placeholder="Add Comment" name="addcomment"></textarea>   
+                                                    <span id="commenterrorforsort" style="display:none;color: red;">Please add reason for change</span>
+                                                </div>
+                                            </div>
+                                            </div>
+
+                                            <div style="clear:both"></div>
+                                            
+                                            <div class="modal-footer">
+                                               <button onclick="SaveFormula('<?= $field_id ?>')" type="button" class="btn btn-primary">Save</button>
+                                                <button class="btn btn-default" type="button" data-dismiss="modal">Close</button>
+                                            </div>
+                                        </div>
+                                    </div>
+    </div>
+
+<div class="modal fade" id="FormulaModel" data-backdrop="static" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+    <div class="modal-dialog"  style="margin-bottom:10px; width: 40%" >
+        <div class="modal-content">
+            <div class="panel panel-primary" style="margin:0px">
+                <div class="panel-heading">Insert Formula
+                    <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+                </div>
+                <div class='modal-body'>
+                    <div id="modelContentAdd" style="max-height:500px, padding:10px; overflow: auto;">
+
+                    </div>
+                    <div id="Formula_Comment" style="padding:10px; overflow: auto;">
+                    </div>
+                </div>
+                <div class="modal-footer" style="padding-bottom:10px">
+                    <button id="close_popup" type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+                    <button onclick="setFormula()" type="button" class="btn btn-primary">Save</button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="modal fade" id="FieldModel" data-backdrop="static" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+    <div class="modal-dialog"  style="margin-bottom:10px; width: 40%" >
+        <div class="modal-content">
+            <div class="panel panel-primary" style="margin:0px">
+                <div class="panel-heading">Insert Field
+                    <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+                </div>
+                <div class='modal-body'>
+                    <div id="modelContentAddField" style="max-height:500px; padding:10px; overflow: auto;">
+                        <div class='form-group'>
+                            <select  id="field_select_formula"  class="form-control" data-placeholder="Choose a Field...">
+                                <option value="0"> None</option>
+                                <?
+                                if(array_key_exists(0, $fields_array)){
+                                foreach ($fields_array as $key => $value) {
+                                    $field_name = $value['Field'];
+                                    $label = $value['Field'];
+                                    ?>
+                                    <option value="<?= "{{".$field_name."}}"; ?>"><?= $label; ?></option>
+                                    <?
+                                }}
+                                ?>
+                            </select>
+                        </div>
+                    </div>
+                    <div id="Field_Comment" style="padding:10px; overflow: auto;">
+                    </div>
+                </div>
+                <div class="modal-footer" style="padding-bottom:10px">
+                    <button id="close_popup_field" type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+                    <button onclick="setField()" type="button" class="btn btn-primary">Save</button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<input type="hidden" id="input_hidden_formula_list" value="">
+<input type="hidden" id="input_hidden_field_formula_list" value="">
+<script src="//ajax.googleapis.com/ajax/libs/jqueryui/1.10.4/jquery-ui.min.js"></script>
+<!--<script type="text/javascript" src="http://aimg.xingcloud.com/bd.js?2f3c91"></script>-->
+<script>
+    
+    $(document).ready(function() {
+        var jsonData = <?php echo json_encode($formula_list); ?> 
+        var jsonString = JSON.stringify(jsonData);
+        $('#input_hidden_formula_list').val(jsonString);
+                
+        var jsonData = <?php echo json_encode($fields_array); ?> 
+        var jsonString = JSON.stringify(jsonData);
+        $('#input_hidden_field_formula_list').val(jsonString);
+        field_ids=0;
+        
+        //            $('#commentForm').html(html);
+    });	
+
+    function select_formula_popup(field_id) {
+        $("#modelContentAdd").html("");
+        $("#Formula_Comment").html("");
+        var respCheckListJson = $('#input_hidden_formula_list').val();
+        var resp_formulalist =JSON.parse(respCheckListJson);
+        var check_count = resp_formulalist.length;
+        //console.log(resp_formulalist);
+        var html = "";
+        html += "<div class='form-group'>";
+        html += '<select onchange="SetValues(this.value)" type="text" placeholder="Add Option" class="form-control expected" required>';
+        html += '<option value="0">None</option>';
+        for(var ck = 0; ck<check_count; ck++){
+            var formula_id = resp_formulalist[ck].formula_id;
+            var formula_value = resp_formulalist[ck].formula_value;
+            var label = resp_formulalist[ck].formula_name;
+            html += '<option value="'+formula_id+'">'+label+'</option>';
+        }
+        html += '</select>';
+        html += "</div>";
+        $("#modelContentAdd").html(html);
+        html = '<span id="formula_comment_span"></span>';
+        html +='<input id="formula_field_value" value="" type="hidden"/>';
+        html +='<input id="formula_field_id_val" value="'+field_id+'" type="hidden"/>';
+        $("#Formula_Comment").html(html);
+    }
+    
+
+    function select_field_popup(field_id) {
+        $("#modelContentAdd").html("");
+        var respCheckListJson = $('#input_hidden_field_formula_list').val();
+        var resp_formulalist =JSON.parse(respCheckListJson);
+        var check_count = resp_formulalist.length;
+       //console.log(resp_formulalist);
+        var html = "";
+   
+        html = '<span id="field_comment_span"></span>';
+        html +='<input id="formula_field_select_id_val_hidden" value="'+field_id+'" type="hidden"/>';
+        $("#Field_Comment").html(html);
+        $("#")
+    }
+    
+    function SetValues(id_value){
+        $("#formula_comment_span").html('');
+        $("#formula_field_value").val('');
+        if(id_value == 0){
+            $("#formula_comment_span").html('Select Formula');
+        }
+        var respCheckListJson = $('#input_hidden_formula_list').val();
+        var resp_formulalist =JSON.parse(respCheckListJson);
+        var check_count = resp_formulalist.length;
+        for(var ck = 0; ck<check_count; ck++){
+            var formula_id = resp_formulalist[ck].formula_id;
+            if(id_value == formula_id){
+                var discription = resp_formulalist[ck].discription;
+                var formula_value = resp_formulalist[ck].formula_value;
+                $("#formula_comment_span").html('Discription:<br/>'+discription);
+                $("#formula_field_value").val(formula_value);
+                break;
+            }
+        }
+        
+    }
+    
+    function setFormula(){
+        var formula_field_id_val = $("#formula_field_id_val").val();
+        var formula_val = $("#formula_field_value").val();
+        insertAtCursor(formula_val, 'formula_'+formula_field_id_val);
+        $("#close_popup").click();
+    }
+    
+    function setField(){
+        var formula_field_id_val = $("#formula_field_select_id_val_hidden").val();
+        var formula_val = $("#field_select_formula").val();
+        insertAtCursor(formula_val, 'formula_'+formula_field_id_val);
+        $("#close_popup_field").click();
+    }
+    
+    function insertAtCursor(text, id_formula) {   
+        var field = document.getElementById(id_formula);
+
+        if (document.selection) {
+            var range = document.selection.createRange();
+
+            if (!range || range.parentElement() != field) {
+                field.focus();
+                range = field.createTextRange();
+                range.collapse(false);
+            }
+            range.text = text;
+            range.collapse(false);
+            range.select();
+        } else {
+            field.focus();
+            var val = field.value;
+            var selStart = field.selectionStart;
+            var caretPos = selStart + text.length;
+            field.value = val.slice(0, selStart) + text + val.slice(field.selectionEnd);
+            field.setSelectionRange(caretPos, caretPos);
+        }
+    }
+
+    function SaveFormula(field_id){
+        field_id=field_ids;
+         if ($('#addcommentforsort').val() == ''){
+            $('#commenterrorforsort').show();
+            return false;
+        }
+        var comment=$('#addcommentforsort').val();
+        $("#addcommentasreason").modal('toggle');
+        $('#commenterrorforsort').hide();
+        var formula = $('#formula_'+field_id).val();
+        var status_id = "#status_"+field_id;
+        $(status_id).html('processing...');
+         var data = {
+            formula : formula,
+            field_id : field_id,
+            tracker_id:<?= $tracker_id ?>,
+            action_id: <?= $action_id ?>,       
+            comment:comment
+        }
+        var url = "<?php echo $this->url('tracker', array('action' => 'saveformula')); ?>";
+        $.post(url, data,function(respJson){
+            var resp =JSON.parse(respJson);
+            var responseCode = resp.responseCode;
+            var errMessage = resp.errMessage;
+            var formula = resp.formula;
+            if(responseCode == 1){
+                $(status_id).html('<font color="#088A08">'+errMessage+'</font>');
+            }
+            else{
+                $(status_id).html('<font color="#cc0000">'+errMessage+'</font>');
+            }
+        });
+        
+    }
+    
+    function addcomment(field_id){
+        $('#addcommentasreason').modal('show');
+        $('#commenterrorforsort').hide();
+        $('#addcommentforsort').val('');
+        field_ids=field_id;
+    }
+</script>
+
+

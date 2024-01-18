@@ -1,0 +1,175 @@
+<?php
+//echo $date_format_selected;die;
+use Zend\Session\Container;
+$tracker_details = $trackerRsults['tracker_details'];
+$forms = $trackerRsults['forms'];
+//echo "<pre>";print_r($trackerRsults);die;
+$tracker_name = $tracker_details['name'];
+$title = "$tracker_name- Date Settings";
+$this->headTitle($title);
+$container = new Container('msg');
+//echo $container->messg;die;
+?>
+
+
+<div class="container-liquid">
+    <div class="row">
+        <div class="col-xs-12">
+            <div class="sec-box">
+<!--                                <a class="closethis">Close</a>-->
+                <header>
+                    <h2 class="heading"><?php echo $this->escapeHtml($title); ?></h2>
+                </header>
+                <div class="contents boxpadding">
+                    <?php if ($container->messg == 'mandatory') { ?>
+                        <span style="color:red;float: left">
+                            Please select mandatory fields.
+                        </span>
+                    <?php
+                    $container->getManager()->getStorage()->clear('msg'); } ?>
+                </div>
+                <div class="contents boxpadding">
+                    <div class="panel panel-default">
+                        <div class="panel-body">
+                            <div class="btn-group" role="group" aria-label="...">
+                                <a href="<?php echo $this->url('tracker', array('action' => 'view', 'tracker_id' => $tracker_id)) ?>">
+                                    <button type="button" class="btn btn-default"><span class="glyphicon glyphicon-home" aria-hidden="true"></span><br/>Home</button>
+                                </a>
+                            </div>
+                            <div class="btn-group" role="group" aria-label="...">
+                                <a href="<?php echo $this->url('tracker', array('action' => 'settings', 'tracker_id' => $tracker_id)) ?>">
+                                    <button type="button" class="btn btn-info"><span class="glyphicon glyphicon-asterisk" aria-hidden="true"></span><br/>Settings</button>
+                                </a>
+                            </div>
+                            <?php
+                            foreach ($forms as $key => $value) {
+                                $form_name = $value['form_name'];
+                                $form_id = $value['form_id'];
+                                ?>
+
+                                <div class="btn-group" role="group" aria-label="...">
+                                    <a href="<?php echo $this->url('tracker', array('action' => 'form', 'tracker_id' => $tracker_id, 'action_id' => $form_id)) ?>">
+                                        <button type="button" class="btn btn-default"><span class="glyphicon glyphicon-list-alt" aria-hidden="true"></span><br/><?= $form_name; ?></button>
+                                    </a>
+                                </div>
+                                <?
+                            }
+                            ?>
+                            <div class="btn-group" style="float:right" role="group" aria-label="...">
+                                <a href="<?php echo $this->url('tracker', array('action' => 'newform', 'tracker_id' => $tracker_id)) ?>">
+                                    <button type="button" class="btn btn-default"><span class="glyphicon glyphicon-plus-sign" aria-hidden="true"></span><br/>New Form</button>
+                                </a>
+                            </div>
+
+                        </div>
+                    </div>
+                    
+                    
+                    
+                    
+                    <div class="panel panel-default">
+                        <div class="panel-body">
+                            <div  class="clearfix">
+                                <span></span>
+                            </div>
+                            <hr/>
+
+                            <form id="trackersearchsetting" method="post" action="/tracker/search_setting/<?php echo $tracker_id ?>" name="trackersearchsetting" class="form-horizontal">
+                                <div class="form-group">
+                                    <label class="col-sm-3 control-label" style="padding-left: 0px;">Date Format</label>
+                                    <div class="col-sm-3">
+                                        <select type="text" onchange="getfields()" class="form-control quesiionMandatory-edit" placeholder="MandatoryType" id="form" name="form"  required>
+                                        <option value=''>Select Form</option>
+                                        <?php 
+                                            foreach ($forms as $key => $value) {
+                                            $form_name = $value['form_name'];
+                                            $form_id = $value['form_id'];
+                                        ?>
+                                        <option  value="<?php echo $form_id ?>"><?php echo $form_name; ?></option>
+                                        <?php
+                                        }
+                                        ?>
+                                    </select>
+                                    </div>
+                                </div>
+
+                                <div class="form-group" id="allfields" style="display:none">
+                                    <label class="col-sm-3 control-label" style="padding-left: 0px;">Fields required for search</label>
+                                    <div class="col-sm-6" id ="fieldscheck">   
+                                        <div class="col-sm-12" id ="fieldscheck">
+                                                <input type="checkbox" id="ckbCheckAll" /> Select all  
+                                        </div>
+                                        <div id="selectfield">
+                                          
+                                        </div>
+                                    </div>
+                                </div>
+                                 <div class="modal-footer" style="padding-bottom:0px">
+                                     <button onclick="addTrackersearchSetting()" type="button" class="btn btn-primary">Save</button>
+                                    <button onclick="window.location.href='/tracker/settings/<?php echo $tracker_id ?>'"  class="btn btn-primary" type="button">Close</button>
+                                </div>
+                            </form>
+                             
+</div>
+
+            </div>
+        </div>
+    </div>
+    <script>
+        $(document).ready(function () {
+        $("#ckbCheckAll").click(function () {
+            $(".checkBoxClass").prop('checked', $(this).prop('checked'));
+        });
+    });
+        function checkChecked() {
+            var somethingChecked = false;
+            $("input[type=checkbox]").each(function() {
+              if($(this).is(':checked')) {
+                $('.clearfix span').html('');
+                somethingChecked = true;
+              }
+            });
+            if(!somethingChecked) {
+              somethingChecked = false;
+              $('.clearfix span').html("Select at least one checkbox.").css({ 'color': 'red'});
+            }
+            return somethingChecked;
+        }
+        function addTrackersearchSetting()
+        {
+            var $valid = $("#trackersearchsetting").valid();
+            if(!$valid) {
+                return false;
+            }
+            if($("#form").val()>0 && (checkChecked() == true))
+            {
+                $("#trackersearchsetting").submit();
+            }
+
+        }
+        
+        function getfields(){  
+        var tracker_id = '<?= $tracker_id; ?>';
+        var action_id = $('#form').val();
+        var data = {
+            tracker_id:tracker_id,
+            form_id:action_id
+        }
+        var html='';
+        var url = "/tracker/getfields";
+            $.post(url, data,function(respJson){
+               var resp =JSON.parse(respJson);
+                $.each(resp, function(index, element) {
+                    var checked='';
+                    if(element.search_field==1){
+                        checked='checked';
+                    }
+                    html = (html == '') ? '<div class="col-sm-4"><input class="checkBoxClass" type="checkbox" name="serach_field[]" '+checked+ ' value="'+element.field_id+'">'+element.label+'<br></div>' : html+'<div class="col-sm-4"><input type="checkbox" class="checkBoxClass" name="serach_field[]" '+checked+ ' value="'+element.field_id+'">'+element.label+'<br></div>';
+                })
+                $("#ckbCheckAll").prop('checked',false);
+                $("#allfields").show();
+                $("#selectfield").html(html);
+            });
+        }
+
+    </script>    

@@ -1,0 +1,26 @@
+CASE_ID,VERSION_NO,AER_FOLLOWUP_DATE,CASE_TYPE,SERIOUSNESS COMPANY,SERIOUSNESS REPORTER,NVL,PT_NAME,SOC_NAME,REACTION RANK,INDICATION PT,INDICATION SOC,LAB RESULT,SERIOUSNESS_EVENT,SOURCE_AER_SOURCE,PATIENT_DATA,OUTCOME_COMPANY,STUDY_PATIENT_NO,PROTOCOL_NO,NARRATIVE,WEIGHT,HEIGHT,AER COUNTRY,PATIENT SEX,DEATH,LIFE THREATENING,HOSPITALIZATION,DISABILITY,CONGENITAL ANOMALY,OTHER MEDICALLY SIGNIFICANT,SUSPECT DOSE INFORMATION,RMC Grade,Reporter Causality,Company Causality,OUTCOME AFTER REINTRO,DECHALLENGE,RECHALLENGE,AE Onset date,AE Cessation date,AE DURATION,MANUFACTURE RECV DATE,STUDY PATIENT NO,MEDICALLY CONFIRMED,CENTER_NO,OUTCOME REPORTER,Initial receipt date
+VIT-2017-05155,0,9-May-17,SPONTANEOUS    ,Not Serious,Not Serious,Aero-Om,Somnolence,Nervous system disorders,1,Product used for unknown indication,Surgical and medical procedures,  ,Not Serious,"Spontaneous,
+Company representative
+","ID-Unknown,Infant,Age-Unknown,Age unit-Unknown,Sex-Unknown,DOB-Unknown",Unknown,,,"This initial spontaneous report was received on 09-May-2017 from a nurse in Peru via a company representative and concerns a infant patient of an unknown age and gender with an unspecified medical history. No information was provided on concomitant medication usage.
+
+On an unspecified date, the patient started to receive dimeticone (Aero-OM) drops, at an unspecified dose for an unknown indication.
+
+On an unspecified date, the patient experienced drowsiness. No information was provided on remedial therapy.
+
+The action taken with Aero-OM therapy was not reported.
+
+The outcome of event drowsiness was unknown.
+
+This case was not serious.
+
+The reporter did not provide the causality assessment for the event drowsiness with Aero-OM therapy.
+
+Causality evaluation by company:
+
+The event somnolence is unlisted according to Aero-OM Company Core Data Sheet (CCDS).
+
+The time to onset between Aero-OM administration and the event reported is missing and hence temporal relationship cannot be judged or evaluated. There could be other contributing factors which are unknown at this moment because medical history and concomitant medication details were not provided. The company assessed the event as possible related to Aero-OM according with the adapted WHO-Uppsala Monitoring Center Standardized Causality Assessment System.
+
+Follow up information has been requested.
+
+No further information could be obtained.","Weight-Unknown,Weight unit-Unknown","Height-Unknown,Height unit-Unknown",PERU,Sex-Unknown,,,,,,,"Unit dose unit-Unknown,Unit dose-Unknown,Total dose unit-Unknown,Total dose-Unknown",,Not assessed,Possible,,Unknown,Unknown,,,"AE duration-Unknown,AE duration unit-Unknown",9-May-17,,Yes,,Unknown,9-May-17

@@ -1,0 +1,62 @@
+<?php
+$title = 'View Customer Details';
+$this->headTitle($title);
+$form->setAttribute('action', $this->url('customer', array('action' => 'view', 'customer_id' => $customerId)));
+$form->prepare();
+?>
+
+<div class="pagebar container-fluid col-md-12">
+    <!-- Sidebar Toggle -->
+    <button type="button" class="pagebar-toggle navbar-toggle pull-left">
+      <span class="pagebar-arrow"></span>
+    </button>
+    <ol class="breadcrumb">
+        <li><a href="/customer"><span>Customer</span></a></li>
+        <li class="active"><span><?php echo $this->escapeHtml($title); ?></span></li>
+    </ol>
+</div>
+<div class="card">
+    <div class="card-body">
+        <div class="card">
+            <div  class="card-header">
+                <h6 class="col-md-6 float-left"><?php echo $this->escapeHtml($title); ?></h6>
+            </div>
+            <div class="card-body">
+                <?php echo $this->form()->openTag($form); ?>
+                <div class="form-group row">
+                    <label class="col-sm-4 col-form-label"><?php echo $this->formlabel($form->get('c_name')); ?></label>
+                    <div class="col-sm-7">
+                        <?php echo stripslashes($customerData['client_name']) ?>
+                    </div>
+                </div>
+                <div class="form-group row">
+                    <label class="col-sm-4 col-form-label"><?php echo $this->formlabel($form->get('c_email')); ?></label>
+                    <div class="col-sm-7">
+                        <?php echo stripslashes($customerData['client_email']) ?>
+                    </div>
+                </div>
+                <div class="form-group row">
+                    <label class="col-sm-4 col-form-label"><?php echo $this->formlabel($form->get('c_proj_manager_name')); ?></label>
+                    <div class="col-sm-7">
+                        <?php echo stripslashes($customerData['project_manager_name']) ?>
+                    </div>
+                </div>
+                <div class="form-group row">
+                    <label class="col-sm-4 col-form-label"><?php echo $this->formlabel($form->get('c_description')); ?></label>
+                    <div class="col-sm-7">
+                        <?php echo stripslashes($customerData['description']) ?>
+                    </div>
+                </div>
+                <div class="form-group row">
+                    <label class="col-sm-4 col-form-label">
+                        <?php echo $this->formlabel($form->get('c_country')); ?>
+                    </label>
+                    <div class="col-sm-7">
+                        <?php echo stripslashes($customerData['country']) ?>
+                    </div>
+                </div>
+                <?php echo $this->form()->closeTag($form); ?>
+            </div>
+        </div>
+    </div>
+</div>

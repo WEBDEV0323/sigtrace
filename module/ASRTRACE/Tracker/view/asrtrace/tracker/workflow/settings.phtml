@@ -1,0 +1,251 @@
+<?php
+$title = "Workflow Settings";
+$this->headTitle($title);
+if(!empty($trackerResults)){
+    $tracker_details = $trackerResults['tracker_details'];
+    $forms = $trackerResults['forms'];
+    $tracker_name = $tracker_details['name'];
+}
+?>
+<div class="pagebar container-fluid col-md-12">
+    <!-- Sidebar Toggle -->
+    <button type="button" class="pagebar-toggle navbar-toggle pull-left">
+        <span class="pagebar-arrow"></span>
+    </button>
+    <ol class="breadcrumb">
+    <li><span><a href="/dashboard/<?php echo isset($forms[0]['tracker_id'])?$forms[0]['tracker_id']:0;?>/<?php echo isset($forms[0]['form_id'])?$forms[0]['form_id']:0;?>"><?php echo $tracker_name;?></a></span></li>
+        <li><a href="/tracker/settings/<?php echo $trackerId;?>"><span>Tracker Settings</span></a></li>
+        <li class="active"><span>Workflow Settings</span></li>
+    </ol>
+</div>
+<div class="card">
+    <div class="card-body">
+        <div class="card" >
+            <div class="card-header">
+                <h6 class="col-md-6 float-left">Rules</h6>
+                <span class="col-md-6">
+                    <button type="button" class="btn btn-primary float-right" id="addrule" data-toggle="modal" data-target="#RuleModel">Add New Rule</button>
+                </span>   
+             </div>
+            <div class="card-body">
+                <?php
+                $flashMessage = $this->flashMessenger()->getMessages();
+                if (count($flashMessage) && isset($flashMessage[0]['success'])) {
+                    echo '<div class="contents boxpadding"><div class="alert alert-dismissable alert-success" id="fashMessage">'.$flashMessage[0]['success'].'<button type="button" class="close" data-dismiss="alert" aria-hidden="true">×</button></div></div>';
+                }
+                ?>
+                <div class="table-responsive">
+                    <table  class="table table-striped" id="list_of_rules">
+                        <thead>
+                            <tr>
+                                <th>Action</th>
+                                <th>Rule</th>
+                                <th>Form Name</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <?php
+                            $ival = 0;
+                            if (!empty($workflowRules)) {
+                                foreach ($workflowRules as $rules => $value) {
+                                    ?>
+                                    <tr>
+                                        <td>
+                                            <button type="button" class="btn btn-default" onclick="editRule(<?php echo $value->rule_id ?>,<?php echo $value->form_id ?>)" data-toggle="modal" data-target="#RuleModel">
+                                                <span class="lnr icon-pencil" aria-hidden="true"></span>
+                                            </button>
+                                            <button type="button" class="btn btn-default" onclick="deleteRule(<?php echo $value->rule_id ?>,<?php echo $value->form_id ?>)">
+                                                <span class="lnr icon-trash2" aria-hidden="true"></span>
+                                            </button>
+                                            <span id="del_<?php echo $value->rule_id;?>"></span>
+                                        </td>
+                                        <td><?php echo $value->rule;?></td>
+                                        <td><?php echo $value->form_name;?></td>
+                                    </tr>
+                                    <?php
+                                }
+                            } else {
+                            ?>
+                                <tr id="rule">
+                                    <td colspan='4'><?php
+                                        echo "No Records Found";
+                                        ?>
+                                    </td>
+                                </tr>
+                            <?php } ?>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+        </div>
+    </div>
+
+<div class="modal fade" id="RuleModel" data-backdrop="static" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="rule_title">Add Rule</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class='modal-body'>
+                <div class="card">
+                    <div class="card-body">
+                        <form id="ruleForm" method="post" action="" name="ruleForm">
+                            <div class="form-group row">
+                                <label class="col-sm-3"></label>
+                                <div id="RuleErrorMessage" class="error col-sm-8"></div>
+                            </div>
+                            <input type="hidden" id="ruleId" name="ruleId" value="0"/>
+                            <div class="form-group row">
+                                <label class="col-sm-3 col-form-label" for="r_form">Form Name<span class="error ml-1">*</span></label>
+                                <div class="col-sm-8">
+                                    <select class="form-control" placeholder="" onchange="getfields(this.value)"id="r_form" name="formName" required="">
+                                        <option value="">Please Select</option>
+                                        <?php foreach ($forms as $key => $value) { ?>
+                                            <option value="<?php echo $value['form_id'] ?>"><?php echo $value['form_name'] ?></option>
+                                        <?php } ?>
+                                    </select>
+                                    <span for="r_form" class="error" id="r_form_error"></span>
+                                </div>
+                            </div>
+                            <div class="form-group row">
+                                <label class="col-sm-3 col-form-label" for="r_condition">Condition<span class="error ml-1">*</span></label>
+                                <div class="col-sm-8">
+                                    <select name="r_condition" class="form-control" id="r_condition" required="required">
+                                        <option value="">Select Condition</option>
+                                        <option value="AND">And</option>
+                                        <option value="OR">OR</option>
+                                    </select>
+                                    <span for="r_condition" class="error" id="r_condition_error"></span>
+                                </div>
+                            </div>
+                            <div id="conditionsgroup">
+                                <div  class="form-group row">
+                                    <label class="col-sm-3 col-form-label" for="r_condition">When<span class="error ml-1">*</span></label>
+                                    <div class="col-sm-3">
+                                        <select id="n_conditionfields_1" class="n_conditionfield form-control"></select>
+                                    </div>
+                                    <div class="col-sm-3">
+                                        <select id="n_condition_operands_1"  class="n_condition_operand form-control">
+                                            <option value="">Select Condition</option>
+                                            <option value="=">=</option>
+                                            <option value="<>">!=</option>
+                                            <option value=">">&gt</option>
+                                            <option value="<"><</option>
+                                        </select>
+                                    </div>
+                                    <div class="col-sm-2">
+                                        <select id="selectuser_1" style="display:none;" class="form-control">
+                                            <option value=""></option>
+                                            <option value="cur_user">Current User</option>
+                                        </select>
+                                        <input class="displayValue form-control" name="displayValue_1" placeholder="add/select a value" id="displayValue_1" onfocus="this.select()" type="text">
+                                        <input class="cond_values form-control" name="cond_values_1" id="cond_values_1" type="hidden">
+                                    </div>
+                                    <div class="col-sm-0">
+                                        <div class="align-center mt-2">
+                                        <i class="lnr icon-plus-circle" style="color:green;cursor: pointer; font-size: 16px" onclick="ClickAddCond(event)" title="ADD CONDITION"></i>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div id="actionsgroup">
+                                <div  class="form-group row">
+                                    <label class="col-sm-3 col-form-label" for="r_condition">Action<span class="error ml-1">*</span></label> 
+                                    <div class="col-sm-3">
+                                        <select id="n_actions_1" class="n_actions form-control">
+                                            <option value="">Select Action</option>
+                                            <option value="Edit Workflow">Edit Workflow</option>
+                                            <option value="Hide Fields">Hide Fields</option>
+                                        </select>
+                                    </div>
+                                    <div class="col-sm-3">
+                                        <select id="n_conditionvals_1" class="n_conditionvals form-control" value="Select Value" placeholder="Select Value"></select>
+                                    </div>
+                                    <div class="col-sm-2">
+                                        <div id="action_fields_1" style="display:none;">
+                                            <select id="n_fields_1" name="n_fields_1[]" value="Select Value" placeholder="Select Field" title="Select Field" class="n_actionfields selectpicker form-control" multiple data-live-search="true" data-actions-box="true" data-container="body"></select>
+                                        </div>
+                                    </div>
+                                    <div class="col-sm-0">
+                                        <div class="align-center mt-2">
+                                        <i class="lnr icon-plus-circle" style="color:green;cursor: pointer;font-size: 16px" onclick="ClickAddAction(event)" title="ADD ACTION"></i>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="form-group row">
+                                <label class="col-sm-3 col-form-label">Reason for change<span class="error ml-1">*</span></label>
+                                <div class="col-sm-8">
+                                    <textarea id="addReasonForAdd" class="form-control" placeholder="Reason for change." name="add_reason"></textarea>   
+                                    <span id="addReasonForAddError" class="error"></span>
+                                </div>
+                            </div>
+                        </form> 
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button onclick="addNewRule('<?php echo $trackerId ?>')" type="button" class="btn btn-primary">Save</button>
+                <button id="close_popup" type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="modal fade" id="deletecommentasreason" data-backdrop="static" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="exampleModalLongTitle">Delete Confirmation</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <input type="hidden" id="ruleIdForDelete" />
+                <input type="hidden" id="formIdForDelete" />
+                <div class="form-group row">
+                    <label class="col-sm-4"></label>
+                    <div id="ruleDeleteErrorMessages" class="error col-sm-6"></div>
+                </div>
+                <div class="form-group row">
+                    <label class="col-sm-4 col-form-label">Reason for change<span class="error ml-1">*</span></label>
+                    <div class="col-sm-7">
+                        <textarea id="addcommentfordelete" class="form-control" placeholder="Reason for change." name="addcomment"></textarea>   
+                        <span id="commenterrorfordelete" class="error"></span>
+                    </div>
+                </div>
+            </div>
+            <div style="clear:both"></div>
+            <div class="modal-footer">
+                <button id="reasonfordelete"  type="button" class="btn btn-primary">Delete</button>
+                <button class="btn btn-default" type="button" data-dismiss="modal">Close</button>
+            </div>
+        </div>
+    </div>
+</div>
+<div id="loading" style="display:none">
+    <p class="loader_img" id="loading_mask_loader">
+        <img src="/assets/spinner.gif" alt="Loading...">
+        <br>
+        <span>Please wait...</span>
+    </p>
+</div>
+<script type="text/javascript">
+    str = 2;
+    actionstr = 2;
+    cond_option = '';
+    action_option = '';
+    rule_id = 0;
+    var trackerId = '<?=$trackerId;?>';
+</script>
+<?php
+$this->headLink()->appendStylesheet($this->basePath() . '/assets/custom/css/loader.css');
+$this->inlineScript()
+        ->appendFile($this->basePath() . '/js/module/tracker/workflow_settings.js');
+    

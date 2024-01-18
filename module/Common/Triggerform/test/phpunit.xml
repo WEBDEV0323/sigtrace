@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<phpunit bootstrap="Bootstrap.php" colors="true" stderr="true" >
+    <testsuites>
+        <testsuite name="sigtrace">
+            <directory>./TriggerformTest</directory>
+        </testsuite>
+    </testsuites>
+    
+    <filter>
+        <whitelist>    
+            <!-- User module -->
+            <directory suffix=".php">../src/Common/Triggerform/Model</directory>
+            <directory suffix=".php">../src/Common/Triggerform/Controller</directory>
+        </whitelist>
+    </filter>
+    
+    <logging>
+        <log type="coverage-html" target="../../../../../test/unittest/code_coverage/Triggerform" lowUpperBound="40" highLowerBound="80" />
+    </logging>
+	
+</phpunit>

@@ -1,0 +1,165 @@
+<?php
+use Session\Container\SessionContainer;
+$session = new SessionContainer();
+$msgSession = $session->getSession("auth_setting_msg");
+$title = "Authorization Settings";
+?>
+
+<div class="pagebar container-fluid col-md-12">
+    <!-- Sidebar Toggle -->
+    <button type="button" class="pagebar-toggle navbar-toggle pull-left">
+      <span class="pagebar-arrow"></span>
+    </button>
+    <ol class="breadcrumb">
+      <li><span>Settings</span></li>
+      <li class="active"><span><?php echo $this->escapeHtml($title); ?></span></li>
+    </ol>
+</div>
+<div class="card">
+    <div class="card-body">
+        <p class="alert" id="alert" style="display:none;"></p>
+        <div class="card">
+            <div class="card-header">
+                <?php echo $this->escapeHtml($title); ?>
+            </div>
+                <form method="POST" id="access" class="form-horizontal row-border">
+                    <div class="card-body"> 
+                        <div class="form-group row">
+                            <label class="col-sm-3 col-form-label">Tracker<span class="error ml-1">*</span></label>
+                            <div class="col-sm-8">
+                                <select id="trackerData" class="form-control required" name="TrackerId" onchange="getRole(this.value)">
+                                    <option value="0"></option>
+                                    <?php foreach($trackers as $tracker){ ?> 
+                                    <option value="<?=$tracker['tracker_id'];?>"><?=$tracker['name'];?></option>
+                                    <?php }?>
+                                </select>
+                                <div id="forTracker" class="error"></div>
+                            </div>
+                        </div>
+                        <div class="form-group row">
+                            <label class="col-sm-3 col-form-label">Role<span class="error ml-1">*</span></label>
+                            <div class="col-sm-8">
+                                <select id="roleData" class="form-control required" name="RoleId" onchange="getData(this.value)">
+                                    <option value="0"></option>
+                                </select>
+                                <div id="forRole" class="error"></div>
+                            </div>
+                        </div>
+                        <div class="form-group row" id="listData" style="display:none;">
+                            <label class="col-sm-3 col-form-label">List</label>
+                            <div class="col-sm-8" id="list">&nbsp;</div>
+                        </div>
+                        <div class="form-group row">
+                            <label class="col-sm-3 col-form-label">Reason for change<span class="error ml-1">*</span></label>
+                            <div class="col-sm-8">
+                               <textarea id="reason" class="form-control" placeholder="Reason for change" name="reason"></textarea>
+                               <div id="forReason" class="error"></div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="card-footer text-right">
+                        <button class="btn btn-primary" type="submit">Save</button>
+                        <button type="button" class="btn btn-default" id='cancelButton'>Cancel</button>
+                    </div>
+                </form>
+        </div>
+    </div>
+</div>
+
+<style> tr:nth-child(even) {background-color: #f2f2f2}</style>
+<script>
+$(document).ready(function() {
+    var msg = '<?php echo $msgSession->msg;?>';
+    if (msg != '') {
+        <?php unset($msgSession->msg); ?>
+        $('#alert').show().removeClass('alert-danger').addClass('alert-success').html('<i class="lnr icon-cross close" data-dismiss="alert"></i>'+msg); 
+        setTimeout(function(){$('#alert').hide();}, 3000);
+    }
+});
+var cancelPath = "<?php echo $this->escapeJs(filter_input(INPUT_SERVER, 'HTTP_REFERER')); ?>";
+$('#cancelButton').on('click',function() {
+        window.location.href = cancelPath;
+    });
+$('#access').on('submit',function() 
+{
+    var count = 0;
+    $("#forTracker").html("");
+    $("#forRole").html("");
+    $("#forReason").html("");
+    if ($('#trackerData').val() == 0) {
+        $("#forTracker").html(messageJSON.MSG_FIELD_EMPTY.replace('#fieldName','Tracker'));
+        count++;
+    }
+    if ($('#roleData').val() == 0) {
+        $("#forRole").html(messageJSON.MSG_FIELD_EMPTY.replace('#fieldName','Role'));
+        count++;
+    }
+    
+    if ($('#reason').val()=='') {
+        $("#forReason").html(messageJSON.MSG_FIELD_EMPTY.replace('#fieldName','Reason for change'));
+        count++; 
+    }
+    if (count > 0) {
+        return false;
+    } 
+   $('#alert').removeClass('alert-danger').hide().html(''); 
+});
+function getData(role){
+    $('#listData #list').html('<img src="/assets/dashboard_spinner.gif" width="15%" class="mx-auto d-block" alt="loading..." />');
+     if(role != 0) {
+         $("#forRole").html("");
+         $('#listData').show();
+         getAccessData(role);
+     }else{
+         $('#listData').hide();
+         $("#forRole").html(messageJSON.MSG_FIELD_EMPTY.replace('#fieldName','Role'));
+     }  
+   } 
+function getRole(trackerId) {
+   $("#forTracker").html("");
+   if (trackerId == 0) {
+       $("#forTracker").html(messageJSON.MSG_FIELD_EMPTY.replace('#fieldName','Tracker'));
+   }
+   $.ajax({
+        method: "POST",
+        url:'/settings/getRolesData',
+        data: "trackerId="+trackerId,
+        success: function(response){
+            $('#roleData').html(response);
+            $('#roleData').val(0);
+            $('#s2id_roleData span.select2-chosen').html('');
+            $('#listData').hide();
+            $('#listData #list').html('');
+        },
+        error: function(e) {
+            console.log(e.message);
+            return false;
+        }
+    });
+    
+      
+} 
+function getAccessData(data){
+    $.ajax({
+            method: "POST",
+            url:'/settings/getAccessData',
+            data: "role_id="+data+"&tracker_id="+$('#trackerData').val(),
+            success: function(response){
+              $('#alert').removeClass('alert-danger').hide().html('');
+                switch(response){
+                  case '[]':
+                      $('#fileCheck').val(0);
+                      break;
+                  default:
+                      $('#fileCheck').val(1);
+                      $('#listData #list').html(response);
+                    break;
+                } 
+            },
+            error: function(e) {
+                console.log(e.message);
+                return false;
+            }
+    });
+}
+</script>

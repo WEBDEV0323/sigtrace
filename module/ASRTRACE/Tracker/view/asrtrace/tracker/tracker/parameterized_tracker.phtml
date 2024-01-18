@@ -1,0 +1,36 @@
+<?php
+$this->headTitle('Audit Trail');
+if(!empty($trackerResults)){
+  $tracker_details = $trackerResults['tracker_details'];
+  $forms = $trackerResults['forms'];
+  $tracker_name = $tracker_details['name'];
+}
+?>
+<div class="pagebar container-fluid col-md-12">
+    <!-- Sidebar Toggle -->
+    <button type="button" class="pagebar-toggle navbar-toggle pull-left">
+      <span class="pagebar-arrow"></span>
+    </button>
+    <ol class="breadcrumb">
+    <li><span><a href="/dashboard/<?php echo isset($forms[0]['tracker_id'])?$forms[0]['tracker_id']:0;?>/<?php echo isset($forms[0]['form_id'])?$forms[0]['form_id']:0;?>"><?php echo $tracker_name;?></a></span></li>
+        <li><span><a href="/tracker/settings/<?php echo $trackerId;?>">Tracker Settings</a></span></li>
+        <li class="active"><span>Audit Log</span></li>
+    </ol>
+</div>
+
+<div class="card">
+  <div class="card-body">
+    <div class="card card-default mb-2">
+        <div class="card-body">
+            <?if($kibana_url!=null){
+                $kibanaUrl= $kibana_url."?embed=true&_g=(refreshInterval%3A(display%3AOff%2Cpause%3A!f%2Cvalue%3A0)%2Ctime%3A(from%3Anow-2y%2Cmode%3Aquick%2Cto%3Anow))&_a=(query:(query_string:(analyze_wildcard:!t,query:'CustomerID:".$clientId."')))";
+            ?>
+            <iframe src="<?=$kibanaUrl;?>" height="600" width="100%"></iframe>
+            <?}else{
+                echo"You dont have access";
+            }
+            ?>
+        </div>
+    </div>
+  </div>
+</div>

@@ -1,0 +1,294 @@
+<?php
+use Zend\Session\Container;
+use Session\Container\SessionContainer;
+$session = new SessionContainer();
+$container = new Container('user');
+
+$tracker_details = $trackerRsults['tracker_details'];
+//$forms = $trackerRsults['forms'];
+$form_name = $form_details['form_name'];
+$record = $form_details['record_name'];
+$tracker_name = $tracker_details['name'];
+$title = "$tracker_name - $form_name";
+$this->headTitle($title);
+$user_details = $container->user_details;
+$role_id = $user_details['group_id'];
+$role_name = $user_details['group_name'];
+if (isset($_SESSION['tracker_user_groups'])) {
+    $tracker_user_groups = $_SESSION['tracker_user_groups'];
+    $role_name = $tracker_user_groups[$tracker_id]['session_group'];
+}
+$tracker_user_groups = @$_SESSION['tracker_user_groups'];
+$session_group = @$tracker_user_groups[$tracker_id]['session_group'];
+$container = new Container('msg');
+
+$configContainer = $session->getSession('config');
+$allowedFileSize=$configContainer->config['importFileSize'];
+//echo $canDelete;
+?>
+<div class="pagebar container-fluid col-md-12">
+    <!-- Sidebar Toggle -->
+    <button type="button" class="pagebar-toggle navbar-toggle pull-left">
+      <span class="pagebar-arrow"></span>
+    </button>
+    <ol class="breadcrumb">
+        <li><a href="/"><span>Dashboard</span></a></li>
+        <li class="active"><span><?php echo $this->escapeHtml($title); ?></span></li>
+    </ol>
+</div>
+<div class="card">
+    <div class="card-body">
+        <?php $flashMessage = $this->flashMessenger()->getMessages();
+            if (count($flashMessage)) {
+               echo '<div class="alert alert-dismissable alert-success">'.$flashMessage[0]['success'].'<button type="button" class="close" data-dismiss="alert" aria-hidden="true">×</button></div>';
+            }
+        ?>
+        
+        <div class="card card-default mb-2">
+            <div id="alert_deleteRecord"></div>
+            <div class="card-body">
+                <div class="row">
+                    Page Size:
+                    <div class="col-md-1">
+                        <select onchange="onPageSizeChanged()" id="page-size" class="form-control">
+                            <option value="5" selected>5</option>
+                            <option value="10">10</option>
+                            <option value="25">25</option>
+                            <option value="50">50</option>
+                            <option value="100">100</option>
+                            <option value="500">500</option>
+                            <option value="1000">1000</option>
+                        </select>
+                    </div>
+                    
+                    <!-- <div class="ml-auto float-right">
+                        <button type="button" class="btn btn-primary" data-toggle="modal" data-target="#importCsvModal">Import Data</button>
+                        <button type="button" onclick="onBtExport()" class="btn btn-primary">Export Data</button>
+                    </div> -->
+                </div>
+                <div id="myGrid" style="height: 50vh; overflow:hidden;" class="ag-theme-material w-100"></div>
+            </div>
+        </div>
+
+    </div>
+</div>
+
+<div class="modal fade" id="deleteRecordModel" tabindex="-1" role="dialog" aria-labelledby="deleteRecord" aria-hidden="true"> 
+    <div class="modal-dialog modal-dialog-centered" role="document"> 
+        <div class="modal-content"> 
+            <div class="modal-header"> 
+                <h5 class="modal-title" id="exampleModalLongTitle">Delete Confirmation</h5> 
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close"> 
+                    <span aria-hidden="true">&times;</span> 
+                </button> 
+            </div> 
+            <div class="modal-body"> 
+                <div class="form-group row"> 
+                    <label class="col-sm-4 col-form-label">Reason for change<span class="error ml-1">*</span></label> 
+                    <div class="col-sm-7"> 
+                        <textarea id="reason" class="form-control" placeholder="Reason for change." name="addcomment"></textarea>    
+                        <span id="forReason" class="error"></span> 
+                    </div> 
+                </div> 
+            </div> 
+            <div class="modal-footer"> 
+                <button id="reasonfordelete" type="button" class="btn btn-primary">Delete</button> 
+                <button class="btn btn-default" type="button" data-dismiss="modal">Close</button> 
+            </div> 
+        </div> 
+    </div>  
+</div>
+
+ <?php 
+    $this->inlineScript()->appendFile($this->basePath() . '/js/module/tracker/importCsv.js', 'text/javascript');
+ ?> 
+
+<?php if ($role_id == 1) {
+    ?>
+<style>
+    th, td { white-space: nowrap; }
+    div.dataTables_wrapper {
+        /*width: 800px;*/
+        margin: 0 auto;
+    }
+</style>
+<?php } else { ?>
+<style>
+    th, td { white-space: nowrap; }
+    div.dataTables_wrapper {
+        /*width: 1100px;*/
+        margin: 0 auto;
+    }
+</style>
+<?php } ?>
+
+ <script type="text/javascript" charset="utf-8">
+    // specify the columns agNumberColumnFilter
+    var columnDefs = [
+        // {headerName: "Action", field: "actionId", filter:false},
+        // {headerName: "Record ID", field: "import_csv_id", sort: 'desc', suppressMenu:true, filter: 'agTextColumnFilter', filterParams: { applyButton: true, clearButton:true}},
+        // {headerName: "Product Name", field: "product_name", suppressMenu:true, filter: 'agTextColumnFilter', filterParams: { apply: true }},
+        // {headerName: "Country", field: "country", suppressMenu:true, filterParams: { applyButton: true }},
+        // {headerName: "Period (ddMMMyyyy - ddMMMyyyy)", field: "period", headerTooltip: "Period (ddMMMyyyy - ddMMMyyyy)", filterParams: { applyButton: true }},
+
+        // {headerName: "Data Lock Point", field: "data_lock_point", suppressMenu:true, filterParams: { applyButton: true }},
+        // {headerName: "Deadline for Submission", field: "deadline_for_submission", suppressMenu:true, filterParams: { applyButton: true }},
+        // {headerName: "Submission Type", field: "submission_type", suppressMenu:true, filterParams: { applyButton: true }},
+        // {headerName: "Reason for Submission", field: "reason_for_submission", suppressMenu:true, filterParams: { applyButton: true }},
+        // {headerName: "Period Covered (Months)", field: "period_coverd_months", suppressMenu:true, filterParams: { applyButton: true }},
+        // {headerName: "Responsible Person", field: "responsible_person", suppressMenu:true, filterParams: { applyButton: true }},
+        // {headerName: "Clinical Expert Statement", field: "clinical_expert_statement", suppressMenu:true, filterParams: { applyButton: true }},
+        // {headerName: "Report Type", field: "report_type", suppressMenu:true, unSortIcon: true},
+        // {headerName: "Report Number", field: "report_number", suppressMenu:true, unSortIcon: true},
+        //     {headerName: "Report Number", field: "report_number", suppressMenu:true, //comparator:
+        //     {headerName: "Report Number1", field: "report_number", suppressMenu:true, //comparator: dateComparator
+        //         filter:'agDateColumnFilter', filterParams:{
+        //     comparator:function (filterLocalDateAtMidnight, cellValue){
+        //         var dateAsString = cellValue;
+        //         var dateParts  = dateAsString.split("/");
+        //         var cellDate = new Date(Number(dateParts[2]), Number(dateParts[1]) - 1, Number(dateParts[0]));
+
+        //         if (filterLocalDateAtMidnight.getTime() == cellDate.getTime()) {
+        //             return 0
+        //         }
+
+        //         if (cellDate < filterLocalDateAtMidnight) {
+        //             return -1;
+        //         }
+
+        //         if (cellDate > filterLocalDateAtMidnight) {
+        //             return 1;
+        //         }
+        //     },
+        //     clearButton:true
+        // }
+        //     },
+        
+    ];
+function dateComparator(date1, date2) {
+    var date1Number = monthToComparableNumber(date1);
+    var date2Number = monthToComparableNumber(date2);
+
+    if (date1Number===null && date2Number===null) {
+        return 0;
+    }
+    if (date1Number===null) {
+        return -1;
+    }
+    if (date2Number===null) {
+        return 1;
+    }
+    return date1Number - date2Number;
+}
+
+// eg 29/08/2004 gets converted to 20040829
+function monthToComparableNumber(date) {
+    if (date === undefined || date === null || date.length !== 10) {
+        return null;
+    }
+    var yearNumber = date.substring(6,10);
+    var monthNumber = date.substring(3,5);
+    var dayNumber = date.substring(0,2);
+
+    var result = (yearNumber*10000) + (monthNumber*100) + dayNumber;
+    return result;
+}
+var gridOptions = {
+    defaultColDef: {
+        minWidth: 150,
+       
+    },
+    //floatingFilter:true,
+    columnDefs: columnDefs,
+    rowData: null,
+    enableSorting: true,
+    multiSortKey: 'ctrl',
+    enableFilter: true,
+    rowSelection: 'multiple',
+    animateRows: true,
+    sortingOrder: ['desc','asc',null],
+    //paginationAutoPageSize:true,
+    pagination: true,
+    paginationPageSize: 5,
+    paginationNumberFormatter: function(params) {
+        return params.value.toLocaleString();
+    },
+    enableColResize: true,
+    enableRangeSelection: true,
+    components: {
+        'myCellRenderer': MyCellRenderer
+    }  
+};
+function onPageSizeChanged(newPageSize) {
+    var value = document.getElementById('page-size').value;
+    gridOptions.api.paginationSetPageSize(Number(value));
+}
+
+function getBooleanValue(cssSelector) {
+    return document.querySelector(cssSelector).checked === true;
+}
+
+function onBtExport() {
+    var params = {};
+    gridOptions.api.exportDataAsCsv(params);
+}
+// function to act as a class
+function MyCellRenderer () {}
+// gets called once before the renderer is used
+MyCellRenderer.prototype.init = function(params) {
+    var tracker_id = "<?php echo $tracker_id?>";
+    var form_id = "<?php echo $action_id?>";
+    var canDelete = "<?php echo $canDelete?>";
+    var canEdit = "<?php echo $canEdit?>";
+    var canRead = "<?php echo $canRead?>";
+    // create the cell
+    this.eGui = document.createElement('div');
+    if(canRead!='No') {
+    this.eGui.innerHTML='<a class="btn btn-default btn-sm" aria-label="Left Align" href="/tracker/viewrecord/'+tracker_id+'/'+form_id+'/'+params.value + '">'+'<span class="lnr icon-eye" aria-hidden="true"></span></a>';
+    }
+    if(canEdit!='No') {
+        this.eGui.innerHTML+='<a class="btn btn-default btn-sm" aria-label="Left Align" href="/tracker/editrecord/'+tracker_id+'/'+form_id+'/'+params.value + '">'+'<span class="lnr icon-pencil" aria-hidden="true"></span></a>'; 
+    }
+    if(canDelete!='No') {
+        this.eGui.innerHTML+='<a class="btn btn-default btn-sm" aria-label="Left Align" data-toggle="modal" data-target="#deleteRecordModel" data-link="/tracker/deleteRecordfromform/'+tracker_id+'/'+form_id+'/'+params.value + '" href="#/tracker/deleterecordfromform/'+tracker_id+'/'+form_id+'/'+params.value + '">'+'<span class="lnr icon-trash2" aria-hidden="true"></span></a>';      
+    }
+    
+};
+
+// gets called once when grid ready to insert the element
+MyCellRenderer.prototype.getGui = function() {
+    return this.eGui;
+};
+
+// gets called whenever the user gets the cell to refresh
+// MyCellRenderer.prototype.refresh = function(params) {
+//     // set value into cell again
+//     this.eValue.innerHTML = params.valueFormatted ? params.valueFormatted : params.value;
+//     // return true to tell the grid we refreshed successfully
+//     return true;
+// };
+
+// // gets called when the cell is removed from the grid
+// MyCellRenderer.prototype.destroy = function() {
+//     // do cleanup, remove event listener from button
+//     this.eButton.removeEventListener('click', this.eventListener);
+// };
+
+// setup the grid after the page has finished loading
+document.addEventListener('DOMContentLoaded', function() {
+    var gridDiv = document.querySelector('#myGrid');
+    new agGrid.Grid(gridDiv, gridOptions);
+
+    agGrid.simpleHttpRequest({url: '<?php echo $this->basePath() . '/tracker/getAllColumnName/'.$tracker_id.'/'.$action_id;?>'}).then(function(data) {
+        gridOptions.api.setColumnDefs(data);
+
+    });
+    agGrid.simpleHttpRequest({url: '<?php echo $this->basePath() . '/tracker/fetchAllData/'.$tracker_id.'/'.$action_id;?>'}).then(function(data) {
+        gridOptions.api.setRowData(data);
+
+    });
+
+});
+</script>
+
+<?php

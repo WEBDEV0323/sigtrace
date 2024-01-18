@@ -1,0 +1,201 @@
+<?php 
+use Session\Container\SessionContainer;
+$session = new SessionContainer();
+$userContainer = $session->getSession('user'); 
+$configData = $session->getSession('config');
+$trackerContainer = $session->getSession('tracker');
+if (isset($userContainer->u_id)) {
+    $user_details = $userContainer->user_details;
+    $role_id = $user_details['group_id'];
+}
+$var = $this->layout()->getVariables();
+$app = $this->AppHelper($var);
+
+$forms = isset($app[0]['forms'])?$app[0]['forms']:array();
+$topmenu = isset($app['menu'][0])?$app['menu'][0]:array();
+
+$reports = isset($app[1])?$app[1]:array();
+?>
+<header class="topmenu navbar-expand-xs navbar-expand-lg container-fluid">
+<!-- Main Menu -->
+    <button type="button" class="menu-toggle" data-toggle="collapse" data-target="#navbarSupportedContent">
+      <span class="sr-only">Toggle navigation</span>
+      <span class="icon-bar"></span>
+      <span class="icon-bar"></span>
+      <span class="icon-bar"></span>
+    </button>
+
+    <!-- brand -->
+    <a href="/">
+        <div class="logo-expanded">
+          <i class="lnr icon-biobug"></i>
+          <span class="nav-label logo-bio">BIOCLINICA</span>
+          <span class="nav-label logo-product"><?php echo isset($configData->config['nameOfTrace'])?$configData->config['nameOfTrace']:'TRACE'?></span>
+        </div>
+    </a>
+    <ul class="navbar-nav top-right-menu justify-content-end float-right ml-auto" style="flex-direction: row !important;">
+        <?php if (isset($tracker_id)) { ?>       
+            <?php  if (isset($trackerContainer->tracker_user_groups)) { ?>
+                <li class="nav-item dropdown">
+                    <?php 
+                    $tracker_user_groups = $trackerContainer->tracker_user_groups;
+                    $session_group = isset($tracker_user_groups[$tracker_id]['session_group'])?$tracker_user_groups[$tracker_id]['session_group']:'';
+
+                    if ($role_id != 1) { 
+                    ?>
+                    <a class="nav-link" href="#" id="roleMenuLink" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                        Role : <?php echo $this->translate($session_group) ?>
+                    </a>
+                     <?php } ?>
+                        <ul class="dropdown-menu" aria-labelledby="roleMenuLink">
+                            <?php
+                            $tracker_rel_group = isset($tracker_user_groups[$tracker_id]['groups'])&& is_array($tracker_user_groups[$tracker_id]['groups'])?$tracker_user_groups[$tracker_id]['groups']:array();
+
+                            foreach ($tracker_rel_group as $key => $value) { 
+                                    $group_name = $value['role_name'];
+                                    $group_id = $value['group_id'];
+                                    ?>
+                                <li>
+                                    <a class="dropdown-item" href="javascript:void(0)" onclick="changeSessionRole('<?= $tracker_id; ?>','<?= $group_id; ?>','<?= $group_name; ?>')">
+                                        <?php echo $this->translate($group_name) ?>
+                                    </a>
+                                </li>
+                           <?php } ?>
+                        </ul>
+                    </li>
+            <?php } ?>       
+        <?php } ?>                   
+        <?php if ($role_id == 1) { ?>
+            <li class="nav-item">
+                <a class="nav-link" href="#">Role : <?php echo $this->translate($user_details['group_name']) ?></a>
+            </li>
+        <?php } ?>
+        <li class="nav-item dropdown">
+            <a class="nav-link" href="#" id="dropdownMenuLink" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false" style="padding-right: .75rem!important; padding-left: .75rem!important;">
+              <i class="lnr icon-user"></i>
+            </a>
+            <ul class="dropdown-menu" aria-labelledby="dropdownMenuLink">
+                <li><a class="dropdown-item"><?php echo $this->translate($user_details['email']) ?></a></li>
+                <div class="dropdown-divider"></div>
+              <?php //if ($user_type == 'Normal') { ?>
+                <!--<li><a class="dropdown-item" href="/profile/changepassword">Change Password</a></li>-->
+              <?php //} ?>
+                <li><a class="dropdown-item" href="/auth/logout">Log Out</a></li>
+            </ul>
+        </li>
+        
+    </ul>
+    
+    <div class="collapse navbar-collapse" id="navbarSupportedContent">
+        <ul class="navbar-nav mr-auto top-right-menu">
+            <?php  if(!empty($topmenu)){ ?>
+                <?php foreach($topmenu as $menu){
+                switch($menu['dependent_on']){
+                    case '':
+                        $abc = array();
+                        break;
+                    default:
+                        $abc = explode(',',$menu['dependent_on']);
+                        break;
+                }
+                ?>
+                <?php if (empty($abc) || (count($abc) == 1 && isset(${$abc[0]})) || (count($abc)== 2 && isset(${$abc[0]}) && isset(${$abc[1]}))) { ?>
+            
+                    <?php if ($menu['have_blocks'] == 0 || ($menu['have_blocks'] == 1 && isset($menu['blocks']) && !empty($menu['blocks'])) || ($menu['action_name'] == 'Report' && sizeof($reports) > 0)){ ?>  
+                    <li class="nav-item <?php if(isset($menu['blocks']) && !empty($menu['blocks']) || ($menu['action_name']== 'Report' && sizeof($reports) > 0)){ ?>dropdown<?php } ?>">
+                        <a
+                           <?php if($menu['action_url'] == ''){  ?> href="#" <?php } else{ ?>
+                           href="<?=$menu['action_url'];?>"
+                           <?php } ?>
+                            
+                           <?php if(isset($menu['blocks']) && !empty($menu['blocks']) || ($menu['action_name']== 'Report' && sizeof($reports) > 0)){ ?>
+                           class="nav-link dropdown-toggle" role="button" aria-haspopup="true" aria-expanded="false" data-toggle="dropdown" id="<?=$menu['action_label'];?>"
+                           <?php } else { ?> class="nav-link" <?php } ?>>
+                            <?php if (strtolower($menu['action_label']) == 'settings'){ ?>
+                            <i class="lnr icon-cog"></i>    
+                            <?php } else { ?>
+                            <?=$menu['action_label'];?>
+                            <?php } ?>
+                        </a>
+                        <?php 
+                        if (($menu['action_name'] == 'Report' && sizeof($reports) > 0)) { ?>
+                            <ul class="dropdown-menu" aria-labelledby="<?=$menu['action_label'];?>">
+                                <?php foreach ($reports as $key => $value) {
+                                    $report_name = $value['report_name'];
+                                    $report_id = $value['report_id']?>
+                                    <li>
+                                        <a class="dropdown-item" href="/report/filter/<?=$tracker_id;?>/<?=$form_id;?>/<?=$report_id;?>">
+                                            <?=$report_name;?>
+                                        </a>
+                                    </li>
+                                <?php } ?>
+                            </ul>
+                        <?php } else if (isset($menu['blocks']) && !empty($menu['blocks'])) { ?>
+                            <ul class="dropdown-menu" aria-labelledby="<?=$menu['action_label'];?>">
+                                <?php foreach($menu['blocks'] as $block){ ?>
+                                    <?php if($block['action_name'] == 'forms_management'){ ?>
+                                            <?php foreach ($forms as $key => $value) { ?>
+                                                <li>
+                                                    <a class="dropdown-item" href="/dashboard/<?=$tracker_id;?>/<?=$value['form_id'];?>">
+                                                    <?=$value['form_name'];?>
+                                                    </a>
+                                                </li>
+                                            <?php } ?>
+                                    <?php } else { ?>
+                                                <li <?php if(isset($block['blocks']) && !empty($block['blocks'])) { ?> class="dropdown-submenu" <?php } ?>>
+                                                    <a 
+                                                        <?php if(isset($block['blocks']) && !empty($block['blocks'])) { ?>
+                                                        class="dropdown-item dropdown-toggle" role="button" aria-haspopup="true" aria-expanded="false" data-toggle="dropdown" id="<?=$block['action_label'];?>"
+                                                        <?php } else { ?> class="dropdown-item" <?php } ?>
+
+                                                        <?php if($block['action_url'] == ''){  ?>
+                                                            href="#"
+                                                        <?php } else {
+                                                            $tailUrl = '';
+                                                             if(!empty($block['dependent_on']) && $block['dependent_on'] != ''){
+                                                                    $cdf = explode(",",$block['dependent_on']);
+                                                                    if(sizeof($cdf) == 2){
+                                                                        for($i=0; count($cdf)>$i; $i++){if(isset(${$cdf[$i]})){$tailUrl .= "/".${$cdf[$i]};}}    
+                                                                    }else { $tailUrl .= "/".${$block['dependent_on']}; }
+                                                            ?>
+                                                            href="<?=$block['action_url'].$tailUrl;?>"
+                                                        <?php } }?> 
+                                                        ><?=$block['action_label']?>
+                                                    </a>
+                                                    <?php if(isset($block['blocks']) && !empty($block['blocks'])) { ?>
+                                                    <ul class="dropdown-menu" aria-labelledby="<?=$block['action_label'];?>">
+                                                        <?php foreach($block['blocks'] as $b){ ?>
+                                                            <li>
+                                                                <a class="dropdown-item" 
+                                                                   <?php if($b['action_url'] == ''){  ?>
+                                                                    href="#"
+                                                                   <?php } else {
+                                                                        $nTailUrl = '';
+                                                                        if(!empty($b['dependent_on']) && $b['dependent_on'] != ''){
+                                                                            $cdf = explode(",",$b['dependent_on']);
+                                                                        if(sizeof($cdf) == 2){
+                                                                            for($i=0; count($cdf)>$i; $i++){if(isset(${$cdf[$i]})){$nTailUrl .= "/".${$cdf[$i]};}}    
+                                                                        } else { $nTailUrl .= "/".${$b['dependent_on']}; }
+                                                                    ?>
+                                                                    href="<?=$b['action_url'].$nTailUrl;?>"
+                                                                    <?php } }?> 
+                                                                ><?=$b['action_label']?>
+                                                                </a>
+                                                            </li>
+                                                        <?php } ?>
+                                                    </ul>  
+                                                    <?php } ?>
+                                                </li>
+                                        <?php } ?>
+                                    <?php } ?>
+                            </ul>
+                        <?php } ?>
+                    </li>
+                    <?php } ?>
+                <?php } ?>
+            <?php } ?>
+          <?php } ?>
+        </ul>
+    </div>
+    
+</header>

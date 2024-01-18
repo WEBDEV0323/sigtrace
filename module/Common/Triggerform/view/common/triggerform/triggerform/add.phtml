@@ -1,0 +1,133 @@
+<?php 
+
+$forms = $trackerResults['forms'];
+$trackerDetails = $trackerResults['tracker_details'];
+$trackerName = $trackerDetails['name'];
+$title = "$trackerName - Trigger Form";
+$this->headTitle($title);
+?>
+
+<div class="pagebar container-fluid col-md-12">
+    <!-- Sidebar Toggle -->
+    <button type="button" class="pagebar-toggle navbar-toggle pull-left">
+      <span class="pagebar-arrow"></span>
+    </button>
+    <ol class="breadcrumb">
+        <li><span>Settings</span></li>
+        <li><span>Tracker Settings</span></li>
+        <li><span><a href="/triggerform/trigger_form/<?php echo $trackerId;?>">Trigger Form</a></span></li>
+        <li class="active"><span>Add Trigger Form</span></li>
+    </ol>
+</div>
+<div class="card">
+    <div class="card-body">
+        <div class="card">
+            <div  class="card-header"><h6>Add Trigger Form</h6></div>
+            <div class="card-body"> 
+                <div class="form-group row">
+                    <label class="col-sm-4"></label>
+                    <div id="triggerErrorMessages" class="error col-sm-6"></div>
+                </div>
+                <?php echo $this->form()->openTag($form); ?>
+                <?php echo $this->formElement($form->get('c_hidden')); ?>
+                <?php echo $this->formElement($form->get('c_flag')); ?>
+               
+                <div class="form-group row">
+                    <label class="col-sm-4 col-form-label" for="c_name"><?php echo $this->formlabel($form->get('c_name')); ?><span class="error ml-1">*</span></label>
+                    <div class="col-sm-6">
+                        <?php echo $this->formElement($form->get('c_name')); ?>
+                        <div class="error" id="forTriggerName"></div>
+                    </div>
+                </div>
+
+                <div class="form-group row">
+                    <label class="col-sm-4 col-form-label" for="trigger_when"><?php echo $this->formlabel($form->get('trigger_when')); ?><span class="error ml-1">*</span></label>
+                        <div class="col-sm-6">
+                            <select class="form-control" id="trigger_when" name="trigger_when">
+                                <option name="" value="">--Select Trigger When--</option>
+                                <option name="modified" value="modified">Modified</option>
+                                <option name="added" value="added">Added</option>
+                                <option name="deleted" value="deleted">Deleted</option>
+                            </select>
+                        <div class="error" id="forTriggerWhen"></div>
+                    </div>
+                </div>
+
+                <div class="form-group row">
+                    <label class="col-sm-4 col-form-label" for="trigger_then"><?php echo $this->formlabel($form->get('trigger_then')); ?><span class="error ml-1">*</span></label>
+                        <div class="col-sm-6">
+                            <select class="form-control" id="trigger_then" name="trigger_then">
+                                <option name="" value="">--Select Trigger Then--</option>
+                                <option name="modified record" value="modified record">Modified record</option>
+                                <option name="add record" value="add record">Add record</option>
+                                <option name="delete record" value="delete record">Delete record</option>
+                            </select>
+                        <div class="error" id="forTriggerThen"></div>
+                    </div>
+                </div>
+
+                <div class="form-group row">
+                    <label class="col-sm-4 col-form-label" for="source"><?php echo $this->formlabel($form->get('source')); ?><span class="error ml-1">*</span></label>
+                        <div class="col-sm-6">
+                            <select class="form-control" id="source" name="source">
+                                <option name="" value="">--Select Trigger Source--</option>
+                                <option name="199" value="199">Signal Detection</option>
+                                <option name="200" value="200">Validation And Assessment</option>
+                                <option name="201" value="201">siganl123</option>
+                            </select>
+                        <div class="error" id="forSource"></div>
+                    </div>
+                </div>
+
+                <div class="form-group row">
+                    <label class="col-sm-4 col-form-label" for="destination"><?php echo $this->formlabel($form->get('destination')); ?><span class="error ml-1">*</span></label>
+                        <div class="col-sm-6">
+                            <select class="form-control" id="destination" name="destination">
+                                <option name="" value="">--Select Trigger Destination--</option>
+                                <option name="199" value="199">Signal Detection</option>
+                                <option name="200" value="200">Validation And Assessment</option>
+                                <option name="201" value="201">siganl123</option>
+                            </select>
+                        <div class="error" id="forDestination"></div>
+                    </div>
+                </div>
+
+                <div class="form-group row">
+                    <label class="col-sm-4 col-form-label" for="when_conditions"><?php echo $this->formlabel($form->get('when_conditions')); ?><span class="error ml-1">*</span></label>
+                    <div class="col-sm-6">
+                        <textarea id="when_conditions" class="form-control" placeholder="Trigger When Condition" name="when_conditions"></textarea>
+                        <div class="error" id="forWhenCondition"></div>
+                    </div>
+                </div>
+
+                <div class="form-group row">
+                    <label class="col-sm-4 col-form-label" for="fields_to_copy"><?php echo $this->formlabel($form->get('fields_to_copy')); ?><span class="error ml-1">*</span></label>
+                    <div class="col-sm-6">
+                        <textarea id="fields_to_copy" class="form-control" placeholder="Trigger Fields to Copy" name="fields_to_copy"></textarea>
+                        <div class="error" id="forFieldsToCopy"></div>
+                    </div>
+                </div>
+
+                <div class="form-group row">
+                    <label class="col-sm-4 col-form-label">Reason for change<span class="error ml-1">*</span></label>
+                    <div class="col-sm-6">
+                       <textarea id="reason" class="form-control" placeholder="Reason for change" name="addcomment"></textarea>
+                       <div id="forReason" class="error"></div>
+                    </div>
+                </div>
+                <div class="card-footer">
+                    <div class="form-group row">
+                        <?php if ($triggerId == 0) { ?>
+                        <div class="offset-sm-4">
+                            <button id ="savebtn" type="button" class="btn btn-primary ml-2" onclick="addEditTrigger('<?php echo $triggerId; ?>', '<?php echo $trackerId; ?>')">Save</button>
+                            <button onclick="window.location.href='/triggerform/trigger_form/<?php echo $trackerId ?>'" type="button" class="btn btn-default">Cancel</button>
+                        </div>
+                        <?php } ?>
+                    </div>
+                </div>
+                <?php echo $this->form()->closeTag($form); ?>
+            </div>
+        </div>
+    </div>
+</div>
+<?php $this->inlineScript()->appendFile($this->basePath() . '/js/module/common/triggerform/trigger_form.js');

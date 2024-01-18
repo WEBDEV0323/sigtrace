@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<phpunit bootstrap="Bootstrap.php" colors="true" stderr="true">
+    <testsuites>
+        <testsuite name="ASRTrace">
+            <directory>./TrackerTest</directory>
+            <!-- <exclude>./TrackerTest/Controller/TrackerControllerTest.php</exclude> -->
+           <!--  <exclude>./TrackerTest/Controller/AwsControllerTest.php</exclude> -->
+        </testsuite>
+    </testsuites>
+    <filter>
+        <whitelist>    
+            <directory suffix=".php">../src/Tracker/Model</directory>
+            <directory suffix=".php">../src/Tracker/Controller</directory>
+        </whitelist>
+        
+    </filter>
+    
+    <logging>
+        <log type="coverage-html" target="../../../../test/unittest/code_coverage/Tracker" lowUpperBound="40" highLowerBound="80" />
+    </logging>
+</phpunit>

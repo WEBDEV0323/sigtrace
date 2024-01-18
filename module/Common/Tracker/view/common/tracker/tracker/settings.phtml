@@ -1,0 +1,107 @@
+<?php
+$tracker_details = $trackerResults['tracker_details'];
+$forms = $trackerResults['forms'];
+$tracker_name = $tracker_details['name'];
+$title = "$tracker_name Tracker";
+$this->headTitle($title);
+?>
+
+<div class="pagebar container-fluid col-md-12">
+    <!-- Sidebar Toggle -->
+    <button type="button" class="pagebar-toggle navbar-toggle pull-left">
+      <span class="pagebar-arrow"></span>
+    </button>
+    <ol class="breadcrumb">
+      <li class="active"><span><?php echo $this->escapeHtml($title); ?></span></li>
+    </ol>
+</div>
+
+<div class="card">
+    <div class="card-body">
+            <div class="card">
+                <div class="card-body">
+                    <div  class="clearfix">
+                        <b>Settings</b>
+                    </div>    
+                    <hr/>
+                    <div class="row">
+                        <div aria-label="..." role="group" class="btn-group mx-1 mb-2">
+                            <a href="<?php echo $this->url('user', array('action' => 'user_management', 'tracker_id' => $tracker_id)) ?>">
+                                <button class="btn btn-default" type="button"><span aria-hidden="true" class="lnr icon-cog"></span><br>User Management</button>
+                            </a>
+                        </div>
+                        <div aria-label="..." role="group" class="btn-group mx-1 mb-2">
+                            <a href="<?php echo $this->url('role', array('action' => 'role_management', 'tracker_id' => $tracker_id)) ?>">
+                                <button class="btn btn-default" type="button"><span aria-hidden="true" class="lnr icon-cog"></span><br>Role Management</button>
+                            </a>
+                        </div>
+                        <div aria-label="..." role="group" class="btn-group mx-1 mb-2">
+                            <a href="<?php echo $this->url('codelist', array('action' => 'codelist_management', 'tracker_id' => $tracker_id)) ?>">
+                                <button class="btn btn-default" type="button"><span aria-hidden="true" class="lnr icon-cog"></span><br>Code List Management</button>
+                            </a>
+                        </div>
+                        <div aria-label="..." role="group" class="btn-group mx-1 mb-2">
+                            <a href="<?php echo $this->url('access', array('action' => 'access_settings', 'tracker_id' => $tracker_id)) ?>">
+                                <button class="btn btn-default" type="button"><span aria-hidden="true" class="lnr icon-cog"></span><br>Access settings</button>
+                            </a>
+                        </div>
+                        <div aria-label="..." role="group" class="btn-group mx-1 mb-2">
+                            <a href="<?php echo $this->url('email', array('action' => 'index', 'tracker_id' => $tracker_id)) ?>">
+                                <button class="btn btn-default" type="button"><span aria-hidden="true" class="lnr icon-cog"></span><br>Notification Settings</button>
+                            </a>
+                        </div>
+                        
+<!--                        <div aria-label="..." role="group" class="btn-group mx-1 mb-2">
+                            <a href="<?php echo $this->url('tracker', array('action' => 'default_report_setting', 'tracker_id' => $tracker_id)) ?>">
+                                <button class="btn btn-default" type="button"><span aria-hidden="true" class="lnr icon-cog"></span><br>Default Report Setting</button>
+                            </a>
+                        </div>-->
+                        <div aria-label="..." role="group" class="btn-group mx-1 mb-2">
+                            <a href="<?php echo $this->url('access', array('action' => 'form_access_settings', 'tracker_id' => $tracker_id)) ?>">
+                                <button class="btn btn-default" type="button"><span aria-hidden="true" class="lnr icon-cog"></span><br>Form Access Setting</button>
+                            </a>
+                        </div>
+                        <div aria-label="..." role="group" class="btn-group mx-1 mb-2">
+                            <a href="<?php echo $this->url('tracker', array('action' => 'report_access_setting', 'tracker_id' => $tracker_id)) ?>">
+                                <button class="btn btn-default" type="button"><span aria-hidden="true" class="lnr icon-cog"></span><br>Report Access Setting</button>
+                            </a>
+                        </div>
+<!--                        <div aria-label="..." role="group" class="btn-group mx-1 mb-2">
+                            <a href="<?php echo $this->url('tracker', array('action' => 'report_export_setting', 'tracker_id' => $tracker_id)) ?>">
+                                <button class="btn btn-default" type="button"><span aria-hidden="true" class="lnr icon-cog"></span><br>Report Export Setting</button>
+                            </a>
+                        </div>  <div aria-label="..." role="group" class="btn-group mx-1 mb-2">
+                            <a href="<?php echo $this->url('tracker', array('action' => 'export_tracker', 'tracker_id' => $tracker_id)) ?>">
+                                <button class="btn btn-default" type="button"><span aria-hidden="true" class="lnr icon-cog"></span><br>Export Tracker</button>
+                            </a>
+                        </div>
+                        <div aria-label="..." role="group" class="btn-group mx-1 mb-2">
+                            <a href="<?php echo $this->url('report', array('action' => 'create-report', 'id' => $tracker_id)) ?>">
+                                <button class="btn btn-default" type="button"><span aria-hidden="true" class="lnr icon-cog"></span><br>Setup Report</button>
+                            </a>
+                        </div>-->
+                        <div aria-label="..." role="group" class="btn-group mx-1 mb-2">
+                            <a href="<?php echo $this->url('workflow', array('action' => 'settings', 'tracker_id' => $tracker_id)) ?>">
+                                <button class="btn btn-default" type="button"><span aria-hidden="true" class="lnr icon-cog"></span><br>Workflow Settings</button>
+                            </a>
+                        </div>
+                        <div aria-label="..." role="group" class="btn-group mx-1 mb-2">
+                            <a href="<?php echo $this->url('tracker', array('action' => 'parameterized_tracker', 'tracker_id' => $tracker_id)) ?>">
+                                <button class="btn btn-default" type="button"><span aria-hidden="true" class="lnr icon-cog"></span><br>Audit Log</button>
+                            </a>
+                        </div>
+<!--                        <div aria-label="..." role="group" class="btn-group mx-1 mb-2">
+                            <a href="<?php echo $this->url('tracker', array('action' => 'tracker_date_setting', 'tracker_id' => $tracker_id)) ?>">
+                                <button class="btn btn-default" type="submit"><span aria-hidden="true" class="lnr icon-cog"></span><br>Tracker Date Setting</button>
+                            </a>
+                        </div>
+                        <div aria-label="..." role="group" class="btn-group mx-1 mb-2">
+                            <a href="<?php echo $this->url('tracker', array('action' => 'search_setting', 'tracker_id' => $tracker_id)) ?>">
+                                <button class="btn btn-default" type="submit"><span aria-hidden="true" class="lnr icon-cog"></span><br>Search Setting</button>
+                            </a>
+                        </div>-->
+                    </div>
+                </div>
+            </div>
+    </div>
+</div>

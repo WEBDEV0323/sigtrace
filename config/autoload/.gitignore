@@ -1,0 +1,4 @@
+global.php
+local.php
+*.local.php
+
